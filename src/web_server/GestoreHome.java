@@ -5,6 +5,9 @@ import fi.iki.elonen.NanoHTTPD.Method;
 import fi.iki.elonen.NanoHTTPD.Response;
 import controller.Controller;
 import dto.Conto;
+import dto.Operazione;
+import dto.Transazione;
+import dto.Trasferimento;
 
 import java.util.List;
 
@@ -19,6 +22,7 @@ public class GestoreHome extends BaseGestorePagina {
         return "/home".equals(uri) || 
                "/api/bilancio".equals(uri) || 
                "/api/conti".equals(uri) ||
+               "/api/operazioni".equals(uri) ||
                "/logout".equals(uri);
     }
     
@@ -33,8 +37,10 @@ public class GestoreHome extends BaseGestorePagina {
             return handleBalance();
         } else if ("/api/conti".equals(uri) && method == Method.GET) {
             return handleAccounts();
+        } else if ("/api/operazioni".equals(uri) && method == Method.GET) {
+            return handleOperazioni();
         } else if ("/logout".equals(uri) && method == Method.GET) {
-            return handleLogout(session); // Aggiungi gestione richiesta logout
+            return handleLogout(session);
         }
         
         return createResponse(Response.Status.NOT_FOUND, "text/plain", "Risorsa non trovata");
@@ -103,6 +109,65 @@ public class GestoreHome extends BaseGestorePagina {
             e.printStackTrace();
             return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
                 "{\"error\": \"Errore durante il recupero dei conti: " + e.getMessage() + "\"}");
+        }
+    }
+
+    private Response handleOperazioni() {
+        try {
+            Operazione[] operazioni = controller.getUltimeOperazioni();
+            
+            StringBuilder jsonBuilder = new StringBuilder("[");
+            for (int i = 0; i < operazioni.length; i++) {
+                Operazione operazione = operazioni[i];
+                
+                String tipo;
+                String categoria;
+                String nomeConto = ""; // Dovrai implementare un metodo per ottenere il nome del conto
+                
+                if (operazione instanceof Transazione) {
+                    Transazione transazione = (Transazione) operazione;
+                    tipo = transazione.getCategoria().getTipo().toString(); // "Guadagno" o "Spesa"
+                    categoria = transazione.getCategoria().getNome();
+                    
+                    // Trova il nome del conto per questa transazione
+                    for (Conto conto : controller.getConti()) {
+                        if (conto.getTransazioni().contains(transazione)) {
+                            nomeConto = conto.getNome();
+                            break;
+                        }
+                    }
+                } else if (operazione instanceof Trasferimento) {
+                    tipo = "Trasferimento";
+                    categoria = "Trasferimento";
+                    nomeConto = "Trasferimento"; // Per ora, poi vedremo come gestirlo meglio
+                } else {
+                    tipo = "Sconosciuto";
+                    categoria = "Sconosciuto";
+                    nomeConto = "Sconosciuto";
+                }
+                
+                // Formatta la data
+                String dataFormattata = operazione.getData().toString().substring(0, 10); // YYYY-MM-DD
+                
+                jsonBuilder.append(String.format(java.util.Locale.US, 
+                    "{\"id\": %d, \"data\": \"%s\", \"conto\": \"%s\", \"categoria\": \"%s\", \"tipo\": \"%s\", \"importo\": %.2f, \"descrizione\": \"%s\"}",
+                    operazione.getID(), dataFormattata, nomeConto, categoria, tipo, 
+                    operazione.getImporto(), operazione.getDescrizione()));
+                
+                if (i < operazioni.length - 1) {
+                    jsonBuilder.append(",");
+                }
+            }
+            jsonBuilder.append("]");
+            
+            String json = jsonBuilder.toString();
+            
+            Response response = createResponse(Response.Status.OK, "application/json", json);
+            return addNoCacheHeaders(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
+                "{\"error\": \"Errore durante il recupero delle operazioni: " + e.getMessage() + "\"}");
         }
     }
 

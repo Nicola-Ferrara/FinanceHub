@@ -3,6 +3,9 @@ package controller;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 
 import db_connection.*;
@@ -126,6 +129,36 @@ public class Controller {
 
     public LinkedList<Conto> getConti() {
         return utente.getConti();
+    }
+
+    public Operazione[] getUltimeOperazioni() {
+        ArrayList<Operazione> tutteLeOperazioni = new ArrayList<>();
+        ArrayList<Integer> trasferimentiGiaAggiunti = new ArrayList<>();
+        for (Conto conto : utente.getConti()) {
+            if (conto.getTransazioni() != null) {
+                tutteLeOperazioni.addAll(conto.getTransazioni());
+            }
+            if (conto.getTrasferimenti() != null) {
+                for (Trasferimento trasferimento : conto.getTrasferimenti()) {
+                    if (!trasferimentiGiaAggiunti.contains(trasferimento.getID())) {
+                        tutteLeOperazioni.add(trasferimento);
+                        trasferimentiGiaAggiunti.add(trasferimento.getID());
+                    }
+                }
+            }
+        }
+        Collections.sort(tutteLeOperazioni, new Comparator<Operazione>() {
+            @Override
+            public int compare(Operazione o1, Operazione o2) {
+                return o2.getData().compareTo(o1.getData());
+            }
+        });
+        int dimensione = Math.min(10, tutteLeOperazioni.size());
+        Operazione[] ultimeDieciOperazioni = new Operazione[dimensione];
+        for (int i = 0; i < dimensione; i++) {
+            ultimeDieciOperazioni[i] = tutteLeOperazioni.get(i);
+        }
+        return ultimeDieciOperazioni;
     }
 
     public static void main(String[] args) {

@@ -10,15 +10,7 @@ const annoCorrente = now.getFullYear();
 // Variabili globali per i dati del bilancio
 let chartInstance = null;
 
-// Aggiorna il titolo del bilancio con il mese corrente
-document.addEventListener("DOMContentLoaded", function() {
-    const balanceTitle = document.getElementById("balanceTitle");
-    if (balanceTitle) {
-        balanceTitle.textContent = `Bilancio ${meseCorrente} ${annoCorrente}`;
-    }
-});
-
-// Funzione per recuperare i dati dal server
+// Funzione per recuperare i dati del bilancio dal server
 async function fetchBilancio() {
     try {
         const response = await fetch("/api/bilancio");
@@ -74,6 +66,7 @@ function createOrUpdateChart(entrate, uscite) {
     });
 }
 
+// Funzione per recuperare i conti dal server
 async function fetchConti() {
     try {
         const response = await fetch("/api/conti");
@@ -105,54 +98,89 @@ async function fetchConti() {
     }
 }
 
-// Chiamata iniziale per recuperare i dati
-fetchBilancio();
-fetchConti();
+// Funzione per recuperare le operazioni dal server
+async function fetchOperazioni() {
+    try {
+        const response = await fetch("/api/operazioni");
+        if (!response.ok) {
+            throw new Error("Errore durante il recupero delle operazioni");
+        }
 
-// Carica la lista dei conti
-const accountsList = document.getElementById("accountsList");
-accounts.forEach(account => {
-    const li = document.createElement("li");
-    li.textContent = `${account.nome}: ${account.saldo} €`;
-    accountsList.appendChild(li);
-});
+        const operazioni = await response.json();
+        
+        // Carica la lista delle operazioni
+        const transactionsList = document.getElementById("transactionsList");
+        transactionsList.innerHTML = ""; // Pulisci la lista prima di aggiungere nuovi elementi
+        
+        if (operazioni.length === 0) {
+            const li = document.createElement("li");
+            li.textContent = "Nessuna operazione disponibile";
+            transactionsList.appendChild(li);
+        } else {
+            operazioni.forEach(operazione => {
+                const li = document.createElement("li");
 
-// Simulazione dati transazioni (da sostituire con una chiamata al server)
-const transactions = [
-    { data: "2025-07-01", conto: "Conto Corrente", categoria: "Spesa Alimentare", importo: -50 },
-    { data: "2025-07-02", conto: "Conto Risparmi", categoria: "Stipendio", importo: 1500 },
-    { data: "2025-07-03", conto: "Conto Corrente", categoria: "Abbonamento Palestra", importo: -30 },
-    { data: "2025-07-04", conto: "Conto Corrente", categoria: "Vendita Usato", importo: 200 },
-];
+                // Indicatore di tipo (spesa, guadagno o trasferimento)
+                const indicator = document.createElement("div");
+                indicator.classList.add("transaction-indicator");
+                
+                // Determina il colore in base al tipo
+                if (operazione.tipo === "Guadagno") {
+                    indicator.classList.add("income");
+                } else if (operazione.tipo === "Spesa") {
+                    indicator.classList.add("expense");
+                } else if (operazione.tipo === "Trasferimento") {
+                    indicator.classList.add("transfer");
+                }
 
-// Carica la lista delle transazioni
-const transactionsList = document.getElementById("transactionsList");
-transactions.forEach(transaction => {
-    const li = document.createElement("li");
+                // Dettagli dell'operazione
+                const details = document.createElement("div");
+                details.classList.add("transaction-details");
+                details.innerHTML = `
+                    <span>${operazione.descrizione}</span>
+                    <span class="transaction-date">${operazione.data}</span>
+                    <span class="transaction-category">${operazione.categoria} - ${operazione.conto}</span>
+                `;
 
-    // Indicatore di tipo (spesa o guadagno)
-    const indicator = document.createElement("div");
-    indicator.classList.add("transaction-indicator");
-    indicator.classList.add(transaction.importo < 0 ? "expense" : "income");
+                // Importo dell'operazione
+                const amount = document.createElement("span");
+                amount.classList.add("transaction-amount");
+                
+                if (operazione.tipo === "Guadagno") {
+                    amount.classList.add("income");
+                    amount.textContent = `+${operazione.importo.toFixed(2)} €`;
+                } else if (operazione.tipo === "Spesa") {
+                    amount.classList.add("expense");
+                    amount.textContent = `-${operazione.importo.toFixed(2)} €`;
+                } else if (operazione.tipo === "Trasferimento") {
+                    amount.classList.add("transfer");
+                    amount.textContent = `${operazione.importo.toFixed(2)} €`;
+                }
 
-    // Dettagli della transazione
-    const details = document.createElement("div");
-    details.classList.add("transaction-details");
-    details.innerHTML = `
-        <span>${transaction.conto}</span>
-        <span class="transaction-date">${transaction.data}</span>
-        <span class="transaction-category">${transaction.categoria}</span>
-    `;
+                // Aggiungi gli elementi alla lista
+                li.appendChild(indicator);
+                li.appendChild(details);
+                li.appendChild(amount);
+                transactionsList.appendChild(li);
+            });
+        }
+    } catch (error) {
+        console.error("Errore:", error);
+        const transactionsList = document.getElementById("transactionsList");
+        transactionsList.innerHTML = "<li>Errore durante il caricamento delle operazioni</li>";
+    }
+}
 
-    // Importo della transazione
-    const amount = document.createElement("span");
-    amount.classList.add("transaction-amount");
-    amount.classList.add(transaction.importo < 0 ? "expense" : "income");
-    amount.textContent = `${transaction.importo < 0 ? "-" : "+"} ${Math.abs(transaction.importo)} €`;
-
-    // Aggiungi gli elementi alla lista
-    li.appendChild(indicator);
-    li.appendChild(details);
-    li.appendChild(amount);
-    transactionsList.appendChild(li);
+// Inizializzazione quando il DOM è caricato
+document.addEventListener("DOMContentLoaded", function() {
+    // Aggiorna il titolo del bilancio con il mese corrente
+    const balanceTitle = document.getElementById("balanceTitle");
+    if (balanceTitle) {
+        balanceTitle.textContent = `Bilancio ${meseCorrente} ${annoCorrente}`;
+    }
+    
+    // Carica tutti i dati
+    fetchBilancio();
+    fetchConti();
+    fetchOperazioni();
 });
