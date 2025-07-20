@@ -10,8 +10,7 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
-*.jar
+# Package Files # (exclude JAR files except those in lib folder)
 *.war
 *.nar
 *.ear
@@ -99,10 +98,6 @@ local.properties
 .Trashes
 ehthumbs.db
 Thumbs.db
-
-# Password files and sensitive data
-pwd_DB/
-pwdfile
 
 # Backup files
 *.backup
