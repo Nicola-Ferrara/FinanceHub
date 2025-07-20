@@ -163,7 +163,7 @@ public class Controller {
                 return o2.getData().compareTo(o1.getData());
             }
         });
-        int dimensione = Math.min(10, tutteLeOperazioni.size());
+        int dimensione = Math.min(5, tutteLeOperazioni.size());
         Operazione[] ultimeDieciOperazioni = new Operazione[dimensione];
         for (int i = 0; i < dimensione; i++) {
             ultimeDieciOperazioni[i] = tutteLeOperazioni.get(i);

@@ -297,7 +297,7 @@ async function handleEditAccountSubmit(event) {
             throw new Error('Errore durante la modifica del conto');
         }
         
-        // Chiudi il modale
+        // ✅ SPOSTA LA CHIUSURA DEL MODALE QUI (dopo il successo)
         document.getElementById('editAccountModal').style.display = 'none';
         
         // Ricarica i dati del conto
@@ -309,6 +309,7 @@ async function handleEditAccountSubmit(event) {
     } catch (error) {
         console.error('Errore:', error);
         showErrorMessage('Errore durante la modifica del conto');
+        // Il modale resta aperto in caso di errore
     }
 }
 
@@ -323,15 +324,17 @@ async function handleDeleteAccount() {
             throw new Error('Errore durante l\'eliminazione del conto');
         }
         
-        // Chiudi il modale
+        // ✅ CHIUDI ENTRAMBI I MODALI IMMEDIATAMENTE
         document.getElementById('deleteConfirmModal').style.display = 'none';
+        document.getElementById('editAccountModal').style.display = 'none';
         
-        // Mostra messaggio di successo e reindirizza alla home
+        // Mostra messaggio di successo con notifica elegante
         showSuccessMessage('Conto eliminato con successo!');
         
+        // ✅ REINDIRIZZA IMMEDIATAMENTE (non aspettare 3 secondi)
         setTimeout(() => {
             window.location.href = '/home';
-        }, 1500);
+        }, 500);
         
     } catch (error) {
         console.error('Errore:', error);
@@ -341,9 +344,53 @@ async function handleDeleteAccount() {
 
 // Funzioni per mostrare messaggi
 function showSuccessMessage(message) {
-    alert('✅ ' + message);
+    showNotification(message, 'success');
 }
 
 function showErrorMessage(message) {
-    alert('❌ ' + message);
+    showNotification(message, 'error');
+}
+
+function showNotification(message, type) {
+    // Rimuovi notifiche precedenti
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notif => notif.remove());
+    
+    // Crea la notifica
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span class="notification-icon">${type === 'success' ? '✅' : '❌'}</span>
+            <span class="notification-message">${message}</span>
+            <button class="notification-close">&times;</button>
+        </div>
+    `;
+    
+    // Aggiungi al body
+    document.body.appendChild(notification);
+    
+    // Animazione di entrata
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    // Rimuovi automaticamente dopo 3 secondi
+    setTimeout(() => {
+        hideNotification(notification);
+    }, 3000);
+    
+    // Event listener per chiudere manualmente
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+        hideNotification(notification);
+    });
+}
+
+function hideNotification(notification) {
+    notification.classList.remove('show');
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 300);
 }
