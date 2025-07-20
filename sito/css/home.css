@@ -158,15 +158,21 @@ body {
     padding: 20px;
     border-bottom: 1px solid #f0f0f0;
     font-size: 16px;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease; /* ✅ Cambiato da 'background' a 'all' */
     border-radius: 10px;
     margin-bottom: 10px;
     background: #f8f9fa;
+    cursor: pointer; /* ✅ AGGIUNTO per indicare che è cliccabile */
 }
 
 .accounts-list li:hover {
     background: #e9ecef;
     transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* ✅ AGGIUNTA ombra per feedback visivo */
+}
+
+.accounts-list li:active {
+    transform: translateX(3px) scale(0.98); /* ✅ AGGIUNTO effetto click */
 }
 
 .accounts-list li:last-child {

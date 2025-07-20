@@ -9,15 +9,17 @@ public class Conto {
     private String nome;
     private String tipo;
     private double saldo;
+    private boolean attivo;
     private LinkedList<Transazione> transazioni = new LinkedList<Transazione>();
     private LinkedList<Trasferimento> trasferimenti = new LinkedList<Trasferimento>();
 
     // Costruttore
-    public Conto(int ID, String nome, String tipo, double saldo, LinkedList<Transazione> transazioni, LinkedList<Trasferimento> trasferimenti) {
+    public Conto(int ID, String nome, String tipo, double saldo, boolean attivo, LinkedList<Transazione> transazioni, LinkedList<Trasferimento> trasferimenti) {
         this.ID = ID;
         this.nome = nome;
         this.tipo = tipo;
         this.saldo = saldo;
+        this.attivo = attivo;
         this.transazioni = (transazioni != null) ? transazioni : new LinkedList<>();
         this.trasferimenti = (trasferimenti != null) ? trasferimenti : new LinkedList<>();
     }
@@ -34,6 +36,9 @@ public class Conto {
     }
     public double getSaldo() {
         return saldo;
+    }
+    public boolean getAttivo() {
+        return attivo;
     }
     public LinkedList<Transazione> getTransazioni() {
         return transazioni;
@@ -54,6 +59,9 @@ public class Conto {
     }
     public void setSaldo(double saldo) {
         this.saldo = saldo;
+    }
+    public void setAttivo(boolean attivo) {
+        this.attivo = attivo;
     }
     public void setTransazioni(LinkedList<Transazione> transazioni) {
         this.transazioni = transazioni;

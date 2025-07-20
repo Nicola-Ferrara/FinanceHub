@@ -92,7 +92,7 @@ async function fetchConti() {
         
         // Carica la lista dei conti
         const accountsList = document.getElementById("accountsList");
-        accountsList.innerHTML = ""; // Pulisci la lista prima di aggiungere nuovi elementi
+        accountsList.innerHTML = ""; 
         
         if (accounts.length === 0) {
             const li = document.createElement("li");
@@ -101,6 +101,11 @@ async function fetchConti() {
         } else {
             accounts.forEach(account => {
                 const li = document.createElement("li");
+                
+                li.style.cursor = "pointer";
+                li.addEventListener("click", function() {
+                    window.location.href = `/conti?id=${account.id}`;
+                });
                 
                 const accountInfo = document.createElement("div");
                 accountInfo.className = "account-info";

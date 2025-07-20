@@ -143,12 +143,20 @@ public class GestoreHome extends BaseGestorePagina {
                     String nomeContoMittente = "Sconosciuto";
                     String nomeContoDestinatario = "Sconosciuto";
                     
-                    for (Conto conto : controller.getConti()) {
+                    for (Conto conto : controller.getTuttiConti()) {
                         if (conto.getID() == trasferimento.getIdContoMittente()) {
-                            nomeContoMittente = conto.getNome();
+                            if (conto.getAttivo()) {
+                                nomeContoMittente = conto.getNome();
+                            } else {
+                                nomeContoMittente = conto.getNome() + " (Eliminato)";
+                            }
                         }
                         if (conto.getID() == trasferimento.getIdContoDestinatario()) {
-                            nomeContoDestinatario = conto.getNome();
+                            if (conto.getAttivo()) {
+                                nomeContoDestinatario = conto.getNome();
+                            } else {
+                                nomeContoDestinatario = conto.getNome() + " (Eliminato)";
+                            }
                         }
                     }
                     

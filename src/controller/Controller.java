@@ -92,28 +92,28 @@ public class Controller {
     }
 
     public double calcolaEntrate() {
-        double entrate = 0.0;
-        int meseCorrente = (new Timestamp(System.currentTimeMillis())).toLocalDateTime().getMonthValue();
-        int annoCorrente = (new Timestamp(System.currentTimeMillis())).toLocalDateTime().getYear();
-        for (Conto conto: utente.getConti()) {
-            for (Transazione transazione : conto.getTransazioni()) {
-                if (transazione.getCategoria().getTipo() == Categoria.TipoCategoria.Guadagno) {
-                    int meseTransazione = transazione.getData().toLocalDateTime().getMonthValue();
-                    int annoTransazione = transazione.getData().toLocalDateTime().getYear();
-                    if (meseTransazione == meseCorrente && annoTransazione == annoCorrente) {
-                        entrate += transazione.getImporto();
-                    }
+    double entrate = 0.0;
+    int meseCorrente = (new Timestamp(System.currentTimeMillis())).toLocalDateTime().getMonthValue();
+    int annoCorrente = (new Timestamp(System.currentTimeMillis())).toLocalDateTime().getYear();
+    for (Conto conto: getConti()) { 
+        for (Transazione transazione : conto.getTransazioni()) {
+            if (transazione.getCategoria().getTipo() == Categoria.TipoCategoria.Guadagno) {
+                int meseTransazione = transazione.getData().toLocalDateTime().getMonthValue();
+                int annoTransazione = transazione.getData().toLocalDateTime().getYear();
+                if (meseTransazione == meseCorrente && annoTransazione == annoCorrente) {
+                    entrate += transazione.getImporto();
                 }
             }
         }
-        return entrate;
     }
+    return entrate;
+}
 
     public double calcolaUscite() {
         double uscite = 0.0;
         int meseCorrente = (new Timestamp(System.currentTimeMillis())).toLocalDateTime().getMonthValue();
         int annoCorrente = (new Timestamp(System.currentTimeMillis())).toLocalDateTime().getYear();
-        for (Conto conto: utente.getConti()) {
+        for (Conto conto: getConti()) { 
             for (Transazione transazione : conto.getTransazioni()) {
                 if (transazione.getCategoria().getTipo() == Categoria.TipoCategoria.Spesa) {
                     int meseTransazione = transazione.getData().toLocalDateTime().getMonthValue();
@@ -128,13 +128,23 @@ public class Controller {
     }
 
     public LinkedList<Conto> getConti() {
+        LinkedList<Conto> contiAttivi = new LinkedList<>();
+        for (Conto conto : utente.getConti()) {
+            if (conto.getAttivo()) { // ✅ Filtra solo attivi per la UI
+                contiAttivi.add(conto);
+            }
+        }
+        return contiAttivi;
+    }
+
+    public LinkedList<Conto> getTuttiConti() {
         return utente.getConti();
     }
 
     public Operazione[] getUltimeOperazioni() {
         ArrayList<Operazione> tutteLeOperazioni = new ArrayList<>();
         ArrayList<Integer> trasferimentiGiaAggiunti = new ArrayList<>();
-        for (Conto conto : utente.getConti()) {
+        for (Conto conto : getConti()) {
             if (conto.getTransazioni() != null) {
                 tutteLeOperazioni.addAll(conto.getTransazioni());
             }
@@ -159,6 +169,52 @@ public class Controller {
             ultimeDieciOperazioni[i] = tutteLeOperazioni.get(i);
         }
         return ultimeDieciOperazioni;
+    }
+
+    public Conto getContoById(int id) {
+        for (Conto conto : utente.getConti()) {
+            if (conto.getID() == id) {
+                return conto;
+            }
+        }
+        return null;
+    }
+
+    public Operazione[] getOperazioniConto(int contoId) {
+        Conto conto = getContoById(contoId);
+        if (conto == null) {
+            return new Operazione[0];
+        }    
+        ArrayList<Operazione> operazioni = new ArrayList<>();
+        if (conto.getTransazioni() != null) {
+            operazioni.addAll(conto.getTransazioni());
+        }
+        if (conto.getTrasferimenti() != null) {
+            operazioni.addAll(conto.getTrasferimenti());
+        }
+        Collections.sort(operazioni, new Comparator<Operazione>() {
+            @Override
+            public int compare(Operazione o1, Operazione o2) {
+                return o2.getData().compareTo(o1.getData());
+            }
+        });
+        return operazioni.toArray(new Operazione[0]);
+    }
+
+    public void modificaConto(int id, String nome, boolean attivo, String tipo) {
+        for (Conto conto : utente.getConti()) {
+            if (conto.getID() == id) {
+                conto.setNome(nome);
+                conto.setTipo(tipo);
+                conto.setAttivo(attivo);
+                try {
+                    contoDAO.updateConto(conto);
+                } catch (SQLException e) {
+                    throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER MODIFICARE UN CONTO", e);
+                }
+                return;
+            }
+        }
     }
 
     public static void main(String[] args) {
