@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanceHub - Home</title>
+    <link rel="stylesheet" href="../css/home.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../js/home.js" defer></script>
+</head>
+<body>
+    <header class="header">
+        <h1>Benvenuto <span id="userName">{{nomeCognome}}</span></h1>
+        <form action="/logout" method="get" style="display: inline;">
+            <button type="submit" class="logout-button">Logout</button>
+        </form>
+    </header>
+
+    <main class="main-content">
+        <!-- Bilancio del mese corrente -->
+        <section class="balance-section">
+            <h2 id="balanceTitle">Bilancio</h2>
+            <div class="balance-details">
+                <p>Entrate: <span id="totalIncome">0.00</span> €</p>
+                <p>Uscite: <span id="totalExpenses">0.00</span> €</p>
+                <p>Totale: <span id="netBalance">0.00</span> €</p>
+            </div>
+            <canvas id="balanceChart" class="balance-chart"></canvas>
+        </section>
+
+        <!-- Lista dei conti -->
+        <section class="accounts-section">
+            <h2>Lista dei conti</h2>
+            <ul id="accountsList" class="accounts-list">
+                <!-- I conti verranno caricati dinamicamente -->
+            </ul>
+        </section>
+
+        <section class="transactions-section">
+            <h2>Transazioni</h2>
+            <ul id="transactionsList" class="transactions-list">
+            </ul>
+        </section>
+    </main>
+</body>
+</html>

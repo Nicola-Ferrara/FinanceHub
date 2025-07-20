@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanceHub - Accesso</title>
+    <link rel="stylesheet" href="../css/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <h1>Accedi</h1>
+        <form id="loginForm">
+            <label for="email">Email</label>
+            <input type="text" id="email" name="email" required>
+
+            <label for="password">Password</label>
+            <div class="password-container">
+                <input type="password" id="password" name="password" required>
+                <button type="button" id="togglePassword" class="toggle-password">
+                    <svg xmlns="http://www.w3.org/2000/svg" id="eyeIcon" fill="currentColor" viewBox="0 0 16 16" width="16" height="16">
+                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM8 13c-3.866 0-7-4-7-5s3.134-5 7-5 7 4 7 5-3.134 5-7 5z"/>
+                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM8 9a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div id="error-message" class="error-message"></div>
+
+            <button type="submit">Login</button>
+        </form>
+        <a href="/register" class="register-link">Non sei registrato? Clicca qui!</a>
+    </div>
+
+    <script src="../js/login.js"></script>
+</body>
+</html>

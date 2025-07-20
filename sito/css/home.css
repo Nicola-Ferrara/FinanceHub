@@ -1,0 +1,182 @@
+/* Stile generale */
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f4f4f9;
+    color: #333;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    color: white;
+    padding: 15px 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.logout-button {
+    background: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.logout-button:hover {
+    background: #d32f2f;
+}
+
+/* Main content */
+.main-content {
+    padding: 20px;
+}
+
+/* Bilancio del mese corrente */
+.balance-section {
+    margin-bottom: 30px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.balance-section h2 {
+    margin-top: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.balance-details p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+.balance-chart {
+    margin-top: 20px;
+    max-width: 300px; /* Larghezza massima del grafico */
+    max-height: 300px; /* Altezza massima del grafico */
+    width: 100%; /* Adatta la larghezza al contenitore */
+    height: auto; /* Mantieni le proporzioni */
+    display: block;
+    margin-left: auto;
+    margin-right: auto; /* Centra il grafico */
+}
+
+/* Lista dei conti */
+.accounts-section {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.accounts-section h2 {
+    margin-top: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.accounts-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.accounts-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: 16px;
+}
+
+.accounts-list li:last-child {
+    border-bottom: none;
+}
+
+/* Sezione Transazioni */
+.transactions-section {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-top: 30px;
+}
+
+.transactions-section h2 {
+    margin-top: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.transactions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.transactions-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: 16px;
+}
+
+.transactions-list li:last-child {
+    border-bottom: none;
+}
+
+.transaction-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.transaction-date {
+    font-size: 14px;
+    color: #888;
+}
+
+.transaction-category {
+    font-size: 14px;
+    color: #555;
+}
+
+.transaction-amount {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.transaction-amount.expense {
+    color: #f44336; /* Rosso per le spese */
+}
+
+.transaction-amount.income {
+    color: #4caf50; /* Verde per i guadagni */
+}
+
+.transaction-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.transaction-indicator.expense {
+    background-color: #f44336; /* Rosso per le spese */
+}
+
+.transaction-indicator.income {
+    background-color: #4caf50; /* Verde per i guadagni */
+}
