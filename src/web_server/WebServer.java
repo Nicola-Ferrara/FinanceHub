@@ -7,13 +7,10 @@ import java.util.List;
 
 public class WebServer extends NanoHTTPD {
 
-    private Controller controller;
     private List<GestorePagina> gestori;
 
     public WebServer(Controller controller) throws Exception {
         super(8080);
-        
-        this.controller = controller;
         
         // Inizializza i gestori
         this.gestori = new ArrayList<>();

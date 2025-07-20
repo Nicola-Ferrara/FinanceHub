@@ -57,9 +57,23 @@ public class Conto {
     }
     public void setTransazioni(LinkedList<Transazione> transazioni) {
         this.transazioni = transazioni;
+        for (Transazione transazione : transazioni) {
+            if(transazione.getCategoria().getTipo() == Categoria.TipoCategoria.Guadagno) {
+                saldo += transazione.getImporto();
+            } else if(transazione.getCategoria().getTipo() == Categoria.TipoCategoria.Spesa) {
+                saldo -= transazione.getImporto();
+            }
+        }
     }
     public void setTrasferimenti(LinkedList<Trasferimento> trasferimenti) {
         this.trasferimenti = trasferimenti;
+        for (Trasferimento trasferimento : trasferimenti) {
+            if(trasferimento.getIdContoDestinatario() == this.ID) {
+                saldo += trasferimento.getImporto();
+            } else if(trasferimento.getIdContoMittente() == this.ID) {
+                saldo -= trasferimento.getImporto();
+            }
+        }
     }
 
     // Aggiungi una transazione
@@ -67,11 +81,21 @@ public class Conto {
         if (transazione != null) {
             this.transazioni.add(transazione);
         }
+        if (transazione.getCategoria().getTipo() == Categoria.TipoCategoria.Guadagno) {
+            saldo += transazione.getImporto();
+        } else if (transazione.getCategoria().getTipo() == Categoria.TipoCategoria.Spesa) {
+            saldo -= transazione.getImporto();
+        }
     }
     // Rimuovi una transazione
     public void removeTransazione(Transazione transazione) {
         if (transazione != null) {
             this.transazioni.remove(transazione);
+        }
+        if (transazione.getCategoria().getTipo() == Categoria.TipoCategoria.Guadagno) {
+            saldo -= transazione.getImporto();
+        } else if (transazione.getCategoria().getTipo() == Categoria.TipoCategoria.Spesa) {
+            saldo += transazione.getImporto();
         }
     }
 
@@ -80,11 +104,21 @@ public class Conto {
         if (trasferimento != null) {
             this.trasferimenti.add(trasferimento);
         }
+        if (trasferimento.getIdContoDestinatario() == this.ID) {
+            saldo += trasferimento.getImporto();
+        } else if (trasferimento.getIdContoMittente() == this.ID) {
+            saldo -= trasferimento.getImporto();
+        }
     }
     // Rimuovi un trasferimento
     public void removeTrasferimento(Trasferimento trasferimento) {
         if (trasferimento != null) {
             this.trasferimenti.remove(trasferimento);
+        }
+        if (trasferimento.getIdContoDestinatario() == this.ID) {
+            saldo -= trasferimento.getImporto();
+        } else if (trasferimento.getIdContoMittente() == this.ID) {
+            saldo += trasferimento.getImporto();
         }
     }
 }

@@ -34,26 +34,35 @@ public class Controller {
     }
 
     public boolean effettuaLogin(String email, String password) {
-        try {
-            utente = utenteDAO.getUtente(email, password);
-            if (utente == null) {
-                return false;
-            }
-            utente.setLogOperazioni(logOperazioniDAO.getLogOperazioni(utente.getEmail()));
-            utente.setConti(contoDAO.getConti(utente.getEmail()));
-            utente.setCategorie(categoriaDAO.getCategorie(utente.getEmail()));
-            utente.setTrasferimenti(trasferimentoDAO.getTrasferimenti(utente.getEmail()));
-            for (Conto conto : utente.getConti()) {
-                conto.setTransazioni(transazioneDAO.getTransazioni(conto.getID()));
-                for (Transazione transazione : conto.getTransazioni()) {
-                    transazione.setCategoria(categoriaDAO.getCategoria(transazione.getIdCategoria()));
+    try {
+        utente = utenteDAO.getUtente(email, password);
+        if (utente == null) {
+            return false;
+        }
+        utente.setLogOperazioni(logOperazioniDAO.getLogOperazioni(utente.getEmail()));
+        utente.setConti(contoDAO.getConti(utente.getEmail()));
+        utente.setCategorie(categoriaDAO.getCategorie(utente.getEmail()));
+        //utente.setTrasferimenti(trasferimentoDAO.getTrasferimenti(utente.getEmail()));
+        LinkedList<Trasferimento> trasferimenti = trasferimentoDAO.getTrasferimenti(utente.getEmail());
+        for (Conto conto : utente.getConti()) {
+            for (Trasferimento trasferimento : trasferimenti) {
+                if ((trasferimento.getIdContoMittente() == conto.getID()) || (trasferimento.getIdContoDestinatario() == conto.getID())) {
+                    conto.addTrasferimento(trasferimento);
                 }
             }
-            return true;
-        } catch (SQLException e) {
-            throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER IL RECUPERO DI TUTTI I DATI RIGUARDANTI L'UTENTE", e);
         }
+        for (Conto conto : utente.getConti()) {
+            LinkedList<Transazione> transazioni = transazioneDAO.getTransazioni(conto.getID());
+            for (Transazione transazione : transazioni) {
+                transazione.setCategoria(categoriaDAO.getCategoria(transazione.getIdCategoria()));
+            }
+            conto.setTransazioni(transazioni);
+        }
+        return true;
+    } catch (SQLException e) {
+        throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER IL RECUPERO DI TUTTI I DATI RIGUARDANTI L'UTENTE", e);
     }
+}
 
     public boolean effettuaRegistrazione(String nome, String cognome, String telefono, String email, String password) {
         try {

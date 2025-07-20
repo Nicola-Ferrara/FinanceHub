@@ -10,8 +10,16 @@ const annoCorrente = now.getFullYear();
 // Variabili globali per i dati del bilancio
 let chartInstance = null;
 
+// Aggiorna il titolo del bilancio con il mese corrente
+document.addEventListener("DOMContentLoaded", function() {
+    const balanceTitle = document.getElementById("balanceTitle");
+    if (balanceTitle) {
+        balanceTitle.textContent = `Bilancio ${meseCorrente} ${annoCorrente}`;
+    }
+});
+
 // Funzione per recuperare i dati dal server
-async function fetchBalanceData() {
+async function fetchBilancio() {
     try {
         const response = await fetch("/api/bilancio");
         if (!response.ok) {
@@ -66,7 +74,7 @@ function createOrUpdateChart(entrate, uscite) {
     });
 }
 
-async function fetchAccounts() {
+async function fetchConti() {
     try {
         const response = await fetch("/api/conti");
         if (!response.ok) {
@@ -98,8 +106,8 @@ async function fetchAccounts() {
 }
 
 // Chiamata iniziale per recuperare i dati
-fetchBalanceData();
-fetchAccounts();
+fetchBilancio();
+fetchConti();
 
 // Carica la lista dei conti
 const accountsList = document.getElementById("accountsList");
