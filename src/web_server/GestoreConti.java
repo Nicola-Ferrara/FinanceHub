@@ -60,11 +60,8 @@ public class GestoreConti extends BaseGestorePagina {
                 // Verifica che il conto esista
                 Conto conto = controller.getContoById(contoId);
                 if (conto == null) {
-                    System.out.println("DEBUG: Conto non trovato");
                     return createResponse(Response.Status.NOT_FOUND, "application/json", "{\"error\": \"Conto non trovato\"}");
                 }
-                
-                System.out.println("DEBUG: Conto trovato: " + conto.getNome());
                 
                 // Usa il metodo del controller per eliminare il conto
                 controller.modificaConto(conto.getID(), conto.getNome(), false, conto.getTipo());

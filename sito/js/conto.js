@@ -125,7 +125,6 @@ function displayOperations(operations) {
         } else if (operazione.tipo === "Spesa") {
             indicator.classList.add("expense");
         } else if (operazione.tipo === "Trasferimento") {
-            // Per i trasferimenti, determina se questo conto è mittente o destinatario
             if (operazione.isIncoming) {
                 indicator.classList.add("transfer-in");
             } else {
@@ -153,12 +152,11 @@ function displayOperations(operations) {
             amount.classList.add("expense");
             amount.textContent = `-€${operazione.importo.toFixed(2)}`;
         } else if (operazione.tipo === "Trasferimento") {
-            // Per i trasferimenti, usa verde/rosso in base al segno
             if (operazione.isIncoming) {
-                amount.classList.add("income"); // Verde per trasferimenti in entrata
+                amount.classList.add("income");
                 amount.textContent = `+€${operazione.importo.toFixed(2)}`;
             } else {
-                amount.classList.add("expense"); // Rosso per trasferimenti in uscita
+                amount.classList.add("expense");
                 amount.textContent = `-€${operazione.importo.toFixed(2)}`;
             }
         }
@@ -202,12 +200,10 @@ function setupActionListeners() {
         alert('Funzionalità in fase di sviluppo: Nuovo Trasferimento');
     });
     
-    // Nuovo listener per il bottone modifica conto
     document.getElementById('editAccountBtn').addEventListener('click', () => {
         openEditAccountModal();
     });
     
-    // Listener per chiudere i modali
     setupModalListeners();
 }
 
@@ -238,11 +234,13 @@ function showError(message) {
 
 function setupModalListeners() {
     const editModal = document.getElementById('editAccountModal');
+    const deleteModal = document.getElementById('deleteConfirmModal');
     
     // Chiudi modali cliccando sulla X
     document.querySelectorAll('.close').forEach(closeBtn => {
         closeBtn.addEventListener('click', () => {
             editModal.style.display = 'none';
+            deleteModal.style.display = 'none';
         });
     });
     
@@ -250,6 +248,9 @@ function setupModalListeners() {
     window.addEventListener('click', (event) => {
         if (event.target === editModal) {
             editModal.style.display = 'none';
+        }
+        if (event.target === deleteModal) {
+            deleteModal.style.display = 'none';
         }
     });
     
@@ -260,6 +261,17 @@ function setupModalListeners() {
     document.getElementById('cancelEdit').addEventListener('click', () => {
         editModal.style.display = 'none';
     });
+    
+    document.getElementById('deleteAccount').addEventListener('click', () => {
+        document.getElementById('deleteAccountName').textContent = contoData.nome;
+        deleteModal.style.display = 'block';
+    });
+    
+    document.getElementById('cancelDelete').addEventListener('click', () => {
+        deleteModal.style.display = 'none';
+    });
+    
+    document.getElementById('confirmDelete').addEventListener('click', handleDeleteAccount);
 }
 
 // Funzione per gestire la modifica del conto
@@ -301,47 +313,14 @@ async function handleEditAccountSubmit(event) {
 }
 
 // Funzione per gestire l'eliminazione del conto
-// async function handleDeleteAccount() {
-//     try {
-//         const response = await fetch(`/api/conto/${contoId}`, {
-//             method: 'DELETE'
-//         });
-        
-//         if (!response.ok) {
-//             throw new Error('Errore durante l\'eliminazione del conto');
-//         }
-        
-//         // Chiudi il modale
-//         document.getElementById('deleteConfirmModal').style.display = 'none';
-        
-//         // Mostra messaggio di successo e reindirizza alla home
-//         showSuccessMessage('Conto eliminato con successo!');
-        
-//         setTimeout(() => {
-//             window.location.href = '/home';
-//         }, 1500);
-        
-//     } catch (error) {
-//         console.error('Errore:', error);
-//         showErrorMessage('Errore durante l\'eliminazione del conto');
-//     }
-// }
 async function handleDeleteAccount() {
     try {
-        console.log('DEBUG: Inizio eliminazione conto ID:', contoId);
-        
         const response = await fetch(`/api/conto/${contoId}`, {
             method: 'DELETE'
         });
         
-        console.log('DEBUG: Response status:', response.status);
-        console.log('DEBUG: Response ok:', response.ok);
-        
-        const responseText = await response.text();
-        console.log('DEBUG: Response text:', responseText);
-        
         if (!response.ok) {
-            throw new Error('Errore durante l\'eliminazione del conto: ' + responseText);
+            throw new Error('Errore durante l\'eliminazione del conto');
         }
         
         // Chiudi il modale
@@ -355,60 +334,16 @@ async function handleDeleteAccount() {
         }, 1500);
         
     } catch (error) {
-        console.error('Errore completo:', error);
-        showErrorMessage('Errore durante l\'eliminazione del conto: ' + error.message);
+        console.error('Errore:', error);
+        showErrorMessage('Errore durante l\'eliminazione del conto');
     }
 }
 
 // Funzioni per mostrare messaggi
 function showSuccessMessage(message) {
-    // Implementazione semplice con alert (in futuro si può migliorare)
     alert('✅ ' + message);
 }
 
 function showErrorMessage(message) {
     alert('❌ ' + message);
-}
-
-function setupModalListeners() {
-    const editModal = document.getElementById('editAccountModal');
-    const deleteModal = document.getElementById('deleteConfirmModal');
-    
-    // Chiudi modali cliccando sulla X
-    document.querySelectorAll('.close').forEach(closeBtn => {
-        closeBtn.addEventListener('click', () => {
-            editModal.style.display = 'none';
-            deleteModal.style.display = 'none';
-        });
-    });
-    
-    // Chiudi modali cliccando fuori
-    window.addEventListener('click', (event) => {
-        if (event.target === editModal) {
-            editModal.style.display = 'none';
-        }
-        if (event.target === deleteModal) {
-            deleteModal.style.display = 'none';
-        }
-    });
-    
-    // Listener per il form di modifica
-    document.getElementById('editAccountForm').addEventListener('submit', handleEditAccountSubmit);
-    
-    // Listener per i bottoni
-    document.getElementById('cancelEdit').addEventListener('click', () => {
-        editModal.style.display = 'none';
-    });
-    
-    // ✅ NUOVO: Listener per il bottone elimina
-    document.getElementById('deleteAccount').addEventListener('click', () => {
-        document.getElementById('deleteAccountName').textContent = contoData.nome;
-        deleteModal.style.display = 'block';
-    });
-    
-    document.getElementById('cancelDelete').addEventListener('click', () => {
-        deleteModal.style.display = 'none';
-    });
-    
-    document.getElementById('confirmDelete').addEventListener('click', handleDeleteAccount);
 }

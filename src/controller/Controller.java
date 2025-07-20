@@ -217,6 +217,17 @@ public class Controller {
         }
     }
 
+    public void aggiungiConto(String nome, String tipo, double saldo) {
+        try {
+            int id = contoDAO.newID();
+            Conto nuovoConto = new Conto(id, nome, tipo, saldo, true, null, null);
+            contoDAO.saveConto(nuovoConto, utente.getEmail());
+            utente.addConto(nuovoConto);
+        } catch (SQLException e) {
+            throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER OTTENERE UN NUOVO ID PER IL CONTO", e);
+        }
+    }
+
     public static void main(String[] args) {
         try {
             // Inizializza la connessione al database

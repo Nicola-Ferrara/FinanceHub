@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aggiungi un nuovo conto - FinanceHub">
+    <title>FinanceHub - Aggiungi Conto</title>
+    <link rel="stylesheet" href="../css/aggiungiConto.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="../js/aggiungiConto.js" defer></script>
+</head>
+<body>
+    <header class="header">
+        <h1>Aggiungi Nuovo Conto</h1>
+        <div class="nav-buttons">
+            <a href="/home" class="nav-link">🏠 Home</a>
+            <form action="/logout" method="get" style="display: inline;">
+                <button type="submit" class="logout-button">Logout</button>
+            </form>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="form-container">
+            <form id="addAccountForm" class="account-form">
+                <div class="form-section">
+                    <h2>Informazioni del Conto</h2>
+                    
+                    <div class="form-group">
+                        <label for="accountName">Nome del Conto *</label>
+                        <input type="text" id="accountName" name="nome" required 
+                               placeholder="Es. Conto Corrente Principale">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="accountType">Tipo di Conto *</label>
+                        <select id="accountType" name="tipo" required>
+                            <option value="">Seleziona il tipo di conto</option>
+                            <option value="Corrente">Conto Corrente</option>
+                            <option value="Risparmio">Conto Risparmio</option>
+                            <option value="Deposito">Conto Deposito</option>
+                            <option value="Investimento">Conto Investimento</option>
+                            <option value="Carta">Carta Prepagata</option>
+                            <option value="Contanti">Contanti</option>
+                            <option value="Altro">Altro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="initialBalance">Saldo Iniziale *</label>
+                        <div class="input-group">
+                            <span class="input-prefix">€</span>
+                            <input type="number" id="initialBalance" name="saldo" 
+                                   step="0.01" min="0" value="0.00" required>
+                        </div>
+                        <small class="form-help">Inserisci il saldo attuale del conto</small>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">
+                        Annulla
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Aggiungi Conto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Loading overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>Aggiunta conto in corso...</p>
+    </div>
+</body>
+</html>

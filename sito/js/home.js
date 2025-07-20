@@ -244,3 +244,16 @@ document.addEventListener("DOMContentLoaded", function() {
     fetchConti();
     fetchOperazioni();
 });
+
+// Listener per il bottone aggiungi conto
+document.addEventListener("DOMContentLoaded", function() {
+    // ... codice esistente ...
+    
+    // Aggiungi questo listener
+    const addAccountBtn = document.getElementById('addAccountBtn');
+    if (addAccountBtn) {
+        addAccountBtn.addEventListener('click', () => {
+            window.location.href = '/aggiungiConto';
+        });
+    }
+});

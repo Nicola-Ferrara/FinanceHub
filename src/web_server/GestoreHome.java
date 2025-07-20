@@ -4,10 +4,7 @@ import fi.iki.elonen.NanoHTTPD.IHTTPSession;
 import fi.iki.elonen.NanoHTTPD.Method;
 import fi.iki.elonen.NanoHTTPD.Response;
 import controller.Controller;
-import dto.Conto;
-import dto.Operazione;
-import dto.Transazione;
-import dto.Trasferimento;
+import dto.*;
 
 import java.util.List;
 

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dettaglio e gestione del conto - FinanceHub">
     <title>FinanceHub - Dettaglio Conto</title>
     <link rel="stylesheet" href="../css/conto.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -113,14 +114,12 @@
             <div class="modal-body">
                 <p><strong>⚠️ Attenzione!</strong></p>
                 <p>Stai per eliminare il conto "<span id="deleteAccountName"></span>".</p>
-                <p><strong>Questa azione non può essere annullata.</strong></p>
-                <p>Tutte le transazioni e i trasferimenti associati verranno rimossi definitivamente.</p>
+                <p><strong>Il conto verrà nascosto dall'interfaccia ma i dati storici saranno preservati per l'integrità del database.</strong></p>
+                <p>Non potrai più effettuare nuove operazioni su questo conto.</p>
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" id="cancelDelete">Annulla</button>
-                    <button type="button" class="btn btn-danger" id="confirmDelete">Elimina Definitivamente</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">Elimina Conto</button>
                 </div>
             </div>
         </div>
     </div>
-</body>
-</html>
