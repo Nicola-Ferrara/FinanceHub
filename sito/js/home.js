@@ -224,11 +224,19 @@ async function fetchOperazioni() {
 // Funzione helper per formattare la data
 function formatDate(dateString) {
     const date = new Date(dateString);
-    return date.toLocaleDateString('it-IT', {
+    const dateFormatted = date.toLocaleDateString('it-IT', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
     });
+    
+    const timeFormatted = date.toLocaleTimeString('it-IT', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false  // Formato 24 ore (0-23)
+    });
+    
+    return `${dateFormatted} - ${timeFormatted}`;
 }
 
 // Inizializzazione quando il DOM è caricato
@@ -247,8 +255,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // Listener per il bottone aggiungi conto
 document.addEventListener("DOMContentLoaded", function() {
-    // ... codice esistente ...
-    
     // Aggiungi questo listener
     const addAccountBtn = document.getElementById('addAccountBtn');
     if (addAccountBtn) {
@@ -256,4 +262,68 @@ document.addEventListener("DOMContentLoaded", function() {
             window.location.href = '/aggiungiConto';
         });
     }
+    checkUrlParams();
 });
+
+function checkUrlParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.get('success') === 'conto-aggiunto') {
+        showNotification('Conto aggiunto con successo!', 'success');
+        
+        // Rimuovi il parametro dall'URL
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+    } else if (urlParams.get('success') === 'conto-eliminato') {
+        // ✅ AGGIUNGI QUESTO CASO
+        showNotification('Conto eliminato con successo!', 'success');
+        
+        // Rimuovi il parametro dall'URL
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+    }
+}
+
+function showNotification(message, type) {
+    // Rimuovi notifiche precedenti
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notif => notif.remove());
+    
+    // Crea la notifica
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span class="notification-icon">${type === 'success' ? '✅' : '❌'}</span>
+            <span class="notification-message">${message}</span>
+            <button class="notification-close">&times;</button>
+        </div>
+    `;
+    
+    // Aggiungi al body
+    document.body.appendChild(notification);
+    
+    // Animazione di entrata
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    // Rimuovi automaticamente dopo 3 secondi
+    setTimeout(() => {
+        hideNotification(notification);
+    }, 3000);
+    
+    // Event listener per chiudere manualmente
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+        hideNotification(notification);
+    });
+}
+
+function hideNotification(notification) {
+    notification.classList.remove('show');
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 300);
+}

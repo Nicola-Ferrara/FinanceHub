@@ -123,3 +123,58 @@
             </div>
         </div>
     </div>
+
+        <!-- Modale per aggiungere transazione -->
+    <div id="addTransactionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Aggiungi Transazione</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addTransactionForm">
+                    <div class="form-section">
+                        <h3>Dettagli Transazione</h3>
+                        
+                        <div class="form-group">
+                            <label for="transactionAmount">Importo *</label>
+                            <div class="input-group">
+                                <span class="input-prefix">€</span>
+                                <input type="number" id="transactionAmount" name="importo" 
+                                       step="0.01" min="0.01" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="transactionDescription">Descrizione *</label>
+                            <input type="text" id="transactionDescription" name="descrizione" 
+                                   placeholder="Es. Spesa per benzina" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="transactionType">Tipo Transazione *</label>
+                            <select id="transactionType" name="tipo" required>
+                                <option value="">Seleziona il tipo</option>
+                                <option value="Spesa">Spesa</option>
+                                <option value="Guadagno">Guadagno</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group" id="categoryGroup" style="display: none;">
+                            <label for="transactionCategory">Categoria *</label>
+                            <select id="transactionCategory" name="categoria">
+                                <option value="">Seleziona una categoria</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancelTransaction">Annulla</button>
+                        <button type="submit" class="btn btn-primary">Aggiungi Transazione</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

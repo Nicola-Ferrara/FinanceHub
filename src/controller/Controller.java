@@ -228,6 +228,52 @@ public class Controller {
         }
     }
 
+    public void aggiungiTransazione(double importo, String descrizione, Categoria categoria, int idConto) {
+        try{
+            int id = transazioneDAO.newID();
+            Timestamp data = new Timestamp(System.currentTimeMillis());
+            Transazione transazione = new Transazione(id, importo, data, descrizione, categoria);
+            transazioneDAO.saveTransazione(transazione, idConto, categoria.getID());
+            for (Conto conto : utente.getConti()) {
+                if (conto.getID() == idConto) {
+                    conto.addTransazione(transazione);
+                    break;
+                }
+            }
+        } catch (SQLException e) {
+            throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER INSERIRE UNA NUOVA TRANSAZIONE", e);
+        }
+    }
+
+    public LinkedList<Categoria> getCategoriaGuadagno() {
+        LinkedList<Categoria> categorieGuadagno = new LinkedList<>();
+        for (Categoria categoria : utente.getCategorie()) {
+            if (categoria.getTipo() == Categoria.TipoCategoria.Guadagno) {
+                categorieGuadagno.add(categoria);
+            }
+        }
+        return categorieGuadagno;
+    }
+
+    public LinkedList<Categoria> getCategoriaSpesa() {
+        LinkedList<Categoria> categorieSpesa = new LinkedList<>();
+        for (Categoria categoria : utente.getCategorie()) {
+            if (categoria.getTipo() == Categoria.TipoCategoria.Spesa) {
+                categorieSpesa.add(categoria);
+            }
+        }
+        return categorieSpesa;
+    }
+
+    public Categoria getCategoriaById(int id) {
+    for (Categoria categoria : utente.getCategorie()) {
+        if (categoria.getID() == id) {
+            return categoria;
+        }
+    }
+    return null;
+}
+
     public static void main(String[] args) {
         try {
             // Inizializza la connessione al database

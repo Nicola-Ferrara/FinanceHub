@@ -193,7 +193,7 @@ function setupFilterListeners() {
 // Funzione per impostare i listener delle azioni
 function setupActionListeners() {
     document.getElementById('addTransactionBtn').addEventListener('click', () => {
-        alert('Funzionalità in fase di sviluppo: Aggiungi Transazione');
+        openAddTransactionModal();
     });
     
     document.getElementById('addTransferBtn').addEventListener('click', () => {
@@ -219,11 +219,19 @@ function openEditAccountModal() {
 // Funzione helper per formattare la data
 function formatDate(dateString) {
     const date = new Date(dateString);
-    return date.toLocaleDateString('it-IT', {
+    const dateFormatted = date.toLocaleDateString('it-IT', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
     });
+    
+    const timeFormatted = date.toLocaleTimeString('it-IT', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false  // Formato 24 ore (0-23)
+    });
+    
+    return `${dateFormatted} - ${timeFormatted}`;
 }
 
 // Funzione per mostrare errori
@@ -235,12 +243,14 @@ function showError(message) {
 function setupModalListeners() {
     const editModal = document.getElementById('editAccountModal');
     const deleteModal = document.getElementById('deleteConfirmModal');
+    const transactionModal = document.getElementById('addTransactionModal');
     
     // Chiudi modali cliccando sulla X
     document.querySelectorAll('.close').forEach(closeBtn => {
         closeBtn.addEventListener('click', () => {
             editModal.style.display = 'none';
             deleteModal.style.display = 'none';
+            transactionModal.style.display = 'none';
         });
     });
     
@@ -252,16 +262,28 @@ function setupModalListeners() {
         if (event.target === deleteModal) {
             deleteModal.style.display = 'none';
         }
+        if (event.target === transactionModal) {
+            transactionModal.style.display = 'none';
+        }
     });
     
-    // Listener per il form di modifica
+    // Listener esistenti...
     document.getElementById('editAccountForm').addEventListener('submit', handleEditAccountSubmit);
     
-    // Listener per i bottoni
+    // ✅ AGGIUNGI QUESTI NUOVI LISTENER
+    document.getElementById('addTransactionForm').addEventListener('submit', handleAddTransactionSubmit);
+    document.getElementById('transactionType').addEventListener('change', handleTransactionTypeChange);
+    
     document.getElementById('cancelEdit').addEventListener('click', () => {
         editModal.style.display = 'none';
     });
     
+    // ✅ AGGIUNGI QUESTO
+    document.getElementById('cancelTransaction').addEventListener('click', () => {
+        transactionModal.style.display = 'none';
+    });
+    
+    // Altri listener esistenti...
     document.getElementById('deleteAccount').addEventListener('click', () => {
         document.getElementById('deleteAccountName').textContent = contoData.nome;
         deleteModal.style.display = 'block';
@@ -297,7 +319,6 @@ async function handleEditAccountSubmit(event) {
             throw new Error('Errore durante la modifica del conto');
         }
         
-        // ✅ SPOSTA LA CHIUSURA DEL MODALE QUI (dopo il successo)
         document.getElementById('editAccountModal').style.display = 'none';
         
         // Ricarica i dati del conto
@@ -324,17 +345,8 @@ async function handleDeleteAccount() {
             throw new Error('Errore durante l\'eliminazione del conto');
         }
         
-        // ✅ CHIUDI ENTRAMBI I MODALI IMMEDIATAMENTE
-        document.getElementById('deleteConfirmModal').style.display = 'none';
-        document.getElementById('editAccountModal').style.display = 'none';
-        
-        // Mostra messaggio di successo con notifica elegante
-        showSuccessMessage('Conto eliminato con successo!');
-        
-        // ✅ REINDIRIZZA IMMEDIATAMENTE (non aspettare 3 secondi)
-        setTimeout(() => {
-            window.location.href = '/home';
-        }, 500);
+        // ✅ REINDIRIZZA IMMEDIATAMENTE ALLA HOME CON PARAMETRO
+        window.location.href = '/home?success=conto-eliminato';
         
     } catch (error) {
         console.error('Errore:', error);
@@ -393,4 +405,126 @@ function hideNotification(notification) {
             notification.parentNode.removeChild(notification);
         }
     }, 300);
+}
+
+// Funzione per aprire il modale aggiungi transazione
+function openAddTransactionModal() {
+    // Reset del form
+    document.getElementById('addTransactionForm').reset();
+    document.getElementById('categoryGroup').style.display = 'none';
+    document.getElementById('transactionCategory').innerHTML = '<option value="">Seleziona una categoria</option>';
+    
+    document.getElementById('addTransactionModal').style.display = 'block';
+}
+
+// Funzione per gestire il cambio di tipo transazione
+function handleTransactionTypeChange() {
+    const typeSelect = document.getElementById('transactionType');
+    const categoryGroup = document.getElementById('categoryGroup');
+    const categorySelect = document.getElementById('transactionCategory');
+    
+    if (typeSelect.value) {
+        // Mostra il gruppo categoria
+        categoryGroup.style.display = 'block';
+        
+        // Cambia il colore del gruppo in base al tipo
+        categoryGroup.className = 'form-group ' + typeSelect.value.toLowerCase();
+        
+        // Carica le categorie appropriate
+        loadCategories(typeSelect.value);
+    } else {
+        categoryGroup.style.display = 'none';
+        categorySelect.innerHTML = '<option value="">Seleziona una categoria</option>';
+    }
+}
+
+// Funzione per caricare le categorie
+async function loadCategories(tipo) {
+    try {
+        const endpoint = tipo === 'Spesa' ? '/api/categorie/spesa' : '/api/categorie/guadagno';
+        const response = await fetch(endpoint);
+        
+        if (!response.ok) {
+            throw new Error('Errore durante il caricamento delle categorie');
+        }
+        
+        const categorie = await response.json();
+        const categorySelect = document.getElementById('transactionCategory');
+        
+        // Svuota le opzioni esistenti
+        categorySelect.innerHTML = '<option value="">Seleziona una categoria</option>';
+        
+        // Aggiungi le nuove categorie
+        categorie.forEach(categoria => {
+            const option = document.createElement('option');
+            option.value = categoria.id;
+            option.textContent = categoria.nome;
+            if (tipo === 'Spesa') {
+                option.style.color = '#dc3545';
+            } else {
+                option.style.color = '#28a745';
+            }
+            categorySelect.appendChild(option);
+        });
+        
+    } catch (error) {
+        console.error('Errore:', error);
+        showErrorMessage('Errore durante il caricamento delle categorie');
+    }
+}
+
+// Funzione per gestire il submit della transazione
+async function handleAddTransactionSubmit(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const transactionData = {
+        importo: parseFloat(formData.get('importo')),
+        descrizione: formData.get('descrizione').trim(),
+        categoriaId: parseInt(formData.get('categoria'))
+    };
+    
+    // Validazione
+    if (!transactionData.importo || transactionData.importo <= 0) {
+        showErrorMessage('Inserisci un importo valido');
+        return;
+    }
+    
+    if (!transactionData.descrizione) {
+        showErrorMessage('Inserisci una descrizione');
+        return;
+    }
+    
+    if (!transactionData.categoriaId) {
+        showErrorMessage('Seleziona una categoria');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/conto/${contoId}/transazione`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(transactionData)
+        });
+        
+        if (!response.ok) {
+            throw new Error('Errore durante l\'aggiunta della transazione');
+        }
+        
+        // Chiudi il modale
+        document.getElementById('addTransactionModal').style.display = 'none';
+        
+        // Ricarica i dati
+        await fetchContoData();
+        await fetchOperazioni();
+        
+        // Mostra messaggio di successo
+        showSuccessMessage('Transazione aggiunta con successo!');
+        
+    } catch (error) {
+        console.error('Errore:', error);
+        showErrorMessage('Errore durante l\'aggiunta della transazione');
+    }
 }

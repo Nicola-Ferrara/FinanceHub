@@ -15,18 +15,6 @@ public class TransazioneDAO {
         this.connection = connection;
     }
 
-    /*public LinkedList<Transazione> getTransazioni(int id_conto) throws SQLException {
-        LinkedList<Transazione> transazioni = new LinkedList<>();
-        String sql = "SELECT * FROM Transazione WHERE id_conto = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, id_conto);
-            ResultSet resultSet = ps.executeQuery();
-            while (resultSet.next()) {
-                transazioni.add(new Transazione(resultSet.getInt("id"), resultSet.getDouble("importo"), resultSet.getTimestamp("data"), resultSet.getString("descrizione"), null));
-            }
-        }
-        return transazioni;
-    }*/
     public LinkedList<Transazione> getTransazioni(int id_conto) throws SQLException {
         LinkedList<Transazione> transazioni = new LinkedList<>();
         String sql = "SELECT * FROM Transazione WHERE id_conto = ?";
@@ -42,16 +30,15 @@ public class TransazioneDAO {
         return transazioni;
     }
 
-    public void saveTransazione(Transazione transazione, String email_utente, int id_conto, int id_categoria) throws SQLException {
-        String sql = "INSERT INTO Transazione (id, importo, data, descrizione, email_utente, id_conto, id_categoria) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    public void saveTransazione(Transazione transazione, int id_conto, int id_categoria) throws SQLException {
+        String sql = "INSERT INTO Transazione (id, importo, data, descrizione, id_conto, id_categoria) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, transazione.getID());
             ps.setDouble(2, transazione.getImporto());
             ps.setTimestamp(3, transazione.getData());
             ps.setString(4, transazione.getDescrizione());
-            ps.setString(5, email_utente);
-            ps.setInt(6, id_conto);
-            ps.setInt(7, id_categoria);
+            ps.setInt(5, id_conto);
+            ps.setInt(6, id_categoria);
             ps.executeUpdate();
         }
     }

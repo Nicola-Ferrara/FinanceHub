@@ -640,3 +640,40 @@ body {
         max-width: none;
     }
 }
+
+/* Stili per input con prefisso */
+.input-group {
+    position: relative;
+}
+
+.input-prefix {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-weight: 500;
+    z-index: 1;
+}
+
+.input-group input {
+    padding-left: 35px !important;
+}
+
+/* Evidenziazione per tipo transazione */
+#transactionType option[value="Spesa"] {
+    color: #dc3545;
+}
+
+#transactionType option[value="Guadagno"] {
+    color: #28a745;
+}
+
+/* Stili dinamici per il form */
+.form-group.spesa select {
+    border-color: #dc3545;
+}
+
+.form-group.guadagno select {
+    border-color: #28a745;
+}

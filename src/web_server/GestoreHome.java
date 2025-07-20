@@ -122,7 +122,7 @@ public class GestoreHome extends BaseGestorePagina {
                 
                 if (operazione instanceof Transazione) {
                     Transazione transazione = (Transazione) operazione;
-                    tipo = transazione.getCategoria().getTipo().toString(); // "Guadagno" o "Spesa"
+                    tipo = transazione.getCategoria().getTipo().toString();
                     categoria = transazione.getCategoria().getNome();
                     
                     // Trova il nome del conto per questa transazione
@@ -164,7 +164,7 @@ public class GestoreHome extends BaseGestorePagina {
                 }
                 
                 // Formatta la data
-                String dataFormattata = operazione.getData().toString().substring(0, 10); // YYYY-MM-DD
+                String dataFormattata = operazione.getData().toString();
                 
                 jsonBuilder.append(String.format(java.util.Locale.US, 
                     "{\"id\": %d, \"data\": \"%s\", \"categoria\": \"%s\", \"tipo\": \"%s\", \"importo\": %.2f, \"descrizione\": \"%s\"}",

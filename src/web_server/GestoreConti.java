@@ -4,6 +4,8 @@ import fi.iki.elonen.NanoHTTPD.IHTTPSession;
 import fi.iki.elonen.NanoHTTPD.Method;
 import fi.iki.elonen.NanoHTTPD.Response;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.LinkedList;
 import controller.Controller;
 import dto.*;
 
@@ -16,7 +18,8 @@ public class GestoreConti extends BaseGestorePagina {
     @Override
     public boolean canHandle(String uri, String method) {
         return uri.startsWith("/conti") || 
-               uri.startsWith("/api/conto/");
+               uri.startsWith("/api/conto/") ||
+               uri.startsWith("/api/categorie");
     }
     
     @Override
@@ -45,6 +48,10 @@ public class GestoreConti extends BaseGestorePagina {
             return handleUpdateConto(uri, session);
         } else if (uri.startsWith("/api/conto/") && method == Method.DELETE) {
             return handleDeleteConto(uri, session);
+        } else if (uri.startsWith("/api/categorie/") && method == Method.GET) {
+            return handleCategorieAPI(uri);
+        } else if (uri.matches("/api/conto/\\d+/transazione") && method == Method.POST) {
+            return handleAddTransazione(uri, session);
         }
         
         return createResponse(Response.Status.NOT_FOUND, "text/plain", "Risorsa non trovata");
@@ -76,8 +83,7 @@ public class GestoreConti extends BaseGestorePagina {
         } catch (Exception e) {
             System.out.println("DEBUG: Errore durante eliminazione: " + e.getMessage());
             e.printStackTrace();
-            return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
-                "{\"error\": \"Errore del server: " + e.getMessage() + "\"}");
+            return createResponse(Response.Status.INTERNAL_ERROR, "application/json",  "{\"error\": \"Errore del server: " + e.getMessage() + "\"}");
         }
     }
 
@@ -121,8 +127,7 @@ public class GestoreConti extends BaseGestorePagina {
         } catch (NumberFormatException e) {
             return createResponse(Response.Status.BAD_REQUEST, "application/json", "{\"error\": \"ID conto non valido\"}");
         } catch (Exception e) {
-            return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
-                "{\"error\": \"Errore del server: " + e.getMessage() + "\"}");
+            return createResponse(Response.Status.INTERNAL_ERROR, "application/json", "{\"error\": \"Errore del server: " + e.getMessage() + "\"}");
         }
     }
 
@@ -180,8 +185,7 @@ public class GestoreConti extends BaseGestorePagina {
             
             return createResponse(Response.Status.BAD_REQUEST, "application/json", "{\"error\": \"Endpoint non valido\"}");
         } catch (Exception e) {
-            return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
-                "{\"error\": \"Errore del server: " + e.getMessage() + "\"}");
+            return createResponse(Response.Status.INTERNAL_ERROR, "application/json", "{\"error\": \"Errore del server: " + e.getMessage() + "\"}");
         }
     }
     
@@ -240,7 +244,8 @@ public class GestoreConti extends BaseGestorePagina {
                     categoria = "Sconosciuto";
                 }
                 
-                String dataFormattata = operazione.getData().toString().substring(0, 10);
+                String dataFormattata = operazione.getData().toString();
+
                 
                 jsonBuilder.append(String.format(java.util.Locale.US,
                     "{\"id\": %d, \"data\": \"%s\", \"categoria\": \"%s\", \"tipo\": \"%s\", \"importo\": %.2f, \"descrizione\": \"%s\", \"isIncoming\": %s}",
@@ -261,4 +266,170 @@ public class GestoreConti extends BaseGestorePagina {
             return createResponse(Response.Status.BAD_REQUEST, "application/json", "{\"error\": \"ID conto non valido\"}");
         }
     }
+
+    private Response handleCategorieAPI(String uri) {
+        try {
+            if (uri.equals("/api/categorie/spesa")) {
+                return getCategorieSpesa();
+            } else if (uri.equals("/api/categorie/guadagno")) {
+                return getCategorieGuadagno();
+            }
+            
+            return createResponse(Response.Status.NOT_FOUND, "application/json", "{\"error\": \"Endpoint non valido\"}");
+        } catch (Exception e) {
+            return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
+                "{\"error\": \"Errore del server: " + e.getMessage() + "\"}");
+        }
+    }
+
+    private Response getCategorieSpesa() {
+        try {
+            LinkedList<Categoria> categorie = controller.getCategoriaSpesa();
+            
+            StringBuilder jsonBuilder = new StringBuilder("[");
+            for (int i = 0; i < categorie.size(); i++) {
+                Categoria categoria = categorie.get(i);
+                jsonBuilder.append(String.format(
+                    "{\"id\": %d, \"nome\": \"%s\", \"tipo\": \"%s\"}", 
+                    categoria.getID(), categoria.getNome(), categoria.getTipo()));
+                
+                if (i < categorie.size() - 1) {
+                    jsonBuilder.append(",");
+                }
+            }
+            jsonBuilder.append("]");
+            
+            Response response = createResponse(Response.Status.OK, "application/json", jsonBuilder.toString());
+            return addNoCacheHeaders(response);
+        } catch (Exception e) {
+            return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
+                "{\"error\": \"Errore durante il recupero delle categorie spesa\"}");
+        }
+    }
+
+    private Response getCategorieGuadagno() {
+        try {
+            LinkedList<Categoria> categorie = controller.getCategoriaGuadagno();
+            
+            StringBuilder jsonBuilder = new StringBuilder("[");
+            for (int i = 0; i < categorie.size(); i++) {
+                Categoria categoria = categorie.get(i);
+                jsonBuilder.append(String.format(
+                    "{\"id\": %d, \"nome\": \"%s\", \"tipo\": \"%s\"}", 
+                    categoria.getID(), categoria.getNome(), categoria.getTipo()));
+                
+                if (i < categorie.size() - 1) {
+                    jsonBuilder.append(",");
+                }
+            }
+            jsonBuilder.append("]");
+            
+            Response response = createResponse(Response.Status.OK, "application/json", jsonBuilder.toString());
+            return addNoCacheHeaders(response);
+        } catch (Exception e) {
+            return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
+                "{\"error\": \"Errore durante il recupero delle categorie guadagno\"}");
+        }
+    }
+
+    private Response handleAddTransazione(String uri, IHTTPSession session) {
+        try {
+            String[] parts = uri.split("/");
+            if (parts.length >= 4) {
+                String contoIdStr = parts[3];
+                int contoId = Integer.parseInt(contoIdStr);
+                
+                // Leggi il body della richiesta con il metodo corretto
+                Map<String, String> body = new HashMap<>();
+                session.parseBody(body);
+                String requestBody = body.get("postData");
+                
+                if (requestBody == null || requestBody.isEmpty()) {
+                    return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                        "{\"error\": \"Body della richiesta vuoto\"}");
+                }
+                
+                // Estrai i dati dal JSON
+                String importoStr = extractJsonValueNumber(requestBody, "importo");
+                String descrizione = extractJsonValue(requestBody, "descrizione");
+                String categoriaIdStr = extractJsonValueNumber(requestBody, "categoriaId");
+                                
+                if (importoStr == null || descrizione == null || categoriaIdStr == null) {
+                    return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                        "{\"error\": \"Dati mancanti - importo: " + importoStr + ", descrizione: " + descrizione + ", categoriaId: " + categoriaIdStr + "\"}");
+                }
+                
+                double importo = Double.parseDouble(importoStr);
+                int categoriaId = Integer.parseInt(categoriaIdStr);
+                
+                // Trova la categoria
+                Categoria categoria = controller.getCategoriaById(categoriaId);
+                if (categoria == null) {
+                    return createResponse(Response.Status.NOT_FOUND, "application/json", 
+                        "{\"error\": \"Categoria non trovata con ID: " + categoriaId + "\"}");
+                }
+                
+                // Aggiungi la transazione
+                controller.aggiungiTransazione(importo, descrizione, categoria, contoId);
+                
+                return createResponse(Response.Status.OK, "application/json", 
+                    "{\"success\": true, \"message\": \"Transazione aggiunta con successo\"}");
+            }
+            
+            return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                "{\"error\": \"Endpoint non valido\"}");
+        } catch (NumberFormatException e) {
+            System.out.println("DEBUG: Errore NumberFormat: " + e.getMessage());
+            return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                "{\"error\": \"Dati numerici non validi: " + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            System.out.println("DEBUG: Errore generale: " + e.getMessage());
+            e.printStackTrace();
+            return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
+                "{\"error\": \"Errore del server: " + e.getMessage() + "\"}");
+        }
+    }
+
+    // Metodo per estrarre valori numerici dal JSON
+    private String extractJsonValueNumber(String json, String key) {
+        String searchKey = "\"" + key + "\"";
+        int keyIndex = json.indexOf(searchKey);
+        if (keyIndex == -1) return null;
+        
+        int valueStart = json.indexOf(":", keyIndex) + 1;
+        if (valueStart == 0) return null;
+        
+        // Rimuovi spazi
+        while (valueStart < json.length() && Character.isWhitespace(json.charAt(valueStart))) {
+            valueStart++;
+        }
+        
+        if (valueStart >= json.length()) return null;
+        
+        // Per i numeri, non cercare le virgolette
+        int valueEnd = valueStart;
+        while (valueEnd < json.length() && 
+            (Character.isDigit(json.charAt(valueEnd)) || json.charAt(valueEnd) == '.')) {
+            valueEnd++;
+        }
+        
+        // Trova la fine del valore (virgola o parentesi graffa)
+        while (valueEnd < json.length() && 
+            json.charAt(valueEnd) != ',' && 
+            json.charAt(valueEnd) != '}') {
+            valueEnd++;
+        }
+        
+        if (valueEnd > valueStart) {
+            String value = json.substring(valueStart, valueEnd).trim();
+            // Rimuovi virgole finali se presenti
+            if (value.endsWith(",")) {
+                value = value.substring(0, value.length() - 1);
+            }
+            return value;
+        }
+        
+        return null;
+    }
+
 }

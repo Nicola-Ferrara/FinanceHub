@@ -56,16 +56,11 @@ async function handleFormSubmit(event) {
             throw new Error(result.error || 'Errore durante l\'aggiunta del conto');
         }
         
-        showSuccessMessage('Conto aggiunto con successo!');
-        
-        // Reindirizza alla home dopo 1.5 secondi
-        setTimeout(() => {
-            window.location.href = '/home';
-        }, 1500);
+        window.location.href = '/home?success=conto-aggiunto';
         
     } catch (error) {
         console.error('Errore:', error);
-        showErrorMessage(error.message || 'Errore durante l\'aggiunta del conto');
+        alert('❌ ' + (error.message || 'Errore durante l\'aggiunta del conto'));
     } finally {
         isSubmitting = false;
         showLoading(false);
@@ -206,32 +201,6 @@ function showLoading(show) {
     }
 }
 
-// Mostra messaggio di successo
-function showSuccessMessage(message) {
-    showMessage(message, 'success');
-}
-
-// Mostra messaggio di errore
-function showErrorMessage(message) {
-    showMessage(message, 'error');
-}
-
-// Mostra messaggio generico
-function showMessage(message, type) {
-    removeMessages();
-    
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${type}`;
-    messageDiv.innerHTML = message;
-    
-    const formContainer = document.querySelector('.form-container');
-    formContainer.insertBefore(messageDiv, formContainer.firstChild);
-    
-    // Scroll al messaggio
-    messageDiv.scrollIntoView({ behavior: 'smooth' });
-}
-
-// Rimuove tutti i messaggi
 function removeMessages() {
     const messages = document.querySelectorAll('.message');
     messages.forEach(msg => msg.remove());
