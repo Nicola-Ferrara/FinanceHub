@@ -245,6 +245,34 @@ public class Controller {
         }
     }
 
+    public void aggiungiTrasferimento(double importo, String descrizione, int idContoMittente, int idContoDestinatario) {
+        try {
+            int id = trasferimentoDAO.newID();
+            Timestamp data = new Timestamp(System.currentTimeMillis());
+            Trasferimento trasferimento = new Trasferimento(id, importo, data, descrizione, idContoMittente, idContoDestinatario);
+            trasferimentoDAO.saveTrasferimento(trasferimento, utente.getEmail());
+            for (Conto conto : utente.getConti()) {
+                if (conto.getID() == idContoMittente) {
+                    conto.addTrasferimento(trasferimento);
+                } else if (conto.getID() == idContoDestinatario) {
+                    conto.addTrasferimento(trasferimento);
+                }
+            }
+        } catch (SQLException e) {
+            throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER INSERIRE UN NUOVO TRASFERIMENTO", e);
+        }
+    }
+
+    public LinkedList<Conto> getSomeConti(int idConto) {
+        LinkedList<Conto> someConti = new LinkedList<>();
+        for (Conto conto : utente.getConti()) {
+            if (conto.getID() != idConto && conto.getAttivo()) {
+                someConti.add(conto);
+            }
+        }
+        return someConti;
+    }
+
     public LinkedList<Categoria> getCategoriaGuadagno() {
         LinkedList<Categoria> categorieGuadagno = new LinkedList<>();
         for (Categoria categoria : utente.getCategorie()) {

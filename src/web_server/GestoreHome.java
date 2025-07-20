@@ -6,8 +6,10 @@ import fi.iki.elonen.NanoHTTPD.Response;
 import controller.Controller;
 import dto.*;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class GestoreHome extends BaseGestorePagina {
     
@@ -23,6 +25,7 @@ public class GestoreHome extends BaseGestorePagina {
                "/api/categorie/spesa".equals(uri) ||
                "/api/categorie/guadagno".equals(uri) ||
                "/api/operazioni".equals(uri) ||
+               uri.startsWith("/api/categoria") ||
                "/logout".equals(uri);
     }
     
@@ -43,6 +46,10 @@ public class GestoreHome extends BaseGestorePagina {
             return getCategorieSpesa();
         } else if ("/api/categorie/guadagno".equals(uri) && method == Method.GET) {
             return getCategorieGuadagno();
+        } else if ("/api/categoria".equals(uri) && method == Method.POST) {
+            return handleAddCategoria(session);  // ✅ AGGIUNGI QUESTO
+        } else if (uri.startsWith("/api/categoria/") && method == Method.DELETE) {
+            return handleDeleteCategoria(uri);
         } else if ("/logout".equals(uri) && method == Method.GET) {
             return handleLogout(session);
         }
@@ -256,5 +263,88 @@ public class GestoreHome extends BaseGestorePagina {
                 "{\"error\": \"Errore durante il recupero delle categorie guadagno\"}");
         }
     }
+
+    private Response handleAddCategoria(IHTTPSession session) {
+        try {
+            // Leggi il body della richiesta
+            Map<String, String> body = new HashMap<>();
+            session.parseBody(body);
+            String requestBody = body.get("postData");
+            
+            if (requestBody == null || requestBody.isEmpty()) {
+                return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                    "{\"error\": \"Body della richiesta vuoto\"}");
+            }
+            
+            // Estrai i dati dal JSON
+            String nome = extractJsonValue(requestBody, "nome");
+            String tipoStr = extractJsonValue(requestBody, "tipo");
+            
+            if (nome == null || tipoStr == null) {
+                return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                    "{\"error\": \"Dati mancanti\"}");
+            }
+            
+            // Converti il tipo
+            Categoria.TipoCategoria tipo = tipoStr.equals("Spesa") ? 
+                Categoria.TipoCategoria.Spesa : Categoria.TipoCategoria.Guadagno;
+            
+            // Aggiungi la categoria
+            controller.aggiungiCategoria(nome, tipo);
+            
+            return createResponse(Response.Status.OK, "application/json", 
+                "{\"success\": true, \"message\": \"Categoria aggiunta con successo\"}");
+                
+        } catch (Exception e) {
+            e.printStackTrace();
+            return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
+                "{\"error\": \"Errore del server: " + e.getMessage() + "\"}");
+        }
+    }
+
+    private Response handleDeleteCategoria(String uri) {
+        try {
+            String[] parts = uri.split("/");
+            if (parts.length >= 4) {
+                String categoriaIdStr = parts[3];
+                int categoriaId = Integer.parseInt(categoriaIdStr);
+                
+                // Elimina la categoria
+                boolean success = controller.eliminaCategoria(categoriaId);
+                
+                if (!success) {
+                    return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                        "{\"error\": \"Impossibile eliminare questa categoria\"}");
+                }
+                
+                return createResponse(Response.Status.OK, "application/json", 
+                    "{\"success\": true, \"message\": \"Categoria eliminata con successo\"}");
+            }
+            
+            return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                "{\"error\": \"Endpoint non valido\"}");
+        } catch (NumberFormatException e) {
+            return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                "{\"error\": \"ID categoria non valido\"}");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
+                "{\"error\": \"Errore del server: " + e.getMessage() + "\"}");
+        }
+    }
+
+    private String extractJsonValue(String json, String key) {
+        String searchKey = "\"" + key + "\":\"";
+        int keyIndex = json.indexOf(searchKey);
+        if (keyIndex == -1) return null;
+        
+        int valueStart = keyIndex + searchKey.length();
+        int valueEnd = json.indexOf("\"", valueStart);
+        
+        if (valueStart >= json.length() || valueEnd == -1) return null;
+        
+        return json.substring(valueStart, valueEnd);
+    }
+
 
 }

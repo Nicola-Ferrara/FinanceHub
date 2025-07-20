@@ -53,7 +53,7 @@ public class CategoriaDAO {
     }
 
     public void saveCategoria(Categoria categoria, String email_utente) throws SQLException {
-        String sql = "INSERT INTO Categoria (id, nome, tipo, email_utente) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Categoria (id, nome, tipo, email_utente) VALUES (?, ?, ?::TipoCategoria, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, categoria.getID());
             ps.setString(2, categoria.getNome());

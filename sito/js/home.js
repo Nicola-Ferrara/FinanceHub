@@ -251,6 +251,7 @@ document.addEventListener("DOMContentLoaded", function() {
     fetchConti();
     fetchOperazioni();
     fetchCategorie();
+    setupCategoryListeners();
 });
 
 // Listener per il bottone aggiungi conto
@@ -409,4 +410,240 @@ async function fetchCategorie() {
         document.getElementById("incomeCategories").innerHTML = '<li class="empty-categories">Errore durante il caricamento</li>';
         document.getElementById("expenseCategories").innerHTML = '<li class="empty-categories">Errore durante il caricamento</li>';
     }
+}
+
+// Setup listeners per i modali delle categorie
+function setupCategoryListeners() {
+    // Bottoni per aprire i modali
+    document.getElementById('addCategoryBtn').addEventListener('click', openAddCategoryModal);
+    document.getElementById('deleteCategoryBtn').addEventListener('click', openDeleteCategoryModal);
+    
+    // Form submissions
+    document.getElementById('addCategoryForm').addEventListener('submit', handleAddCategorySubmit);
+    document.getElementById('deleteCategoryForm').addEventListener('submit', handleDeleteCategorySubmit);
+    
+    // Bottoni di chiusura
+    document.getElementById('cancelAddCategory').addEventListener('click', closeAddCategoryModal);
+    document.getElementById('cancelDeleteCategory').addEventListener('click', closeDeleteCategoryModal);
+    
+    // Listener per il cambio di tipo nella eliminazione
+    document.getElementById('deleteCategoryType').addEventListener('change', handleDeleteTypeChange);
+    document.getElementById('categorySelect').addEventListener('change', handleCategorySelectChange);
+    
+    // Chiudi modali con X e click fuori
+    setupModalCloseListeners();
+}
+
+// Apri modale aggiungi categoria
+function openAddCategoryModal() {
+    document.getElementById('addCategoryForm').reset();
+    document.getElementById('addCategoryModal').style.display = 'block';
+}
+
+// Chiudi modale aggiungi categoria
+function closeAddCategoryModal() {
+    document.getElementById('addCategoryModal').style.display = 'none';
+}
+
+// Apri modale elimina categoria
+function openDeleteCategoryModal() {
+    document.getElementById('deleteCategoryForm').reset();
+    document.getElementById('categorySelectGroup').style.display = 'none';
+    document.getElementById('deleteWarning').style.display = 'none';
+    document.getElementById('confirmDeleteCategory').disabled = true;
+    document.getElementById('deleteCategoryModal').style.display = 'block';
+}
+
+// Chiudi modale elimina categoria
+function closeDeleteCategoryModal() {
+    document.getElementById('deleteCategoryModal').style.display = 'none';
+}
+
+// Gestisci cambio tipo per eliminazione
+function handleDeleteTypeChange() {
+    const typeSelect = document.getElementById('deleteCategoryType');
+    const categoryGroup = document.getElementById('categorySelectGroup');
+    const categorySelect = document.getElementById('categorySelect');
+    
+    if (typeSelect.value) {
+        categoryGroup.style.display = 'block';
+        loadCategoriesForDelete(typeSelect.value);
+    } else {
+        categoryGroup.style.display = 'none';
+        document.getElementById('deleteWarning').style.display = 'none';
+        document.getElementById('confirmDeleteCategory').disabled = true;
+    }
+}
+
+// Gestisci selezione categoria per eliminazione
+function handleCategorySelectChange() {
+    const categorySelect = document.getElementById('categorySelect');
+    const deleteWarning = document.getElementById('deleteWarning');
+    const confirmButton = document.getElementById('confirmDeleteCategory');
+    const typeSelect = document.getElementById('deleteCategoryType'); // ✅ AGGIUNGI QUESTO
+    
+    if (categorySelect.value) {
+        deleteWarning.style.display = 'block';
+        confirmButton.disabled = false;
+        
+        // ✅ AGGIORNA IL MESSAGGIO ANCHE QUI (per sicurezza)
+        if (typeSelect.value === 'Spesa') {
+            deleteWarning.innerHTML = "⚠️ Attenzione: Eliminando questa categoria, tutte le transazioni associate verranno riassegnate alla categoria 'Spesa'.";
+        } else if (typeSelect.value === 'Guadagno') {
+            deleteWarning.innerHTML = "⚠️ Attenzione: Eliminando questa categoria, tutte le transazioni associate verranno riassegnate alla categoria 'Guadagno'.";
+        }
+    } else {
+        deleteWarning.style.display = 'none';
+        confirmButton.disabled = true;
+    }
+}
+
+// Carica categorie per eliminazione
+async function loadCategoriesForDelete(tipo) {
+    try {
+        const endpoint = tipo === 'Spesa' ? '/api/categorie/spesa' : '/api/categorie/guadagno';
+        const response = await fetch(endpoint);
+        
+        if (!response.ok) {
+            throw new Error('Errore durante il caricamento delle categorie');
+        }
+        
+        const categorie = await response.json();
+        const categorySelect = document.getElementById('categorySelect');
+        
+        // Svuota le opzioni esistenti
+        categorySelect.innerHTML = '<option value="">Seleziona una categoria</option>';
+        
+        // Filtra le categorie eliminabili (escludi ID 1 e 2)
+        const categorieEliminabili = categorie.filter(categoria => categoria.id !== 1 && categoria.id !== 2);
+        
+        if (categorieEliminabili.length === 0) {
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'Nessuna categoria eliminabile';
+            option.disabled = true;
+            categorySelect.appendChild(option);
+        } else {
+            categorieEliminabili.forEach(categoria => {
+                const option = document.createElement('option');
+                option.value = categoria.id;
+                option.textContent = categoria.nome;
+                categorySelect.appendChild(option);
+            });
+        }
+        
+    } catch (error) {
+        console.error('Errore:', error);
+        showNotification('Errore durante il caricamento delle categorie', 'error');
+    }
+}
+
+// Gestisci submit aggiungi categoria
+async function handleAddCategorySubmit(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const categoryData = {
+        nome: formData.get('nome').trim(),
+        tipo: formData.get('tipo')
+    };
+    
+    // Validazione
+    if (!categoryData.nome) {
+        showNotification('Inserisci il nome della categoria', 'error');
+        return;
+    }
+    
+    if (!categoryData.tipo) {
+        showNotification('Seleziona il tipo di categoria', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/categoria', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(categoryData)
+        });
+        
+        if (!response.ok) {
+            throw new Error('Errore durante l\'aggiunta della categoria');
+        }
+        
+        // Chiudi il modale
+        closeAddCategoryModal();
+        
+        // Ricarica le categorie
+        await fetchCategorie();
+        
+        // Mostra messaggio di successo
+        showNotification('Categoria aggiunta con successo!', 'success');
+        
+    } catch (error) {
+        console.error('Errore:', error);
+        showNotification('Errore durante l\'aggiunta della categoria', 'error');
+    }
+}
+
+// Gestisci submit elimina categoria
+async function handleDeleteCategorySubmit(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const categoriaId = parseInt(formData.get('categoria'));
+    
+    if (!categoriaId) {
+        showNotification('Seleziona una categoria da eliminare', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/categoria/${categoriaId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            const result = await response.json();
+            throw new Error(result.error || 'Errore durante l\'eliminazione della categoria');
+        }
+        
+        // Chiudi il modale
+        closeDeleteCategoryModal();
+        
+        // Ricarica le categorie
+        await fetchCategorie();
+        
+        // Mostra messaggio di successo
+        showNotification('Categoria eliminata con successo!', 'success');
+        
+    } catch (error) {
+        console.error('Errore:', error);
+        showNotification(error.message || 'Errore durante l\'eliminazione della categoria', 'error');
+    }
+}
+
+// Setup listeners per chiudere modali
+function setupModalCloseListeners() {
+    // Chiudi con X
+    document.querySelectorAll('.close').forEach(closeBtn => {
+        closeBtn.addEventListener('click', () => {
+            closeAddCategoryModal();
+            closeDeleteCategoryModal();
+        });
+    });
+    
+    // Chiudi cliccando fuori
+    window.addEventListener('click', (event) => {
+        const addModal = document.getElementById('addCategoryModal');
+        const deleteModal = document.getElementById('deleteCategoryModal');
+        
+        if (event.target === addModal) {
+            closeAddCategoryModal();
+        }
+        if (event.target === deleteModal) {
+            closeDeleteCategoryModal();
+        }
+    });
 }
