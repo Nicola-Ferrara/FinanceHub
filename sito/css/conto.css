@@ -677,3 +677,75 @@ body {
 .form-group.guadagno select {
     border-color: #28a745;
 }
+
+/* Stili per il trasferimento */
+.transfer-preview {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    border: 2px solid #2196f3;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.transfer-flow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.account-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.account-box.from {
+    background: linear-gradient(135deg, #ffebee, #ffcdd2);
+    border: 1px solid #f44336;
+}
+
+.account-box.to {
+    background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+    border: 1px solid #4caf50;
+}
+
+.account-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #666;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.account-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.transfer-arrow {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2196f3;
+    flex-shrink: 0;
+}
+
+/* Responsive per trasferimenti */
+@media (max-width: 768px) {
+    .transfer-flow {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .transfer-arrow {
+        transform: rotate(90deg);
+    }
+    
+    .account-box {
+        width: 100%;
+    }
+}

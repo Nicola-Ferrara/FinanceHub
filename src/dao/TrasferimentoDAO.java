@@ -29,7 +29,7 @@ public class TrasferimentoDAO {
     }
 
     public void saveTrasferimento(Trasferimento trasferimento, String email_utente) throws SQLException {
-        String sql = "INSERT INTO Trasferimento (id, importo, data, descrizione, email_utente, id_conto1, id_conto2) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Trasferimento (id, importo, data, descrizione, email_utente, id_conto_mittente, id_conto_destinatario) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, trasferimento.getID());
             ps.setDouble(2, trasferimento.getImporto());

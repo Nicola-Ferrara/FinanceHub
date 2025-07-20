@@ -21,7 +21,7 @@ public class GestoreConti extends BaseGestorePagina {
                uri.startsWith("/api/conto/") ||
                uri.startsWith("/api/categorie");
     }
-    
+
     @Override
     public Response handle(IHTTPSession session) throws Exception {
         String uri = session.getUri();
@@ -42,6 +42,12 @@ public class GestoreConti extends BaseGestorePagina {
                 response.addHeader("Location", "/home");
                 return addNoCacheHeaders(response);
             }
+        } else if (uri.matches("/api/conto/\\d+/conti-disponibili") && method == Method.GET) {
+            return handleContiDisponibili(uri);
+        } else if (uri.matches("/api/conto/\\d+/trasferimento") && method == Method.POST) {
+            return handleAddTrasferimento(uri, session);
+        } else if (uri.matches("/api/conto/\\d+/transazione") && method == Method.POST) {
+            return handleAddTransazione(uri, session);
         } else if (uri.startsWith("/api/conto/") && method == Method.GET) {
             return handleContoAPI(uri);
         } else if (uri.startsWith("/api/conto/") && method == Method.PUT) {
@@ -50,8 +56,6 @@ public class GestoreConti extends BaseGestorePagina {
             return handleDeleteConto(uri, session);
         } else if (uri.startsWith("/api/categorie/") && method == Method.GET) {
             return handleCategorieAPI(uri);
-        } else if (uri.matches("/api/conto/\\d+/transazione") && method == Method.POST) {
-            return handleAddTransazione(uri, session);
         }
         
         return createResponse(Response.Status.NOT_FOUND, "text/plain", "Risorsa non trovata");
@@ -78,10 +82,8 @@ public class GestoreConti extends BaseGestorePagina {
             
             return createResponse(Response.Status.BAD_REQUEST, "application/json", "{\"error\": \"Endpoint non valido\"}");
         } catch (NumberFormatException e) {
-            System.out.println("DEBUG: Errore NumberFormat: " + e.getMessage());
             return createResponse(Response.Status.BAD_REQUEST, "application/json", "{\"error\": \"ID conto non valido\"}");
         } catch (Exception e) {
-            System.out.println("DEBUG: Errore durante eliminazione: " + e.getMessage());
             e.printStackTrace();
             return createResponse(Response.Status.INTERNAL_ERROR, "application/json",  "{\"error\": \"Errore del server: " + e.getMessage() + "\"}");
         }
@@ -379,11 +381,9 @@ public class GestoreConti extends BaseGestorePagina {
             return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                 "{\"error\": \"Endpoint non valido\"}");
         } catch (NumberFormatException e) {
-            System.out.println("DEBUG: Errore NumberFormat: " + e.getMessage());
             return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                 "{\"error\": \"Dati numerici non validi: " + e.getMessage() + "\"}");
         } catch (Exception e) {
-            System.out.println("DEBUG: Errore generale: " + e.getMessage());
             e.printStackTrace();
             return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
                 "{\"error\": \"Errore del server: " + e.getMessage() + "\"}");
@@ -430,6 +430,113 @@ public class GestoreConti extends BaseGestorePagina {
         }
         
         return null;
+    }
+
+    private Response handleContiDisponibili(String uri) {
+        try {
+            String[] parts = uri.split("/");
+            if (parts.length >= 4) {
+                String contoIdStr = parts[3];
+                int contoId = Integer.parseInt(contoIdStr);
+                
+                LinkedList<Conto> contiDisponibili = controller.getSomeConti(contoId);
+                
+                StringBuilder jsonBuilder = new StringBuilder("[");
+                for (int i = 0; i < contiDisponibili.size(); i++) {
+                    Conto conto = contiDisponibili.get(i);
+                    jsonBuilder.append(String.format(java.util.Locale.US,
+                        "{\"id\": %d, \"nome\": \"%s\", \"tipo\": \"%s\", \"saldo\": %.2f}",
+                        conto.getID(), conto.getNome(), conto.getTipo(), conto.getSaldo()));
+                    
+                    if (i < contiDisponibili.size() - 1) {
+                        jsonBuilder.append(",");
+                    }
+                }
+                jsonBuilder.append("]");
+                
+                Response response = createResponse(Response.Status.OK, "application/json", jsonBuilder.toString());
+                return addNoCacheHeaders(response);
+            }
+            
+            return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                "{\"error\": \"Endpoint non valido\"}");
+        } catch (NumberFormatException e) {
+            return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                "{\"error\": \"ID conto non valido\"}");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
+                "{\"error\": \"Errore del server: " + e.getMessage() + "\"}");
+        }
+    }
+
+    private Response handleAddTrasferimento(String uri, IHTTPSession session) {
+        try {
+            String[] parts = uri.split("/");
+            if (parts.length >= 4) {
+                String contoIdStr = parts[3];
+                int contoMittente = Integer.parseInt(contoIdStr);
+                
+                // Leggi il body della richiesta
+                Map<String, String> body = new HashMap<>();
+                session.parseBody(body);
+                String requestBody = body.get("postData");
+                
+                if (requestBody == null || requestBody.isEmpty()) {
+                    return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                        "{\"error\": \"Body della richiesta vuoto\"}");
+                }
+                
+                // Estrai i dati dal JSON
+                String importoStr = extractJsonValueNumber(requestBody, "importo");
+                String descrizione = extractJsonValue(requestBody, "descrizione");
+                String contoDestinatarioStr = extractJsonValueNumber(requestBody, "contoDestinatario");
+                
+                if (importoStr == null || descrizione == null || contoDestinatarioStr == null) {
+                    return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                        "{\"error\": \"Dati mancanti\"}");
+                }
+                
+                double importo = Double.parseDouble(importoStr);
+                int contoDestinatario = Integer.parseInt(contoDestinatarioStr);
+                
+                // Verifica che i conti esistano e siano diversi
+                Conto contoMit = controller.getContoById(contoMittente);
+                Conto contoDest = controller.getContoById(contoDestinatario);
+                
+                if (contoMit == null || contoDest == null) {
+                    return createResponse(Response.Status.NOT_FOUND, "application/json", 
+                        "{\"error\": \"Uno dei conti non è stato trovato\"}");
+                }
+                
+                if (contoMittente == contoDestinatario) {
+                    return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                        "{\"error\": \"Non puoi trasferire denaro allo stesso conto\"}");
+                }
+                
+                // Verifica fondi sufficienti
+                if (importo > contoMit.getSaldo()) {
+                    return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                        "{\"error\": \"Fondi insufficienti\"}");
+                }
+                
+                // Effettua il trasferimento
+                controller.aggiungiTrasferimento(importo, descrizione, contoMittente, contoDestinatario);
+                
+                return createResponse(Response.Status.OK, "application/json", 
+                    "{\"success\": true, \"message\": \"Trasferimento effettuato con successo\"}");
+            }
+            
+            return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                "{\"error\": \"Endpoint non valido\"}");
+        } catch (NumberFormatException e) {
+            return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                "{\"error\": \"Dati numerici non validi\"}");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
+                "{\"error\": \"Errore del server: " + e.getMessage() + "\"}");
+        }
     }
 
 }

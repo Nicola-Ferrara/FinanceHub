@@ -197,7 +197,7 @@ function setupActionListeners() {
     });
     
     document.getElementById('addTransferBtn').addEventListener('click', () => {
-        alert('Funzionalità in fase di sviluppo: Nuovo Trasferimento');
+        openAddTransferModal();
     });
     
     document.getElementById('editAccountBtn').addEventListener('click', () => {
@@ -244,6 +244,7 @@ function setupModalListeners() {
     const editModal = document.getElementById('editAccountModal');
     const deleteModal = document.getElementById('deleteConfirmModal');
     const transactionModal = document.getElementById('addTransactionModal');
+    const transferModal = document.getElementById('addTransferModal');
     
     // Chiudi modali cliccando sulla X
     document.querySelectorAll('.close').forEach(closeBtn => {
@@ -251,6 +252,7 @@ function setupModalListeners() {
             editModal.style.display = 'none';
             deleteModal.style.display = 'none';
             transactionModal.style.display = 'none';
+            transferModal.style.display = 'none';
         });
     });
     
@@ -265,22 +267,31 @@ function setupModalListeners() {
         if (event.target === transactionModal) {
             transactionModal.style.display = 'none';
         }
+        if (event.target === transferModal) {
+            transferModal.style.display = 'none';
+        }
     });
     
-    // Listener esistenti...
+    // Form submissions
     document.getElementById('editAccountForm').addEventListener('submit', handleEditAccountSubmit);
-    
-    // ✅ AGGIUNGI QUESTI NUOVI LISTENER
     document.getElementById('addTransactionForm').addEventListener('submit', handleAddTransactionSubmit);
-    document.getElementById('transactionType').addEventListener('change', handleTransactionTypeChange);
+    document.getElementById('addTransferForm').addEventListener('submit', handleAddTransferSubmit);
     
+    // Listeners per i campi
+    document.getElementById('transactionType').addEventListener('change', handleTransactionTypeChange);
+    document.getElementById('destinationAccount').addEventListener('change', handleDestinationAccountChange);
+    
+    // Bottoni di cancellazione
     document.getElementById('cancelEdit').addEventListener('click', () => {
         editModal.style.display = 'none';
     });
     
-    // ✅ AGGIUNGI QUESTO
     document.getElementById('cancelTransaction').addEventListener('click', () => {
         transactionModal.style.display = 'none';
+    });
+    
+    document.getElementById('cancelTransfer').addEventListener('click', () => {
+        transferModal.style.display = 'none';
     });
     
     // Altri listener esistenti...
@@ -526,5 +537,133 @@ async function handleAddTransactionSubmit(event) {
     } catch (error) {
         console.error('Errore:', error);
         showErrorMessage('Errore durante l\'aggiunta della transazione');
+    }
+}
+
+// Funzione per aprire il modale aggiungi trasferimento
+function openAddTransferModal() {
+    // Reset del form
+    document.getElementById('addTransferForm').reset();
+    document.getElementById('transferPreview').style.display = 'none';
+    
+    // Carica i conti disponibili
+    loadDestinationAccounts();
+    
+    document.getElementById('addTransferModal').style.display = 'block';
+}
+
+// Funzione per caricare i conti di destinazione
+async function loadDestinationAccounts() {
+    try {
+        const response = await fetch(`/api/conto/${contoId}/conti-disponibili`);
+
+        if (!response.ok) {
+            throw new Error('Errore durante il caricamento dei conti');
+        }
+        
+        const conti = await response.json();
+        const destinationSelect = document.getElementById('destinationAccount');
+        
+        // Svuota le opzioni esistenti
+        destinationSelect.innerHTML = '<option value="">Seleziona il conto di destinazione</option>';
+        
+        if (conti.length === 0) {
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'Nessun conto disponibile';
+            option.disabled = true;
+            destinationSelect.appendChild(option);
+        } else {
+            conti.forEach(conto => {
+                const option = document.createElement('option');
+                option.value = conto.id;
+                option.textContent = `${conto.nome} (${conto.tipo}) - €${conto.saldo.toFixed(2)}`;
+                destinationSelect.appendChild(option);
+            });
+        }
+        
+    } catch (error) {
+        console.error('Errore Completo:', error);
+        showErrorMessage('Errore durante il caricamento dei conti');
+    }
+}
+
+// Funzione per gestire il cambio di conto destinazione
+function handleDestinationAccountChange() {
+    const destinationSelect = document.getElementById('destinationAccount');
+    const transferPreview = document.getElementById('transferPreview');
+    const fromAccountName = document.getElementById('fromAccountName');
+    const toAccountName = document.getElementById('toAccountName');
+    
+    if (destinationSelect.value && contoData) {
+        // Mostra l'anteprima del trasferimento
+        fromAccountName.textContent = contoData.nome;
+        toAccountName.textContent = destinationSelect.options[destinationSelect.selectedIndex].text.split(' (')[0];
+        transferPreview.style.display = 'block';
+    } else {
+        transferPreview.style.display = 'none';
+    }
+}
+
+// Funzione per gestire il submit del trasferimento
+async function handleAddTransferSubmit(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const transferData = {
+        importo: parseFloat(formData.get('importo')),
+        descrizione: formData.get('descrizione').trim(),
+        contoDestinatario: parseInt(formData.get('contoDestinatario'))
+    };
+    
+    // Validazione
+    if (!transferData.importo || transferData.importo <= 0) {
+        showErrorMessage('Inserisci un importo valido');
+        return;
+    }
+    
+    if (!transferData.descrizione) {
+        showErrorMessage('Inserisci una descrizione');
+        return;
+    }
+    
+    if (!transferData.contoDestinatario) {
+        showErrorMessage('Seleziona il conto di destinazione');
+        return;
+    }
+    
+    // Verifica che ci siano fondi sufficienti
+    if (transferData.importo > contoData.saldo) {
+        showErrorMessage('Fondi insufficienti per effettuare il trasferimento');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/conto/${contoId}/trasferimento`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(transferData)
+        });
+        
+        if (!response.ok) {
+            const result = await response.json();
+            throw new Error(result.error || 'Errore durante il trasferimento');
+        }
+        
+        // Chiudi il modale
+        document.getElementById('addTransferModal').style.display = 'none';
+        
+        // Ricarica i dati
+        await fetchContoData();
+        await fetchOperazioni();
+        
+        // Mostra messaggio di successo
+        showSuccessMessage('Trasferimento effettuato con successo!');
+        
+    } catch (error) {
+        console.error('Errore:', error);
+        showErrorMessage(error.message || 'Errore durante il trasferimento');
     }
 }
