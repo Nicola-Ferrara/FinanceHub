@@ -13,10 +13,9 @@ public class Utente {
 	private LinkedList<Conto> conti = new LinkedList<Conto>();
     private LinkedList<Categoria> categorie = new LinkedList<Categoria>();
     private LinkedList<LogOperazione> logOperazioni = new LinkedList<LogOperazione>();
-    private LinkedList<Trasferimento> trasferimenti = new LinkedList<Trasferimento>();
 	
 	// Costruttore
-	public Utente(String nome, String cognome, String email, String password, String numero_tel, LinkedList<Conto> conti, LinkedList<Categoria> categorie, LinkedList<LogOperazione> logOperazioni, LinkedList<Trasferimento> trasferimenti) {
+	public Utente(String nome, String cognome, String email, String password, String numero_tel, LinkedList<Conto> conti, LinkedList<Categoria> categorie, LinkedList<LogOperazione> logOperazioni) {
 	    this.nome = nome;
 	    this.cognome = cognome;
 	    this.email = email;
@@ -25,7 +24,6 @@ public class Utente {
 	    this.conti = (conti != null) ? conti : new LinkedList<>();
         this.categorie = (categorie != null) ? categorie : new LinkedList<>();
         this.logOperazioni = (logOperazioni != null) ? logOperazioni : new LinkedList<>();
-        this.trasferimenti = (trasferimenti != null) ? trasferimenti : new LinkedList<>();
 	}
 	
 	// Getters
@@ -53,9 +51,6 @@ public class Utente {
     public LinkedList<LogOperazione> getLogOperazioni() {
         return logOperazioni;
     }
-    public LinkedList<Trasferimento> getTrasferimenti() {
-        return trasferimenti;
-    }
 
     // Setters
     public void setNome(String nome) {
@@ -81,9 +76,6 @@ public class Utente {
     }
     public void setLogOperazioni(LinkedList<LogOperazione> logOperazioni) {
         this.logOperazioni = logOperazioni;
-    }
-    public void setTrasferimenti(LinkedList<Trasferimento> trasferimenti) {
-        this.trasferimenti = trasferimenti;
     }
     
     // Aggiungi un conto
@@ -125,16 +117,4 @@ public class Utente {
         }
     }
 
-    // Aggiungi un trasferimento
-    public void addTrasferimento(Trasferimento trasferimento) {
-        if (trasferimento != null) {
-            this.trasferimenti.add(trasferimento);
-        }
-    }
-    // Rimuovi un trasferimento
-    public void removeTrasferimento(Trasferimento trasferimento) {
-        if (trasferimento != null) {
-            this.trasferimenti.remove(trasferimento);
-        }
-    }
 }
