@@ -17,7 +17,7 @@ public class WebServer extends NanoHTTPD {
         this.gestori.add(new GestoreLogin(controller));
         this.gestori.add(new GestoreHome(controller));
         this.gestori.add(new GestoreRegistrazione(controller));
-        // Aggiungi altri gestori secondo necessità
+        this.gestori.add(new GestoreConti(controller));
         
         start(SOCKET_READ_TIMEOUT, false);
         System.out.println("Directory di lavoro: " + System.getProperty("user.dir"));

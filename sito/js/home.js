@@ -27,7 +27,11 @@ async function fetchBilancio() {
         // Aggiorna i dati nella pagina
         document.getElementById("totalIncome").textContent = entrate.toFixed(2);
         document.getElementById("totalExpenses").textContent = uscite.toFixed(2);
-        document.getElementById("netBalance").textContent = bilancioNetto.toFixed(2);
+        
+        // Imposta il colore del totale in base al segno
+        const netBalanceElement = document.getElementById("netBalance");
+        netBalanceElement.textContent = bilancioNetto.toFixed(2);
+        netBalanceElement.className = bilancioNetto >= 0 ? "positive" : "negative";
         
         // Aggiorna o crea il grafico
         createOrUpdateChart(entrate, uscite);
@@ -47,19 +51,29 @@ function createOrUpdateChart(entrate, uscite) {
     
     // Crea un nuovo grafico
     chartInstance = new Chart(ctx, {
-        type: "pie",
+        type: "doughnut",
         data: {
             labels: ["Entrate", "Uscite"],
             datasets: [{
                 data: [entrate, uscite],
-                backgroundColor: ["#4caf50", "#f44336"],
+                backgroundColor: ["#28a745", "#dc3545"],
+                borderWidth: 0,
+                cutout: "60%"
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: true,
             plugins: {
                 legend: {
                     position: "bottom",
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        font: {
+                            size: 14
+                        }
+                    }
                 }
             }
         }
@@ -87,7 +101,30 @@ async function fetchConti() {
         } else {
             accounts.forEach(account => {
                 const li = document.createElement("li");
-                li.textContent = `${account.nome} (${account.tipo}): ${account.saldo.toFixed(2)} €`;
+                
+                const accountInfo = document.createElement("div");
+                accountInfo.className = "account-info";
+                
+                const accountDetails = document.createElement("div");
+                accountDetails.className = "account-details";
+                
+                const accountName = document.createElement("h3");
+                accountName.textContent = account.nome;
+                
+                const accountType = document.createElement("p");
+                accountType.textContent = account.tipo;
+                
+                accountDetails.appendChild(accountName);
+                accountDetails.appendChild(accountType);
+                
+                const accountBalance = document.createElement("div");
+                accountBalance.className = `account-balance ${account.saldo >= 0 ? "positive" : "negative"}`;
+                accountBalance.textContent = `${account.saldo.toFixed(2)} €`;
+                
+                accountInfo.appendChild(accountDetails);
+                accountInfo.appendChild(accountBalance);
+                li.appendChild(accountInfo);
+                
                 accountsList.appendChild(li);
             });
         }
@@ -136,10 +173,18 @@ async function fetchOperazioni() {
                 // Dettagli dell'operazione
                 const details = document.createElement("div");
                 details.classList.add("transaction-details");
+                
+                // Per i trasferimenti, mostra "Destinatario ← Mittente"
+                let categoriaText = operazione.categoria;
+                if (operazione.tipo === "Trasferimento") {
+                    // Assumendo che il server invii i nomi dei conti nel campo categoria
+                    categoriaText = operazione.categoria; // Il server dovrà essere modificato per inviare "ContoA ← ContoB"
+                }
+                
                 details.innerHTML = `
                     <span>${operazione.descrizione}</span>
-                    <span class="transaction-date">${operazione.data}</span>
-                    <span class="transaction-category">${operazione.categoria} - ${operazione.conto}</span>
+                    <span class="transaction-date">${formatDate(operazione.data)}</span>
+                    <span class="transaction-category">${categoriaText}</span>
                 `;
 
                 // Importo dell'operazione
@@ -169,6 +214,16 @@ async function fetchOperazioni() {
         const transactionsList = document.getElementById("transactionsList");
         transactionsList.innerHTML = "<li>Errore durante il caricamento delle operazioni</li>";
     }
+}
+
+// Funzione helper per formattare la data
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('it-IT', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
 }
 
 // Inizializzazione quando il DOM è caricato

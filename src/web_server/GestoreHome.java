@@ -122,7 +122,6 @@ public class GestoreHome extends BaseGestorePagina {
                 
                 String tipo;
                 String categoria;
-                String nomeConto = ""; // Dovrai implementare un metodo per ottenere il nome del conto
                 
                 if (operazione instanceof Transazione) {
                     Transazione transazione = (Transazione) operazione;
@@ -132,26 +131,39 @@ public class GestoreHome extends BaseGestorePagina {
                     // Trova il nome del conto per questa transazione
                     for (Conto conto : controller.getConti()) {
                         if (conto.getTransazioni().contains(transazione)) {
-                            nomeConto = conto.getNome();
+                            categoria += " - " + conto.getNome();
                             break;
                         }
                     }
                 } else if (operazione instanceof Trasferimento) {
+                    Trasferimento trasferimento = (Trasferimento) operazione;
                     tipo = "Trasferimento";
-                    categoria = "Trasferimento";
-                    nomeConto = "Trasferimento"; // Per ora, poi vedremo come gestirlo meglio
+                    
+                    // Trova i nomi dei conti mittente e destinatario
+                    String nomeContoMittente = "Sconosciuto";
+                    String nomeContoDestinatario = "Sconosciuto";
+                    
+                    for (Conto conto : controller.getConti()) {
+                        if (conto.getID() == trasferimento.getIdContoMittente()) {
+                            nomeContoMittente = conto.getNome();
+                        }
+                        if (conto.getID() == trasferimento.getIdContoDestinatario()) {
+                            nomeContoDestinatario = conto.getNome();
+                        }
+                    }
+                    
+                    categoria = nomeContoDestinatario + " ← " + nomeContoMittente;
                 } else {
                     tipo = "Sconosciuto";
                     categoria = "Sconosciuto";
-                    nomeConto = "Sconosciuto";
                 }
                 
                 // Formatta la data
                 String dataFormattata = operazione.getData().toString().substring(0, 10); // YYYY-MM-DD
                 
                 jsonBuilder.append(String.format(java.util.Locale.US, 
-                    "{\"id\": %d, \"data\": \"%s\", \"conto\": \"%s\", \"categoria\": \"%s\", \"tipo\": \"%s\", \"importo\": %.2f, \"descrizione\": \"%s\"}",
-                    operazione.getID(), dataFormattata, nomeConto, categoria, tipo, 
+                    "{\"id\": %d, \"data\": \"%s\", \"categoria\": \"%s\", \"tipo\": \"%s\", \"importo\": %.2f, \"descrizione\": \"%s\"}",
+                    operazione.getID(), dataFormattata, categoria, tipo, 
                     operazione.getImporto(), operazione.getDescrizione()));
                 
                 if (i < operazioni.length - 1) {

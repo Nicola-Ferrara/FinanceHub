@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FinanceHub - Home</title>
     <link rel="stylesheet" href="../css/home.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../js/home.js" defer></script>
 </head>
@@ -20,25 +21,29 @@
         <!-- Bilancio del mese corrente -->
         <section class="balance-section">
             <h2 id="balanceTitle">Bilancio</h2>
-            <div class="balance-details">
-                <p>Entrate: <span id="totalIncome">0.00</span> €</p>
-                <p>Uscite: <span id="totalExpenses">0.00</span> €</p>
-                <p>Totale: <span id="netBalance">0.00</span> €</p>
+            <div class="balance-container">
+                <div class="balance-details">
+                    <p>Entrate: <span id="totalIncome" class="income">0.00</span> €</p>
+                    <p>Uscite: <span id="totalExpenses" class="expense">0.00</span> €</p>
+                    <p>Totale: <span id="netBalance">0.00</span> €</p>
+                </div>
+                <canvas id="balanceChart" class="balance-chart"></canvas>
             </div>
-            <canvas id="balanceChart" class="balance-chart"></canvas>
         </section>
 
         <!-- Lista dei conti -->
         <section class="accounts-section">
-            <h2>Lista dei conti</h2>
+            <h2>I tuoi conti</h2>
             <ul id="accountsList" class="accounts-list">
                 <!-- I conti verranno caricati dinamicamente -->
             </ul>
         </section>
 
+        <!-- Transazioni recenti -->
         <section class="transactions-section">
-            <h2>Transazioni</h2>
+            <h2>Operazioni recenti</h2>
             <ul id="transactionsList" class="transactions-list">
+                <!-- Le transazioni verranno caricate dinamicamente -->
             </ul>
         </section>
     </main>
