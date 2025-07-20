@@ -241,7 +241,6 @@ function formatDate(dateString) {
 
 // Inizializzazione quando il DOM è caricato
 document.addEventListener("DOMContentLoaded", function() {
-    // Aggiorna il titolo del bilancio con il mese corrente
     const balanceTitle = document.getElementById("balanceTitle");
     if (balanceTitle) {
         balanceTitle.textContent = `Bilancio ${meseCorrente} ${annoCorrente}`;
@@ -251,6 +250,7 @@ document.addEventListener("DOMContentLoaded", function() {
     fetchBilancio();
     fetchConti();
     fetchOperazioni();
+    fetchCategorie();
 });
 
 // Listener per il bottone aggiungi conto
@@ -326,4 +326,87 @@ function hideNotification(notification) {
             notification.parentNode.removeChild(notification);
         }
     }, 300);
+}
+
+// Funzione per recuperare le categorie dal server
+async function fetchCategorie() {
+    try {
+        // Recupera le categorie di guadagno
+        const incomeResponse = await fetch("/api/categorie/guadagno");
+        const expenseResponse = await fetch("/api/categorie/spesa");
+        
+        if (!incomeResponse.ok || !expenseResponse.ok) {
+            throw new Error("Errore durante il recupero delle categorie");
+        }
+
+        const incomeCategories = await incomeResponse.json();
+        const expenseCategories = await expenseResponse.json();
+        
+        // Carica le categorie di guadagno
+        const incomeCategoriesList = document.getElementById("incomeCategories");
+        incomeCategoriesList.innerHTML = "";
+        
+        if (incomeCategories.length === 0) {
+            const li = document.createElement("li");
+            li.className = "empty-categories";
+            li.textContent = "Nessuna categoria di guadagno";
+            incomeCategoriesList.appendChild(li);
+        } else {
+            incomeCategories.forEach(categoria => {
+                const li = document.createElement("li");
+                
+                const categoryItem = document.createElement("div");
+                categoryItem.className = "category-item";
+                
+                const categoryIcon = document.createElement("div");
+                categoryIcon.className = "category-icon income";
+                
+                const categoryName = document.createElement("span");
+                categoryName.className = "category-name";
+                categoryName.textContent = categoria.nome;
+                
+                categoryItem.appendChild(categoryIcon);
+                categoryItem.appendChild(categoryName);
+                li.appendChild(categoryItem);
+                
+                incomeCategoriesList.appendChild(li);
+            });
+        }
+        
+        // Carica le categorie di spesa
+        const expenseCategoriesList = document.getElementById("expenseCategories");
+        expenseCategoriesList.innerHTML = "";
+        
+        if (expenseCategories.length === 0) {
+            const li = document.createElement("li");
+            li.className = "empty-categories";
+            li.textContent = "Nessuna categoria di spesa";
+            expenseCategoriesList.appendChild(li);
+        } else {
+            expenseCategories.forEach(categoria => {
+                const li = document.createElement("li");
+                
+                const categoryItem = document.createElement("div");
+                categoryItem.className = "category-item";
+                
+                const categoryIcon = document.createElement("div");
+                categoryIcon.className = "category-icon expense";
+                
+                const categoryName = document.createElement("span");
+                categoryName.className = "category-name";
+                categoryName.textContent = categoria.nome;
+                
+                categoryItem.appendChild(categoryIcon);
+                categoryItem.appendChild(categoryName);
+                li.appendChild(categoryItem);
+                
+                expenseCategoriesList.appendChild(li);
+            });
+        }
+        
+    } catch (error) {
+        console.error("Errore:", error);
+        document.getElementById("incomeCategories").innerHTML = '<li class="empty-categories">Errore durante il caricamento</li>';
+        document.getElementById("expenseCategories").innerHTML = '<li class="empty-categories">Errore durante il caricamento</li>';
+    }
 }

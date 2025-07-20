@@ -430,3 +430,138 @@ body {
 .notification-close:hover {
     background: rgba(0, 0, 0, 0.1);
 }
+
+/* Sezione Categorie */
+.categories-section {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    transition: transform 0.3s ease;
+    grid-column: 1 / -1; /* Occupa tutta la larghezza */
+}
+
+.categories-section:hover {
+    transform: translateY(-5px);
+}
+
+.categories-section h2 {
+    margin-top: 0;
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 25px;
+    font-weight: 300;
+    text-align: center;
+}
+
+.categories-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.categories-group h3 {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 10px 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.income-title {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.expense-title {
+    background: linear-gradient(135deg, #f8d7da, #f1b0b7);
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+}
+
+.categories-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.categories-list li {
+    padding: 15px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+    margin-right: 10px;
+}
+
+.categories-list.income li {
+    background: #f8f9fa;
+    border-left-color: #28a745;
+}
+
+.categories-list.income li:hover {
+    background: #e2f4e6;
+    transform: translateX(5px);
+    box-shadow: 0 3px 10px rgba(40, 167, 69, 0.2);
+}
+
+.categories-list.expense li {
+    background: #f8f9fa;
+    border-left-color: #dc3545;
+}
+
+.categories-list.expense li:hover {
+    background: #f5e6e8;
+    transform: translateX(5px);
+    box-shadow: 0 3px 10px rgba(220, 53, 69, 0.2);
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.categories-group {
+    overflow: hidden;
+}
+
+.category-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.category-icon.income {
+    background: #28a745;
+}
+
+.category-icon.expense {
+    background: #dc3545;
+}
+
+.category-name {
+    font-weight: 500;
+}
+
+.empty-categories {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* Responsive per categorie */
+@media (max-width: 768px) {
+    .categories-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}

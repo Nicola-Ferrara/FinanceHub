@@ -6,6 +6,7 @@ import fi.iki.elonen.NanoHTTPD.Response;
 import controller.Controller;
 import dto.*;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class GestoreHome extends BaseGestorePagina {
@@ -19,6 +20,8 @@ public class GestoreHome extends BaseGestorePagina {
         return "/home".equals(uri) || 
                "/api/bilancio".equals(uri) || 
                "/api/conti".equals(uri) ||
+               "/api/categorie/spesa".equals(uri) ||
+               "/api/categorie/guadagno".equals(uri) ||
                "/api/operazioni".equals(uri) ||
                "/logout".equals(uri);
     }
@@ -36,6 +39,10 @@ public class GestoreHome extends BaseGestorePagina {
             return handleAccounts();
         } else if ("/api/operazioni".equals(uri) && method == Method.GET) {
             return handleOperazioni();
+        } else if ("/api/categorie/spesa".equals(uri) && method == Method.GET) {
+            return getCategorieSpesa();
+        } else if ("/api/categorie/guadagno".equals(uri) && method == Method.GET) {
+            return getCategorieGuadagno();
         } else if ("/logout".equals(uri) && method == Method.GET) {
             return handleLogout(session);
         }
@@ -197,6 +204,56 @@ public class GestoreHome extends BaseGestorePagina {
         } catch (Exception e) {
             e.printStackTrace();
             return createResponse(Response.Status.INTERNAL_ERROR, "text/plain", "Errore durante il logout: " + e.getMessage());
+        }
+    }
+
+    private Response getCategorieSpesa() {
+        try {
+            LinkedList<Categoria> categorie = controller.getCategoriaSpesa();
+            
+            StringBuilder jsonBuilder = new StringBuilder("[");
+            for (int i = 0; i < categorie.size(); i++) {
+                Categoria categoria = categorie.get(i);
+                jsonBuilder.append(String.format(
+                    "{\"id\": %d, \"nome\": \"%s\", \"tipo\": \"%s\"}", 
+                    categoria.getID(), categoria.getNome(), categoria.getTipo()));
+                
+                if (i < categorie.size() - 1) {
+                    jsonBuilder.append(",");
+                }
+            }
+            jsonBuilder.append("]");
+            
+            Response response = createResponse(Response.Status.OK, "application/json", jsonBuilder.toString());
+            return addNoCacheHeaders(response);
+        } catch (Exception e) {
+            return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
+                "{\"error\": \"Errore durante il recupero delle categorie spesa\"}");
+        }
+    }
+
+    private Response getCategorieGuadagno() {
+        try {
+            LinkedList<Categoria> categorie = controller.getCategoriaGuadagno();
+            
+            StringBuilder jsonBuilder = new StringBuilder("[");
+            for (int i = 0; i < categorie.size(); i++) {
+                Categoria categoria = categorie.get(i);
+                jsonBuilder.append(String.format(
+                    "{\"id\": %d, \"nome\": \"%s\", \"tipo\": \"%s\"}", 
+                    categoria.getID(), categoria.getNome(), categoria.getTipo()));
+                
+                if (i < categorie.size() - 1) {
+                    jsonBuilder.append(",");
+                }
+            }
+            jsonBuilder.append("]");
+            
+            Response response = createResponse(Response.Status.OK, "application/json", jsonBuilder.toString());
+            return addNoCacheHeaders(response);
+        } catch (Exception e) {
+            return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
+                "{\"error\": \"Errore durante il recupero delle categorie guadagno\"}");
         }
     }
 

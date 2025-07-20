@@ -44,6 +44,14 @@ public class CategoriaDAO {
         return null;
     }
 
+    public void deleteCategoria(int id) throws SQLException {
+        String sql = "DELETE FROM Categoria WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        }
+    }
+
     public void saveCategoria(Categoria categoria, String email_utente) throws SQLException {
         String sql = "INSERT INTO Categoria (id, nome, tipo, email_utente) VALUES (?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {

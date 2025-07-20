@@ -266,13 +266,59 @@ public class Controller {
     }
 
     public Categoria getCategoriaById(int id) {
-    for (Categoria categoria : utente.getCategorie()) {
-        if (categoria.getID() == id) {
-            return categoria;
+        for (Categoria categoria : utente.getCategorie()) {
+            if (categoria.getID() == id) {
+                return categoria;
+            }
+        }
+        return null;
+    }
+
+    public void aggiungiCategoria(String nome, Categoria.TipoCategoria tipo) {
+        try {
+            int id = categoriaDAO.newID();
+            Categoria nuovaCategoria = new Categoria(id, nome, tipo);
+            categoriaDAO.saveCategoria(nuovaCategoria, utente.getEmail());
+            utente.addCategoria(nuovaCategoria);
+        } catch (SQLException e) {
+            throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER INSERIRE UNA NUOVA CATEGORIA", e);
         }
     }
-    return null;
-}
+
+    public boolean eliminaCategoria(int id) {
+        Categoria categoria = getCategoriaById(id);
+        if (categoria.getID() == 1 || categoria.getID() == 2) {
+            return false;
+        }
+        for (Conto conto : utente.getConti()) {
+            for (Transazione transazione : conto.getTransazioni()) {
+                if (transazione.getIdCategoria() == id) {
+                    if (transazione.getCategoria().getTipo() == Categoria.TipoCategoria.Spesa) {
+                        for (Categoria cat : utente.getCategorie()) {
+                            if (cat.getID() == 2) {
+                                transazione.setCategoria(cat);
+                                break;
+                            }
+                        }
+                    } else if (transazione.getCategoria().getTipo() == Categoria.TipoCategoria.Guadagno) {
+                        for (Categoria cat : utente.getCategorie()) {
+                            if (cat.getID() == 1) {
+                                transazione.setCategoria(cat);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        try {
+            categoriaDAO.deleteCategoria(id);
+            utente.removeCategoria(categoria);
+        } catch (SQLException e) {
+            throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER ELIMINARE UNA CATEGORIA", e);
+        }
+        return true;
+    }
 
     public static void main(String[] args) {
         try {
