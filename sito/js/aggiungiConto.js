@@ -97,26 +97,32 @@ function validateForm(data) {
 
 // Formatta il campo saldo
 function formatBalance(event) {
-    let value = event.target.value;
+    const input = event.target;
+    let value = input.value;
+    const cursorPosition = input.selectionStart;
+    const oldLength = value.length;
     
-    // Rimuovi caratteri non numerici eccetto punto e virgola
-    value = value.replace(/[^0-9.,]/g, '');
+    let cleanValue = value.replace(/[^0-9.,]/g, '');
     
-    // Sostituisci virgola con punto
-    value = value.replace(',', '.');
+    cleanValue = cleanValue.replace(/,/g, '.');
     
-    // Assicurati che ci sia solo un punto decimale
-    const parts = value.split('.');
+    const parts = cleanValue.split('.');
     if (parts.length > 2) {
-        value = parts[0] + '.' + parts.slice(1).join('');
+        cleanValue = parts[0] + '.' + parts.slice(1).join('');
     }
     
-    // Limita a 2 decimali
-    if (parts[1] && parts[1].length > 2) {
-        value = parts[0] + '.' + parts[1].substring(0, 2);
+    if (parts.length === 2 && parts[1].length > 2) {
+        cleanValue = parts[0] + '.' + parts[1].substring(0, 2);
     }
-    
-    event.target.value = value;
+    if (cleanValue !== value) {
+        const newLength = cleanValue.length;
+        const lengthDiff = newLength - oldLength;
+        
+        input.value = cleanValue;
+        
+        const newCursorPosition = Math.max(0, cursorPosition + lengthDiff);
+        input.setSelectionRange(newCursorPosition, newCursorPosition);
+    }
 }
 
 // Imposta la validazione del form

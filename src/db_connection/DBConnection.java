@@ -52,7 +52,7 @@ public class DBConnection {
         props.setProperty("loginTimeout", "10");
         props.setProperty("socketTimeout", "30"); 
         conn = DriverManager.getConnection(s_url, props);
-        System.out.println("🔄 Nuova connessione database creata");
+        System.out.println("Nuova connessione database creata");
         return conn;
     }
 }

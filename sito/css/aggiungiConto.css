@@ -301,7 +301,18 @@ body {
     .form-group input,
     .form-group select {
         padding: 12px;
-        font-size: 16px; /* Evita zoom su iOS */
+        font-size: 16px;
+    }
+
+    .input-prefix {
+        left: 12px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    
+    .input-group input {
+        padding-left: 40px;
+        font-size: 16px;
     }
 }
 
