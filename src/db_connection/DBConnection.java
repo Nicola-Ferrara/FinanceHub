@@ -25,8 +25,9 @@ public class DBConnection {
         if (conn == null || conn.isClosed()) {
         	try (InputStream is = getClass().getResourceAsStream("/pwdfile"); BufferedReader b = new BufferedReader(new InputStreamReader(is))) {
                 String pwd = b.readLine();
-                String s_url = "jdbc:postgresql://localhost:5432/FinanceHub?currentSchema=View_FinanceHub";
-                conn = DriverManager.getConnection(s_url, "postgres", pwd);
+                String s_url = "jdbc:postgresql://aws-0-eu-central-2.pooler.supabase.com:5432/postgres?sslmode=require";
+                String username = "postgres.essksmuwvtgqubgzokal";
+                conn = DriverManager.getConnection(s_url, username, pwd);
             }
         }
         return conn;

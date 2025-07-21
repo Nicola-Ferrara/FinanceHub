@@ -76,7 +76,21 @@ public class Controller {
 			}
 			throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER INSERIRE UN NUOVO UTENTE", e);
 		}
+        setCategorieBase();
         return true;
+    }
+
+    public void setCategorieBase() {
+        try {
+            Categoria categoria1 = new Categoria(1, "Guadagno", Categoria.TipoCategoria.Guadagno);
+            Categoria categoria2 = new Categoria(2, "Spesa", Categoria.TipoCategoria.Spesa);
+            categoriaDAO.saveCategoria(categoria1, utente.getEmail());
+            categoriaDAO.saveCategoria(categoria2, utente.getEmail());
+            utente.addCategoria(categoria1);
+            utente.addCategoria(categoria2);
+        } catch (SQLException e) {
+            throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER INSERIRE LE CATEGORIE BASE", e);
+        }
     }
 
     public void clearUtente() {
@@ -357,6 +371,7 @@ public class Controller {
 
             // Avvia il WebServer
             new WebServer(controller);
+            Thread.currentThread().join();
         } catch (NullPointerException e) {
             EccezioneNull.errorePWD(e);
         } catch (Exception e) {
