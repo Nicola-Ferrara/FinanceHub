@@ -575,7 +575,7 @@ async function handleAddCategorySubmit(event) {
         // Chiudi il modale
         closeAddCategoryModal();
         
-        // Ricarica le categorie
+        // ✅ RICARICA TUTTE LE CATEGORIE
         await fetchCategorie();
         
         // Mostra messaggio di successo
@@ -612,8 +612,13 @@ async function handleDeleteCategorySubmit(event) {
         // Chiudi il modale
         closeDeleteCategoryModal();
         
-        // Ricarica le categorie
-        await fetchCategorie();
+        // ✅ RICARICA TUTTI I DATI DOPO L'ELIMINAZIONE
+        await Promise.all([
+            fetchCategorie(),
+            fetchBilancio(),
+            fetchOperazioni(),
+            fetchConti()
+        ]);
         
         // Mostra messaggio di successo
         showNotification('Categoria eliminata con successo!', 'success');
