@@ -284,8 +284,43 @@ body {
     }
     
     .nav-buttons {
-        flex-direction: column;
-        gap: 10px;
+        position: relative;
+    }
+
+    .mobile-menu-toggle {
+        display: block;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 8px;
+    }
+    
+    .mobile-nav-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 10px;
+        padding: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        min-width: 120px;
+    }
+    
+    .mobile-nav-menu.active {
+        display: block;
+    }
+    
+    .mobile-nav-menu .nav-link,
+    .mobile-nav-menu .logout-button {
+        display: block;
+        width: 100%;
+        margin-bottom: 8px;
+        text-align: center;
+        color: #333;
     }
     
     .form-actions {

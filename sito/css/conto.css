@@ -547,9 +547,34 @@ body {
         margin-left: 0;
     }
     
+    .header {
+        padding: 12px 15px;
+        flex-wrap: wrap;
+    }
+    
+    .header h1 {
+        font-size: 18px;
+        flex: 1;
+        min-width: 200px;
+    }
+    
     .nav-buttons {
-        flex-direction: column;
-        gap: 10px;
+        flex-direction: row;
+        gap: 15px;
+        flex-shrink: 0;
+    }
+    
+    .nav-link {
+        padding: 8px 15px;
+        font-size: 14px;
+        border-radius: 20px;
+        white-space: nowrap;
+    }
+    
+    .logout-button {
+        padding: 12px 20px;
+        font-size: 14px;
+        border-radius: 25px;
     }
     
     .form-actions {
