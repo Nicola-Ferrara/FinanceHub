@@ -3,47 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrazione</title>
+    <title>FinanceHub - Registrazione</title>
     <link rel="stylesheet" href="../css/register.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="register-container">
-        <h1>Registrati</h1>
-        <form id="registerForm">
-            <label for="nome">Nome</label>
-            <input type="text" id="nome" name="nome" pattern="[A-Za-zÀ-ÿ\s]+" title="Il nome può contenere solo lettere e spazi" required>
-
-            <label for="cognome">Cognome</label>
-            <input type="text" id="cognome" name="cognome" pattern="[A-Za-zÀ-ÿ\s]+" title="Il cognome può contenere solo lettere e spazi" required>
-
-            <label for="telefono">Numero di Telefono</label>
-            <input type="tel" id="telefono" name="telefono" pattern="[0-9]{10}" title="Inserisci un numero di telefono valido (10 cifre)" required>
-
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" required>
-
-            <label for="password">Password</label>
-            <div class="password-container">
-                <input type="password" id="password" name="password" 
-                    pattern="(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}" 
-                    title="La password deve contenere almeno 6 caratteri, una lettera maiuscola, un numero e un carattere speciale" 
-                    required>
-                <button type="button" id="togglePassword" class="toggle-password">
-                    <svg xmlns="http://www.w3.org/2000/svg" id="eyeIcon" fill="currentColor" viewBox="0 0 16 16" width="16" height="16">
-                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM8 13c-3.866 0-7-4-7-5s3.134-5 7-5 7 4 7 5-3.134 5-7 5z"/>
-                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM8 9a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-                    </svg>
-                </button>
+    <div class="register-background">
+        <div class="register-container">
+            <div class="register-header">
+                <div class="logo">
+                    <div class="logo-icon">💰</div>
+                    <h1>FinanceHub</h1>
+                </div>
+                <p class="welcome-text">Crea il tuo account e inizia a gestire le tue finanze</p>
             </div>
 
-            <div id="error-message" class="error-message"></div>
-            <div id="success-message" class="success-message"></div>
+            <div class="register-form-container">
+                <form id="registerForm" class="register-form">
+                    <div class="form-row">
+                        <div class="form-group half-width">
+                            <label for="nome">
+                                <span class="label-icon">👤</span>
+                                Nome
+                            </label>
+                            <input type="text" id="nome" name="nome" 
+                                   placeholder="Il tuo nome" 
+                                   pattern="[A-Za-zÀ-ÿ\s]+" 
+                                   title="Il nome può contenere solo lettere e spazi" required>
+                        </div>
 
-            <button type="submit">Registrati</button>
-        </form>
-        <a href="/login" class="register-link">Hai già un account? Accedi qui!</a>
+                        <div class="form-group half-width">
+                            <label for="cognome">
+                                <span class="label-icon">👤</span>
+                                Cognome
+                            </label>
+                            <input type="text" id="cognome" name="cognome" 
+                                   placeholder="Il tuo cognome" 
+                                   pattern="[A-Za-zÀ-ÿ\s]+" 
+                                   title="Il cognome può contenere solo lettere e spazi" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">
+                            <span class="label-icon">📧</span>
+                            Email
+                        </label>
+                        <input type="email" id="email" name="email" 
+                               placeholder="Inserisci la tua email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefono">
+                            <span class="label-icon">📱</span>
+                            Numero di Telefono
+                        </label>
+                        <input type="tel" id="telefono" name="telefono" 
+                               placeholder="3xx xxx xxxx" 
+                               pattern="[0-9]{10}" 
+                               title="Inserisci un numero di telefono valido (10 cifre)" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <span class="label-icon">🔒</span>
+                            Password
+                        </label>
+                        <div class="password-container">
+                            <input type="password" id="password" name="password" 
+                                   placeholder="Inserisci la tua password" 
+                                   pattern="(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}" 
+                                   title="La password deve contenere almeno 6 caratteri, una lettera maiuscola, un numero e un carattere speciale" 
+                                   required>
+                            <button type="button" id="togglePassword" class="toggle-password">
+                                <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="password-requirements">
+                            <div class="requirement" id="req-length">
+                                <span class="requirement-icon">⚪</span>
+                                Almeno 6 caratteri
+                            </div>
+                            <div class="requirement" id="req-uppercase">
+                                <span class="requirement-icon">⚪</span>
+                                Una lettera maiuscola
+                            </div>
+                            <div class="requirement" id="req-number">
+                                <span class="requirement-icon">⚪</span>
+                                Un numero
+                            </div>
+                            <div class="requirement" id="req-special">
+                                <span class="requirement-icon">⚪</span>
+                                Un carattere speciale (@$!%*?&)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="error-message" class="error-message">
+                        <span class="error-icon">⚠️</span>
+                        <span id="error-text">Errore durante la registrazione</span>
+                    </div>
+
+                    <div id="success-message" class="success-message">
+                        <span class="success-icon">✅</span>
+                        <span id="success-text">Registrazione completata con successo!</span>
+                    </div>
+
+                    <button type="submit" class="register-button">
+                        <span class="button-text">Crea Account</span>
+                        <div class="loading-spinner" style="display: none;">
+                            <div class="spinner"></div>
+                        </div>
+                    </button>
+                </form>
+
+                <div class="register-footer">
+                    <div class="divider">
+                        <span>oppure</span>
+                    </div>
+                    <a href="/login" class="login-link">
+                        <span class="link-icon">🔑</span>
+                        Hai già un account? Accedi qui
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Elementi decorativi -->
+        <div class="floating-elements">
+            <div class="floating-element element-1">📊</div>
+            <div class="floating-element element-2">💳</div>
+            <div class="floating-element element-3">📈</div>
+            <div class="floating-element element-4">💰</div>
+            <div class="floating-element element-5">🏦</div>
+        </div>
     </div>
 
-    <script src="../js/register.js" defer></script>
+    <script src="../js/register.js"></script>
 </body>
 </html>

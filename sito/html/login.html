@@ -5,30 +5,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FinanceHub - Accesso</title>
     <link rel="stylesheet" href="../css/login.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="login-container">
-        <h1>Accedi</h1>
-        <form id="loginForm">
-            <label for="email">Email</label>
-            <input type="text" id="email" name="email" required>
-
-            <label for="password">Password</label>
-            <div class="password-container">
-                <input type="password" id="password" name="password" required>
-                <button type="button" id="togglePassword" class="toggle-password">
-                    <svg xmlns="http://www.w3.org/2000/svg" id="eyeIcon" fill="currentColor" viewBox="0 0 16 16" width="16" height="16">
-                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM8 13c-3.866 0-7-4-7-5s3.134-5 7-5 7 4 7 5-3.134 5-7 5z"/>
-                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM8 9a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-                    </svg>
-                </button>
+    <div class="login-background">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="logo">
+                    <div class="logo-icon">💰</div>
+                    <h1>FinanceHub</h1>
+                </div>
+                <p class="welcome-text">Bentornato! Accedi al tuo account</p>
             </div>
 
-            <div id="error-message" class="error-message"></div>
+            <div class="login-form-container">
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="email">
+                            <span class="label-icon">📧</span>
+                            Email
+                        </label>
+                        <input type="email" id="email" name="email" 
+                               placeholder="inserisci la tua email" required>
+                    </div>
 
-            <button type="submit">Login</button>
-        </form>
-        <a href="/register" class="register-link">Non sei registrato? Clicca qui!</a>
+                    <div class="form-group">
+                        <label for="password">
+                            <span class="label-icon">🔒</span>
+                            Password
+                        </label>
+                        <div class="password-container">
+                            <input type="password" id="password" name="password" 
+                                   placeholder="inserisci la tua password" required>
+                            <button type="button" id="togglePassword" class="toggle-password">
+                                <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="error-message" class="error-message">
+                        <span class="error-icon">⚠️</span>
+                        <span id="error-text">Credenziali non valide</span>
+                    </div>
+
+                    <button type="submit" class="login-button">
+                        <span class="button-text">Accedi</span>
+                        <div class="loading-spinner" style="display: none;">
+                            <div class="spinner"></div>
+                        </div>
+                    </button>
+                </form>
+
+                <div class="login-footer">
+                    <div class="divider">
+                        <span>oppure</span>
+                    </div>
+                    <a href="/register" class="register-link">
+                        <span class="link-icon">👤</span>
+                        Non hai un account? Registrati qui
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Elementi decorativi -->
+        <div class="floating-elements">
+            <div class="floating-element element-1">💳</div>
+            <div class="floating-element element-2">📊</div>
+            <div class="floating-element element-3">💰</div>
+            <div class="floating-element element-4">📈</div>
+        </div>
     </div>
 
     <script src="../js/login.js"></script>

@@ -2,23 +2,84 @@
 document.getElementById("togglePassword").addEventListener("click", function() {
     const passwordField = document.getElementById("password");
     const eyeIcon = document.getElementById("eyeIcon");
-    const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
-    passwordField.setAttribute("type", type);
+    const isPassword = passwordField.getAttribute("type") === "password";
 
-    // Cambia l'icona dell'occhio
-    if (type === "password") {
-        eyeIcon.setAttribute("fill", "currentColor"); // Occhio chiuso
-    } else {
-        eyeIcon.setAttribute("fill", "#2575fc"); // Occhio aperto
+    const currentClasses = passwordField.className;
+    const currentValue = passwordField.value;
+    const isFocused = document.activeElement === passwordField;
+    
+    passwordField.setAttribute("type", isPassword ? "text" : "password");
+    
+    passwordField.className = currentClasses;
+    passwordField.value = currentValue;
+    
+    if (isFocused) {
+        passwordField.focus();
+        // Posiziona il cursore alla fine
+        passwordField.setSelectionRange(currentValue.length, currentValue.length);
     }
+    
+    // Cambia l'icona dell'occhio
+    if (isPassword) {
+        eyeIcon.innerHTML = `
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94l.94.94A15.85 15.85 0 0 0 3.59 12s3.14 7 8.41 7a9.26 9.26 0 0 0 5.94-2.07l1 1Z"></path>
+            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19l-.98-.98A16.5 16.5 0 0 0 22.14 12S19 5 12 5c-.69 0-1.36.07-2 .24l-1.1-1Z"></path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+        `;
+    } else {
+        eyeIcon.innerHTML = `
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+        `;
+    }
+    
+    // Animazione del bottone
+    this.style.transform = "scale(0.95)";
+    setTimeout(() => {
+        this.style.transform = "scale(1)";
+    }, 150);
 });
+
+// Rimuovi errori quando l'utente inizia a digitare
+document.getElementById("email").addEventListener("input", clearErrors);
+document.getElementById("password").addEventListener("input", clearErrors);
+
+function clearErrors() {
+    const errorMessage = document.getElementById("error-message");
+    const emailField = document.getElementById("email");
+    const passwordField = document.getElementById("password");
+    
+    errorMessage.style.display = "none";
+    emailField.classList.remove("input-error");
+    passwordField.classList.remove("input-error");
+}
 
 // Gestione del form di login
 document.getElementById("loginForm").addEventListener("submit", async function(event) {
-    event.preventDefault(); // Previeni il comportamento predefinito del form
+    event.preventDefault();
 
-    const email = document.getElementById("email").value;
+    const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
+    const submitButton = document.querySelector(".login-button");
+    const buttonText = document.querySelector(".button-text");
+    const loadingSpinner = document.querySelector(".loading-spinner");
+
+    // Validazione lato client
+    if (!email || !password) {
+        showError("Compila tutti i campi");
+        return;
+    }
+
+    if (!isValidEmail(email)) {
+        showError("Inserisci un'email valida");
+        document.getElementById("email").classList.add("input-error");
+        return;
+    }
+
+    // Mostra loading
+    submitButton.disabled = true;
+    buttonText.style.opacity = "0";
+    loadingSpinner.style.display = "block";
 
     try {
         const response = await fetch("/login", {
@@ -28,19 +89,71 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
         });
 
         if (response.status === 401) {
-            const errorMessage = document.getElementById("error-message");
-            errorMessage.textContent = "Credenziali non valide";
-            errorMessage.style.display = "block";
-
-            // Evidenzia i campi con un bordo rosso
+            showError("Email o password non corretti");
             document.getElementById("email").classList.add("input-error");
             document.getElementById("password").classList.add("input-error");
-        } else if (response.status === 200) {
-            window.location.href = "/home";
+        } else if (response.status === 200 || response.redirected) {
+            // Login successful - show success and redirect
+            showSuccess();
+            setTimeout(() => {
+                window.location.href = "/home";
+            }, 1000);
         } else {
-            console.error("Errore sconosciuto:", response.status);
+            showError("Errore del server. Riprova più tardi.");
         }
     } catch (error) {
         console.error("Errore durante la richiesta:", error);
+        showError("Errore di connessione. Controlla la tua connessione internet.");
+    } finally {
+        // Nasconde loading solo se non c'è redirect
+        if (!document.getElementById("error-message").style.display !== "none") {
+            submitButton.disabled = false;
+            buttonText.style.opacity = "1";
+            loadingSpinner.style.display = "none";
+        }
     }
+});
+
+function showError(message) {
+    const errorMessage = document.getElementById("error-message");
+    const errorText = document.getElementById("error-text");
+    
+    errorText.textContent = message;
+    errorMessage.style.display = "flex";
+    
+    // Reset button state
+    const submitButton = document.querySelector(".login-button");
+    const buttonText = document.querySelector(".button-text");
+    const loadingSpinner = document.querySelector(".loading-spinner");
+    
+    submitButton.disabled = false;
+    buttonText.style.opacity = "1";
+    loadingSpinner.style.display = "none";
+}
+
+function showSuccess() {
+    const submitButton = document.querySelector(".login-button");
+    const buttonText = document.querySelector(".button-text");
+    const loadingSpinner = document.querySelector(".loading-spinner");
+    
+    submitButton.style.background = "linear-gradient(135deg, #10b981, #059669)";
+    buttonText.textContent = "Accesso effettuato!";
+    buttonText.style.opacity = "1";
+    loadingSpinner.style.display = "none";
+}
+
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+// Animazione di focus sui campi
+document.querySelectorAll('input').forEach(input => {
+    input.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'translateY(-1px)';
+    });
+    
+    input.addEventListener('blur', function() {
+        this.parentElement.style.transform = 'translateY(0)';
+    });
 });
