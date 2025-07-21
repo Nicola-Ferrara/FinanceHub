@@ -247,6 +247,7 @@ public class Controller {
             int id = transazioneDAO.newID();
             Timestamp data = new Timestamp(System.currentTimeMillis());
             Transazione transazione = new Transazione(id, importo, data, descrizione, categoria);
+            transazione.setIdCategoria(categoria.getID());
             transazioneDAO.saveTransazione(transazione, idConto, categoria.getID());
             for (Conto conto : utente.getConti()) {
                 if (conto.getID() == idConto) {
@@ -327,28 +328,77 @@ public class Controller {
         }
     }
 
+    // public boolean eliminaCategoria(int id) {
+    //     Categoria categoria = getCategoriaById(id);
+    //     for (Conto conto : utente.getConti()) {
+    //         for (Transazione transazione : conto.getTransazioni()) {
+    //             if (transazione.getIdCategoria() == id) {
+    //                 int nuovoId = 0;
+    //                 if (transazione.getCategoria().getTipo() == Categoria.TipoCategoria.Spesa) {
+    //                     for (Categoria cat : utente.getCategorie()) {
+    //                         if (cat.getNome().equals("Spesa")) {
+    //                             transazione.setCategoria(cat);
+    //                             nuovoId = cat.getID();
+    //                             transazione.setIdCategoria(nuovoId);
+    //                             break;
+    //                         }
+    //                     }
+    //                 } else if (transazione.getCategoria().getTipo() == Categoria.TipoCategoria.Guadagno) {
+    //                     for (Categoria cat : utente.getCategorie()) {
+    //                         if (cat.getNome().equals("Guadagno")) {
+    //                             transazione.setCategoria(cat);
+    //                             nuovoId = cat.getID();
+    //                             transazione.setIdCategoria(nuovoId);
+    //                             break;
+    //                         }
+    //                     }
+    //                 }
+    //                 try {
+    //                     transazioneDAO.updateTransazione(transazione, nuovoId);
+    //                 } catch (SQLException e) {
+    //                     throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER MODIFICARE UNA TRANSAZIONE", e);
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     try {
+    //         categoriaDAO.deleteCategoria(id);
+    //         utente.removeCategoria(categoria);
+    //     } catch (SQLException e) {
+    //         throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER ELIMINARE UNA CATEGORIA", e);
+    //     }
+    //     return true;
+    // }
+
     public boolean eliminaCategoria(int id) {
         Categoria categoria = getCategoriaById(id);
-        if (categoria.getID() == 1 || categoria.getID() == 2) {
-            return false;
-        }
         for (Conto conto : utente.getConti()) {
             for (Transazione transazione : conto.getTransazioni()) {
                 if (transazione.getIdCategoria() == id) {
-                    if (transazione.getCategoria().getTipo() == Categoria.TipoCategoria.Spesa) {
+                    int nuovoId = 0;
+                    if (categoria.getTipo() == Categoria.TipoCategoria.Spesa) {
                         for (Categoria cat : utente.getCategorie()) {
-                            if (cat.getID() == 2) {
+                            if (cat.getNome().equals("Spesa")) {
                                 transazione.setCategoria(cat);
+                                nuovoId = cat.getID();
+                                transazione.setIdCategoria(nuovoId);
                                 break;
                             }
                         }
-                    } else if (transazione.getCategoria().getTipo() == Categoria.TipoCategoria.Guadagno) {
+                    } else if (categoria.getTipo() == Categoria.TipoCategoria.Guadagno) {
                         for (Categoria cat : utente.getCategorie()) {
-                            if (cat.getID() == 1) {
+                            if (cat.getNome().equals("Guadagno")) {
                                 transazione.setCategoria(cat);
+                                nuovoId = cat.getID();
+                                transazione.setIdCategoria(nuovoId);
                                 break;
                             }
                         }
+                    }
+                    try {
+                        transazioneDAO.updateTransazione(transazione, nuovoId);
+                    } catch (SQLException e) {
+                        throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER MODIFICARE UNA TRANSAZIONE", e);
                     }
                 }
             }

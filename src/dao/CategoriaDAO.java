@@ -34,11 +34,7 @@ public class CategoriaDAO {
             ps.setInt(1, id);
             ResultSet resultSet = ps.executeQuery();
             if (resultSet.next()) {
-                return new Categoria(
-                    resultSet.getInt("id"), 
-                    resultSet.getString("nome"), 
-                    Categoria.TipoCategoria.valueOf(resultSet.getString("tipo"))
-                );
+                return new Categoria(resultSet.getInt("id"), resultSet.getString("nome"), Categoria.TipoCategoria.valueOf(resultSet.getString("tipo")));
             }
         }
         return null;

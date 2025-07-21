@@ -43,6 +43,15 @@ public class TransazioneDAO {
         }
     }
 
+    public void updateTransazione(Transazione transazione, int idCategoria) throws SQLException {
+        String sql = "UPDATE Transazione SET id_categoria = ? WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, idCategoria);
+            ps.setInt(2, transazione.getID());
+            ps.executeUpdate();
+        }
+    }
+
     public int newID() throws SQLException {
         String sql = "SELECT MAX(id) AS max_id FROM Transazione";
         try (PreparedStatement ps = connection.prepareStatement(sql);
