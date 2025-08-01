@@ -41,8 +41,10 @@ public class DBConnection {
                 pwd = b.readLine();
             }
         }
+        
         String s_url = "jdbc:postgresql://aws-0-eu-central-2.pooler.supabase.com:5432/postgres?sslmode=require&tcpKeepAlive=true&socketTimeout=30000";
         String username = "postgres.essksmuwvtgqubgzokal";
+        
         Properties props = new Properties();
         props.setProperty("user", username);
         props.setProperty("password", pwd);
@@ -50,9 +52,11 @@ public class DBConnection {
         props.setProperty("sslmode", "require");
         props.setProperty("tcpKeepAlive", "true");
         props.setProperty("loginTimeout", "10");
-        props.setProperty("socketTimeout", "30"); 
-        conn = DriverManager.getConnection(s_url, props);
-        System.out.println("Nuova connessione database creata");
-        return conn;
+        props.setProperty("socketTimeout", "30");
+        
+        // ✅ NON SETTARE PIÙ conn = ... MA RESTITUISCI DIRETTAMENTE
+        Connection newConnection = DriverManager.getConnection(s_url, props);
+        System.out.println("🔄 Nuova connessione database creata");
+        return newConnection;
     }
 }
