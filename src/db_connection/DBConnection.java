@@ -56,7 +56,7 @@ public class DBConnection {
         
         // ✅ NON SETTARE PIÙ conn = ... MA RESTITUISCI DIRETTAMENTE
         Connection newConnection = DriverManager.getConnection(s_url, props);
-        System.out.println("🔄 Nuova connessione database creata");
+        System.out.println("Nuova connessione database creata");
         return newConnection;
     }
 }

@@ -17,17 +17,14 @@ public class GestoreLogin extends BaseGestorePagina {
     
     @Override
     public boolean canHandle(String uri, String method) {
-        return ("/login".equals(uri) || "/".equals(uri)) && 
-               ("POST".equals(method) || "GET".equals(method));
+        return ("/login".equals(uri) || "/".equals(uri)) && ("POST".equals(method) || "GET".equals(method));
     }
     
     @Override
     public Response handle(IHTTPSession session) throws Exception {
         if (session.getMethod() == Method.GET) {
-            // Serve la pagina di login
             return serveLoginPage();
         } else if (session.getMethod() == Method.POST) {
-            // Gestisci il tentativo di login
             return handleLoginAttempt(session);
         }
         
