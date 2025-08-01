@@ -6,20 +6,31 @@ document.getElementById("togglePassword").addEventListener("click", function() {
 
     const currentClasses = passwordField.className;
     const currentValue = passwordField.value;
-    const isFocused = document.activeElement === passwordField;
+    
+    // ✅ SALVA LA POSIZIONE DEL CURSORE PRIMA CHE CAMBI
+    const cursorPosition = passwordField.selectionStart || currentValue.length;
+    const wasFocused = document.activeElement === passwordField;
+    
+    console.log("🔍 Debug PRIMA del cambio:");
+    console.log("Era in focus:", wasFocused);
+    console.log("Posizione cursore:", cursorPosition);
+    console.log("Valore:", currentValue);
     
     passwordField.setAttribute("type", isPassword ? "text" : "password");
     
     passwordField.className = currentClasses;
     passwordField.value = currentValue;
     
-    if (isFocused) {
-        passwordField.focus();
-        // Posiziona il cursore alla fine
-        passwordField.setSelectionRange(currentValue.length, currentValue.length);
-    }
+    // ✅ USA setTimeout PER ASSICURARTI CHE IL BROWSER ABBIA PROCESSATO IL CAMBIO
+    setTimeout(() => {
+        if (wasFocused) {
+            console.log("🔄 Rimetto focus e cursore alla posizione:", cursorPosition);
+            passwordField.focus();
+            passwordField.setSelectionRange(cursorPosition, cursorPosition);
+        }
+    }, 0);
     
-    // Cambia l'icona dell'occhio
+    // Resto del codice...
     if (isPassword) {
         eyeIcon.innerHTML = `
             <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94l.94.94A15.85 15.85 0 0 0 3.59 12s3.14 7 8.41 7a9.26 9.26 0 0 0 5.94-2.07l1 1Z"></path>
@@ -33,7 +44,6 @@ document.getElementById("togglePassword").addEventListener("click", function() {
         `;
     }
     
-    // Animazione del bottone
     this.style.transform = "scale(0.95)";
     setTimeout(() => {
         this.style.transform = "scale(1)";
