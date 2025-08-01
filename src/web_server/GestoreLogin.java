@@ -38,7 +38,7 @@ public class GestoreLogin extends BaseGestorePagina {
             Response response = createResponse(Response.Status.OK, "text/html", content);
             return addNoCacheHeaders(response);
         } catch (Exception e) {
-            return createResponse(Response.Status.INTERNAL_ERROR, "text/plain", "Errore nel caricamento della pagina: " + e.getMessage());
+            return addNoCacheHeaders(createResponse(Response.Status.INTERNAL_ERROR, "text/plain", "Errore nel caricamento della pagina: " + e.getMessage()));
         }
     }
     
@@ -50,17 +50,12 @@ public class GestoreLogin extends BaseGestorePagina {
         String email = parameters.get("email") != null ? parameters.get("email").get(0) : null;
         String password = parameters.get("password") != null ? parameters.get("password").get(0) : null;
 
-        // Usa il Controller per gestire il login
         boolean loginSuccess = controller.effettuaLogin(email, password);
 
         if (loginSuccess) {
-            // Reindirizza a /home
-            Response response = createResponse(Response.Status.REDIRECT, "text/html", "");
-            response.addHeader("Location", "/home");
-            return addNoCacheHeaders(response);
+            return addNoCacheHeaders(createResponse(Response.Status.OK, "text/plain", "Login effettuato con successo"));
         } else {
-            // Restituisci uno stato HTTP 401 per credenziali non valide
-            return createResponse(Response.Status.UNAUTHORIZED, "text/html", "Credenziali non valide");
+            return addNoCacheHeaders(createResponse(Response.Status.UNAUTHORIZED, "text/plain", "Credenziali non valide"));
         }
     }
 }

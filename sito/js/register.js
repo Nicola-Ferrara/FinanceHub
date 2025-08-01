@@ -1,28 +1,11 @@
-// Gestione del pulsante Mostra/Nascondi password
+// Toggle password
 document.getElementById("togglePassword").addEventListener("click", function() {
     const passwordField = document.getElementById("password");
     const eyeIcon = document.getElementById("eyeIcon");
     const isPassword = passwordField.getAttribute("type") === "password";
-    
-    // Mantieni le classi CSS durante il cambio
-    const currentClasses = passwordField.className;
-    const currentValue = passwordField.value;
-    const isFocused = document.activeElement === passwordField;
-    
-    // Cambia il tipo del campo
+
     passwordField.setAttribute("type", isPassword ? "text" : "password");
     
-    // Ripristina le classi e il valore
-    passwordField.className = currentClasses;
-    passwordField.value = currentValue;
-    
-    // Ripristina il focus se era presente
-    if (isFocused) {
-        passwordField.focus();
-        passwordField.setSelectionRange(currentValue.length, currentValue.length);
-    }
-    
-    // Cambia l'icona dell'occhio
     if (isPassword) {
         eyeIcon.innerHTML = `
             <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94l.94.94A15.85 15.85 0 0 0 3.59 12s3.14 7 8.41 7a9.26 9.26 0 0 0 5.94-2.07l1 1Z"></path>
@@ -36,7 +19,6 @@ document.getElementById("togglePassword").addEventListener("click", function() {
         `;
     }
     
-    // Animazione del bottone
     this.style.transform = "scale(0.95)";
     setTimeout(() => {
         this.style.transform = "scale(1)";
@@ -47,7 +29,6 @@ document.getElementById("togglePassword").addEventListener("click", function() {
 document.getElementById("password").addEventListener("input", function() {
     const password = this.value;
     
-    // Controlla lunghezza
     const lengthReq = document.getElementById("req-length");
     if (password.length >= 6) {
         lengthReq.classList.add("valid");
@@ -57,7 +38,6 @@ document.getElementById("password").addEventListener("input", function() {
         lengthReq.querySelector(".requirement-icon").textContent = "⚪";
     }
     
-    // Controlla maiuscola
     const uppercaseReq = document.getElementById("req-uppercase");
     if (/[A-Z]/.test(password)) {
         uppercaseReq.classList.add("valid");
@@ -67,7 +47,6 @@ document.getElementById("password").addEventListener("input", function() {
         uppercaseReq.querySelector(".requirement-icon").textContent = "⚪";
     }
     
-    // Controlla numero
     const numberReq = document.getElementById("req-number");
     if (/\d/.test(password)) {
         numberReq.classList.add("valid");
@@ -77,7 +56,6 @@ document.getElementById("password").addEventListener("input", function() {
         numberReq.querySelector(".requirement-icon").textContent = "⚪";
     }
     
-    // Controlla carattere speciale
     const specialReq = document.getElementById("req-special");
     if (/[@$!%*?&]/.test(password)) {
         specialReq.classList.add("valid");
@@ -87,7 +65,6 @@ document.getElementById("password").addEventListener("input", function() {
         specialReq.querySelector(".requirement-icon").textContent = "⚪";
     }
     
-    // Rimuovi errori quando l'utente digita
     clearErrors();
 });
 
@@ -124,40 +101,44 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     const buttonText = document.querySelector(".button-text");
     const loadingSpinner = document.querySelector(".loading-spinner");
 
-    // Validazione lato client
     let hasErrors = false;
+    let firstErrorMessage = "";
 
     if (!nome) {
         showFieldError("nome", "Il nome è obbligatorio");
+        if (!firstErrorMessage) firstErrorMessage = "Il nome è obbligatorio";
         hasErrors = true;
     }
 
     if (!cognome) {
         showFieldError("cognome", "Il cognome è obbligatorio");
+        if (!firstErrorMessage) firstErrorMessage = "Il cognome è obbligatorio";
         hasErrors = true;
     }
 
     if (!email || !isValidEmail(email)) {
         showFieldError("email", "Inserisci un'email valida");
+        if (!firstErrorMessage) firstErrorMessage = "Inserisci un'email valida";
         hasErrors = true;
     }
 
     if (!telefono || !/^[0-9]{10}$/.test(telefono)) {
         showFieldError("telefono", "Inserisci un numero di telefono valido (10 cifre)");
+        if (!firstErrorMessage) firstErrorMessage = "Inserisci un numero di telefono valido (10 cifre)";
         hasErrors = true;
     }
 
     if (!isValidPassword(password)) {
         showFieldError("password", "La password non soddisfa tutti i requisiti");
+        if (!firstErrorMessage) firstErrorMessage = "La password non soddisfa tutti i requisiti";
         hasErrors = true;
     }
 
     if (hasErrors) {
-        showError("Correggi gli errori evidenziati");
+        showError(firstErrorMessage);
         return;
     }
 
-    // Mostra loading
     submitButton.disabled = true;
     buttonText.style.opacity = "0";
     loadingSpinner.style.display = "block";
@@ -171,11 +152,8 @@ document.getElementById("registerForm").addEventListener("submit", async functio
 
         if (response.status === 201) {
             showSuccess("Registrazione completata con successo!");
-            
-            // Reset del form
             document.getElementById("registerForm").reset();
             
-            // Reindirizza al login dopo 2 secondi
             setTimeout(() => {
                 window.location.href = "/login";
             }, 2000);
@@ -190,7 +168,6 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         console.error("Errore durante la richiesta:", error);
         showError("Errore di connessione. Controlla la tua connessione internet.");
     } finally {
-        // Reset button state
         submitButton.disabled = false;
         buttonText.style.opacity = "1";
         loadingSpinner.style.display = "none";
@@ -227,9 +204,6 @@ function showSuccess(message) {
 function showFieldError(fieldId, message) {
     const field = document.getElementById(fieldId);
     field.classList.add("input-error");
-    
-    // Opzionalmente, potresti mostrare un tooltip o messaggio specifico
-    field.setAttribute("title", message);
 }
 
 function isValidEmail(email) {

@@ -17,17 +17,14 @@ public class GestoreRegistrazione extends BaseGestorePagina {
     
     @Override
     public boolean canHandle(String uri, String method) {
-        return "/register".equals(uri) && 
-               ("POST".equals(method) || "GET".equals(method));
+        return "/register".equals(uri) && ("POST".equals(method) || "GET".equals(method));
     }
     
     @Override
     public Response handle(IHTTPSession session) throws Exception {
         if (session.getMethod() == Method.GET) {
-            // Serve la pagina di registrazione
             return serveRegisterPage();
         } else if (session.getMethod() == Method.POST) {
-            // Gestisci il tentativo di registrazione
             return handleRegistrationAttempt(session);
         }
         
@@ -41,7 +38,7 @@ public class GestoreRegistrazione extends BaseGestorePagina {
             Response response = createResponse(Response.Status.OK, "text/html", content);
             return addNoCacheHeaders(response);
         } catch (Exception e) {
-            return createResponse(Response.Status.INTERNAL_ERROR, "text/plain", "Errore nel caricamento della pagina: " + e.getMessage());
+            return addNoCacheHeaders(createResponse(Response.Status.INTERNAL_ERROR, "text/plain", "Errore nel caricamento della pagina: " + e.getMessage()));
         }
     }
     
@@ -57,16 +54,12 @@ public class GestoreRegistrazione extends BaseGestorePagina {
         String email = parameters.get("email") != null ? parameters.get("email").get(0) : null;
         String password = parameters.get("password") != null ? parameters.get("password").get(0) : null;
 
-        // Usa il Controller per gestire la registrazione
         boolean registrazioneSuccesso = controller.effettuaRegistrazione(nome, cognome, telefono, email, password);
 
         if (registrazioneSuccesso) {
-            // Registrazione avvenuta con successo
-            Response response = createResponse(Response.Status.CREATED, "text/plain", "Registrazione completata con successo");
-            return addNoCacheHeaders(response);
+            return addNoCacheHeaders(createResponse(Response.Status.CREATED, "text/plain", "Registrazione completata con successo"));
         } else {
-            // Email già registrata o altro errore
-            return createResponse(Response.Status.BAD_REQUEST, "text/plain", "Email già registrata");
+            return addNoCacheHeaders(createResponse(Response.Status.BAD_REQUEST, "text/plain", "Email già registrata"));
         }
     }
 }
