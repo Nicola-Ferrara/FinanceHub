@@ -83,10 +83,10 @@ public class Controller {
     public void setCategorieBase() {
         try {
             Categoria categoria1 = new Categoria(categoriaDAO.newID(), "Guadagno", Categoria.TipoCategoria.Guadagno);
-            Categoria categoria2 = new Categoria(categoriaDAO.newID(), "Spesa", Categoria.TipoCategoria.Spesa);
             categoriaDAO.saveCategoria(categoria1, utente.getEmail());
-            categoriaDAO.saveCategoria(categoria2, utente.getEmail());
             utente.addCategoria(categoria1);
+            Categoria categoria2 = new Categoria(categoriaDAO.newID(), "Spesa", Categoria.TipoCategoria.Spesa);
+            categoriaDAO.saveCategoria(categoria2, utente.getEmail());
             utente.addCategoria(categoria2);
         } catch (SQLException e) {
             throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER INSERIRE LE CATEGORIE BASE", e);
