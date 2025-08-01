@@ -95,6 +95,7 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
     }
 });
 
+// Messaggio di errore
 function showError(message) {
     const errorMessage = document.getElementById("error-message");
     const errorText = document.getElementById("error-text");
@@ -102,7 +103,6 @@ function showError(message) {
     errorText.textContent = message;
     errorMessage.style.display = "flex";
     
-    // Reset button state
     const submitButton = document.querySelector(".login-button");
     const buttonText = document.querySelector(".button-text");
     const loadingSpinner = document.querySelector(".loading-spinner");
@@ -112,6 +112,7 @@ function showError(message) {
     loadingSpinner.style.display = "none";
 }
 
+// Messaggio di successo
 function showSuccess() {
     const submitButton = document.querySelector(".login-button");
     const buttonText = document.querySelector(".button-text");
