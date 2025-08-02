@@ -94,7 +94,6 @@ public class DBConnection {
         props.setProperty("socketTimeout", "60");
         
         Connection newConnection = DriverManager.getConnection(s_url, props);
-        System.out.println("Nuova connessione database creata");
         return newConnection;
     }
 }

@@ -812,3 +812,36 @@ body {
         align-items: center;
     }
 }
+
+/* Messaggio nessun dato per il grafico */
+.balance-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    transition: justify-content 0.3s ease;
+}
+
+.balance-details {
+    flex: 1;
+    max-width: 100%; /* ✅ ASSICURA CHE NON SUPERI LA LARGHEZZA */
+}
+
+.balance-chart {
+    max-width: 350px;
+    max-height: 350px;
+    width: 100%;
+    height: auto;
+    transition: all 0.3s ease; /* ✅ TRANSIZIONE SMOOTH */
+}
+
+/* ✅ QUANDO NON C'È GRAFICO, CENTRA I DATI */
+.balance-container[style*="center"] .balance-details {
+    text-align: center;
+    max-width: 600px;
+}
+
+/* ✅ RIMUOVI IL MESSAGGIO NO-DATA (non serve più) */
+.no-data-message {
+    display: none !important;
+}

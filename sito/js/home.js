@@ -41,8 +41,79 @@ async function fetchBilancio() {
 }
 
 // Funzione per creare o aggiornare il grafico
+// function createOrUpdateChart(entrate, uscite) {
+//     const ctx = document.getElementById("balanceChart").getContext("2d");
+    
+//     // Se il grafico esiste già, distruggilo
+//     if (chartInstance) {
+//         chartInstance.destroy();
+//     }
+    
+//     // Crea un nuovo grafico
+//     chartInstance = new Chart(ctx, {
+//         type: "doughnut",
+//         data: {
+//             labels: ["Entrate", "Uscite"],
+//             datasets: [{
+//                 data: [entrate, uscite],
+//                 backgroundColor: ["#28a745", "#dc3545"],
+//                 borderWidth: 0,
+//                 cutout: "60%"
+//             }]
+//         },
+//         options: {
+//             responsive: true,
+//             maintainAspectRatio: true,
+//             plugins: {
+//                 legend: {
+//                     position: "bottom",
+//                     labels: {
+//                         padding: 20,
+//                         usePointStyle: true,
+//                         font: {
+//                             size: 14
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//     });
+// }
 function createOrUpdateChart(entrate, uscite) {
     const ctx = document.getElementById("balanceChart").getContext("2d");
+    const chartContainer = document.getElementById("balanceChart");
+    const balanceContainer = document.querySelector('.balance-container');
+    
+    // ✅ SE NON CI SONO DATI, NASCONDI IL GRAFICO
+    if (entrate === 0 && uscite === 0) {
+        chartContainer.style.display = 'none';
+        
+        // Rimuovi messaggio se esiste
+        const noDataMessage = document.getElementById('noDataMessage');
+        if (noDataMessage) {
+            noDataMessage.remove();
+        }
+        
+        // Distruggi il grafico esistente se esiste
+        if (chartInstance) {
+            chartInstance.destroy();
+            chartInstance = null;
+        }
+        
+        // ✅ FAI OCCUPARE TUTTO LO SPAZIO AI DATI DEL BILANCIO
+        balanceContainer.style.justifyContent = 'center';
+        return;
+    }
+    
+    // ✅ SE CI SONO DATI, MOSTRA IL GRAFICO
+    chartContainer.style.display = 'block';
+    balanceContainer.style.justifyContent = 'space-between';
+    
+    // Rimuovi messaggio se esiste
+    const noDataMessage = document.getElementById('noDataMessage');
+    if (noDataMessage) {
+        noDataMessage.remove();
+    }
     
     // Se il grafico esiste già, distruggilo
     if (chartInstance) {
