@@ -48,7 +48,7 @@ FinanceHub è un'applicazione web sviluppata in Java che permette agli utenti di
    ```bash
    run.bat
    ```
-5. Apri il browser e vai su http://localhost:8080
+5. Apri il browser e vai su https://financehub-h6bk.onrender.com
 
 ## Dipendenze
 
