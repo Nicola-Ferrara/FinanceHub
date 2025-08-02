@@ -37,7 +37,7 @@ public class WebServer extends NanoHTTPD {
             String method = session.getMethod().toString();
 
             if (uri.equals("/favicon.ico")) {
-                return serveStaticFile(uri);
+                return serveStaticFile("/img/favicon.ico");
             }
             
             // Cerca il gestore appropriato
@@ -60,7 +60,7 @@ public class WebServer extends NanoHTTPD {
         }
     }
     
-    private Response serveStaticFile(String uri) {
+    /*private Response serveStaticFile(String uri) {
         try {
             String filePath = "./sito" + uri;
             String mimeType = getContentTypeForFile(uri);
@@ -71,6 +71,30 @@ public class WebServer extends NanoHTTPD {
             response.addHeader("Cache-Control", "max-age=86400"); // Cache per 24 ore
             return response;
         } catch (Exception e) {
+            return newFixedLengthResponse(Response.Status.NOT_FOUND, "text/plain", "File non trovato");
+        }
+    }*/
+
+    private Response serveStaticFile(String uri) {
+        try {
+            String filePath = "./sito" + uri;
+            String mimeType = getContentTypeForFile(uri);
+            
+            byte[] fileData = java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(filePath));
+            
+            Response response;
+            if (mimeType.startsWith("text/") || mimeType.equals("application/javascript")) {
+                response = newFixedLengthResponse(Response.Status.OK, mimeType, new String(fileData));
+            } else {
+                response = newFixedLengthResponse(Response.Status.OK, mimeType, 
+                    new java.io.ByteArrayInputStream(fileData), fileData.length);
+            }
+            
+            response.addHeader("Cache-Control", "max-age=86400");
+            return response;
+            
+        } catch (Exception e) {
+            System.out.println("Errore servendo file " + uri + ": " + e.getMessage());
             return newFixedLengthResponse(Response.Status.NOT_FOUND, "text/plain", "File non trovato");
         }
     }
