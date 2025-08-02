@@ -1,14 +1,11 @@
 package controller;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 
-import db_connection.*;
 import exception.*;
 import web_server.*;
 import dao.*;
@@ -17,35 +14,24 @@ import dto.*;
 public class Controller {
 
     // Attributi
-    private UtenteDAO utenteDAO;
-    private CategoriaDAO categoriaDAO;
-    private ContoDAO contoDAO;
-    private LogOperazioniDAO logOperazioniDAO;
-    private TransazioneDAO transazioneDAO;
-    private TrasferimentoDAO trasferimentoDAO;
-
+    private DAOFactory daoFactory;
     private Utente utente;
 
     // Costruttore
-    public Controller(Connection conn) {
-        this.utenteDAO = new UtenteDAO(conn);
-        this.categoriaDAO = new CategoriaDAO(conn);
-        this.contoDAO = new ContoDAO(conn);
-        this.logOperazioniDAO = new LogOperazioniDAO(conn);
-        this.transazioneDAO = new TransazioneDAO(conn);
-        this.trasferimentoDAO = new TrasferimentoDAO(conn);
+    public Controller() {
+        this.daoFactory = DAOFactory.getInstance();
     }
 
-    public boolean effettuaLogin(String email, String password) {
+    public boolean effettuaLogin(String email, String password) throws EccezioniDatabase {
         try {
-            utente = utenteDAO.getUtente(email, password);
+            utente = daoFactory.getUtenteDAO().getUtente(email, password);
             if (utente == null) {
                 return false;
             }
-            utente.setLogOperazioni(logOperazioniDAO.getLogOperazioni(utente.getEmail()));
-            utente.setConti(contoDAO.getConti(utente.getEmail()));
-            utente.setCategorie(categoriaDAO.getCategorie(utente.getEmail()));
-            LinkedList<Trasferimento> trasferimenti = trasferimentoDAO.getTrasferimenti(utente.getEmail());
+            utente.setLogOperazioni(daoFactory.getLogOperazioniDAO().getLogOperazioni(utente.getEmail()));
+            utente.setConti(daoFactory.getContoDAO().getConti(utente.getEmail()));
+            utente.setCategorie(daoFactory.getCategoriaDAO().getCategorie(utente.getEmail()));
+            LinkedList<Trasferimento> trasferimenti = daoFactory.getTrasferimentoDAO().getTrasferimenti(utente.getEmail());
             for (Conto conto : utente.getConti()) {
                 for (Trasferimento trasferimento : trasferimenti) {
                     if ((trasferimento.getIdContoMittente() == conto.getID()) || (trasferimento.getIdContoDestinatario() == conto.getID())) {
@@ -54,42 +40,42 @@ public class Controller {
                 }
             }
             for (Conto conto : utente.getConti()) {
-                LinkedList<Transazione> transazioni = transazioneDAO.getTransazioni(conto.getID());
+                LinkedList<Transazione> transazioni = daoFactory.getTransazioneDAO().getTransazioni(conto.getID());
                 for (Transazione transazione : transazioni) {
-                    transazione.setCategoria(categoriaDAO.getCategoria(transazione.getIdCategoria()));
+                    transazione.setCategoria(daoFactory.getCategoriaDAO().getCategoria(transazione.getIdCategoria()));
                 }
                 conto.setTransazioni(transazioni);
             }
             return true;
-        } catch (SQLException e) {
-            throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER IL RECUPERO DI TUTTI I DATI RIGUARDANTI L'UTENTE", e);
+        } catch (EccezioniDatabase e) {
+            throw e;
         }
     }
 
-    public boolean effettuaRegistrazione(String nome, String cognome, String telefono, String email, String password) {
+    public boolean effettuaRegistrazione(String nome, String cognome, String telefono, String email, String password) throws EccezioniDatabase {
         try {
             utente = new Utente(nome, cognome, email, password, telefono, null, null, null);
-            utenteDAO.saveUtente(utente);
-        } catch (SQLException e) {
-			if (e.getSQLState().equals("23505")) {
-			    return false;
-			}
-			throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER INSERIRE UN NUOVO UTENTE", e);
-		}
+            daoFactory.getUtenteDAO().saveUtente(utente);
+        } catch (EccezioniDatabase e) {
+            if (e.getMessage().contains("23505")) {
+                return false;
+            }
+            throw e;
+        }
         setCategorieBase();
         return true;
     }
 
-    public void setCategorieBase() {
+    public void setCategorieBase() throws EccezioniDatabase {
         try {
-            Categoria categoria1 = new Categoria(categoriaDAO.newID(), "Guadagno", Categoria.TipoCategoria.Guadagno);
-            categoriaDAO.saveCategoria(categoria1, utente.getEmail());
+            Categoria categoria1 = new Categoria(daoFactory.getCategoriaDAO().newID(), "Guadagno", Categoria.TipoCategoria.Guadagno);
+            daoFactory.getCategoriaDAO().saveCategoria(categoria1, utente.getEmail());
             utente.addCategoria(categoria1);
-            Categoria categoria2 = new Categoria(categoriaDAO.newID(), "Spesa", Categoria.TipoCategoria.Spesa);
-            categoriaDAO.saveCategoria(categoria2, utente.getEmail());
+            Categoria categoria2 = new Categoria(daoFactory.getCategoriaDAO().newID(), "Spesa", Categoria.TipoCategoria.Spesa);
+            daoFactory.getCategoriaDAO().saveCategoria(categoria2, utente.getEmail());
             utente.addCategoria(categoria2);
-        } catch (SQLException e) {
-            throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER INSERIRE LE CATEGORIE BASE", e);
+        } catch (EccezioniDatabase e) {
+            throw e;
         }
     }
 
@@ -106,22 +92,22 @@ public class Controller {
     }
 
     public double calcolaEntrate() {
-    double entrate = 0.0;
-    int meseCorrente = (new Timestamp(System.currentTimeMillis())).toLocalDateTime().getMonthValue();
-    int annoCorrente = (new Timestamp(System.currentTimeMillis())).toLocalDateTime().getYear();
-    for (Conto conto: getConti()) { 
-        for (Transazione transazione : conto.getTransazioni()) {
-            if (transazione.getCategoria().getTipo() == Categoria.TipoCategoria.Guadagno) {
-                int meseTransazione = transazione.getData().toLocalDateTime().getMonthValue();
-                int annoTransazione = transazione.getData().toLocalDateTime().getYear();
-                if (meseTransazione == meseCorrente && annoTransazione == annoCorrente) {
-                    entrate += transazione.getImporto();
+        double entrate = 0.0;
+        int meseCorrente = (new Timestamp(System.currentTimeMillis())).toLocalDateTime().getMonthValue();
+        int annoCorrente = (new Timestamp(System.currentTimeMillis())).toLocalDateTime().getYear();
+        for (Conto conto: getConti()) { 
+            for (Transazione transazione : conto.getTransazioni()) {
+                if (transazione.getCategoria().getTipo() == Categoria.TipoCategoria.Guadagno) {
+                    int meseTransazione = transazione.getData().toLocalDateTime().getMonthValue();
+                    int annoTransazione = transazione.getData().toLocalDateTime().getYear();
+                    if (meseTransazione == meseCorrente && annoTransazione == annoCorrente) {
+                        entrate += transazione.getImporto();
+                    }
                 }
             }
         }
+        return entrate;
     }
-    return entrate;
-}
 
     public double calcolaUscite() {
         double uscite = 0.0;
@@ -144,7 +130,7 @@ public class Controller {
     public LinkedList<Conto> getConti() {
         LinkedList<Conto> contiAttivi = new LinkedList<>();
         for (Conto conto : utente.getConti()) {
-            if (conto.getAttivo()) { // ✅ Filtra solo attivi per la UI
+            if (conto.getAttivo()) {
                 contiAttivi.add(conto);
             }
         }
@@ -215,57 +201,57 @@ public class Controller {
         return operazioni.toArray(new Operazione[0]);
     }
 
-    public void modificaConto(int id, String nome, boolean attivo, String tipo) {
+    public void modificaConto(int id, String nome, boolean attivo, String tipo) throws EccezioniDatabase {
         for (Conto conto : utente.getConti()) {
             if (conto.getID() == id) {
                 conto.setNome(nome);
                 conto.setTipo(tipo);
                 conto.setAttivo(attivo);
                 try {
-                    contoDAO.updateConto(conto);
-                } catch (SQLException e) {
-                    throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER MODIFICARE UN CONTO", e);
+                    daoFactory.getContoDAO().updateConto(conto);
+                } catch (EccezioniDatabase e) {
+                    throw e;
                 }
                 return;
             }
         }
     }
 
-    public void aggiungiConto(String nome, String tipo, double saldo) {
+    public void aggiungiConto(String nome, String tipo, double saldo) throws EccezioniDatabase {
         try {
-            int id = contoDAO.newID();
+            int id = daoFactory.getContoDAO().newID();
             Conto nuovoConto = new Conto(id, nome, tipo, saldo, true, null, null);
-            contoDAO.saveConto(nuovoConto, utente.getEmail());
+            daoFactory.getContoDAO().saveConto(nuovoConto, utente.getEmail());
             utente.addConto(nuovoConto);
-        } catch (SQLException e) {
-            throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER OTTENERE UN NUOVO ID PER IL CONTO", e);
+        } catch (EccezioniDatabase e) {
+            throw e;
         }
     }
 
-    public void aggiungiTransazione(double importo, String descrizione, Categoria categoria, int idConto) {
-        try{
-            int id = transazioneDAO.newID();
+    public void aggiungiTransazione(double importo, String descrizione, Categoria categoria, int idConto) throws EccezioniDatabase {
+        try {
+            int id = daoFactory.getTransazioneDAO().newID();
             Timestamp data = new Timestamp(System.currentTimeMillis());
             Transazione transazione = new Transazione(id, importo, data, descrizione, categoria);
             transazione.setIdCategoria(categoria.getID());
-            transazioneDAO.saveTransazione(transazione, idConto, categoria.getID());
+            daoFactory.getTransazioneDAO().saveTransazione(transazione, idConto, categoria.getID());
             for (Conto conto : utente.getConti()) {
                 if (conto.getID() == idConto) {
                     conto.addTransazione(transazione);
                     break;
                 }
             }
-        } catch (SQLException e) {
-            throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER INSERIRE UNA NUOVA TRANSAZIONE", e);
+        } catch (EccezioniDatabase e) {
+            throw e;
         }
     }
 
-    public void aggiungiTrasferimento(double importo, String descrizione, int idContoMittente, int idContoDestinatario) {
+    public void aggiungiTrasferimento(double importo, String descrizione, int idContoMittente, int idContoDestinatario) throws EccezioniDatabase {
         try {
-            int id = trasferimentoDAO.newID();
+            int id = daoFactory.getTrasferimentoDAO().newID();
             Timestamp data = new Timestamp(System.currentTimeMillis());
             Trasferimento trasferimento = new Trasferimento(id, importo, data, descrizione, idContoMittente, idContoDestinatario);
-            trasferimentoDAO.saveTrasferimento(trasferimento, utente.getEmail());
+            daoFactory.getTrasferimentoDAO().saveTrasferimento(trasferimento, utente.getEmail());
             for (Conto conto : utente.getConti()) {
                 if (conto.getID() == idContoMittente) {
                     conto.addTrasferimento(trasferimento);
@@ -273,8 +259,8 @@ public class Controller {
                     conto.addTrasferimento(trasferimento);
                 }
             }
-        } catch (SQLException e) {
-            throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER INSERIRE UN NUOVO TRASFERIMENTO", e);
+        } catch (EccezioniDatabase e) {
+            throw e;
         }
     }
 
@@ -317,18 +303,18 @@ public class Controller {
         return null;
     }
 
-    public void aggiungiCategoria(String nome, Categoria.TipoCategoria tipo) {
+    public void aggiungiCategoria(String nome, Categoria.TipoCategoria tipo) throws EccezioniDatabase {
         try {
-            int id = categoriaDAO.newID();
+            int id = daoFactory.getCategoriaDAO().newID();
             Categoria nuovaCategoria = new Categoria(id, nome, tipo);
-            categoriaDAO.saveCategoria(nuovaCategoria, utente.getEmail());
+            daoFactory.getCategoriaDAO().saveCategoria(nuovaCategoria, utente.getEmail());
             utente.addCategoria(nuovaCategoria);
-        } catch (SQLException e) {
-            throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER INSERIRE UNA NUOVA CATEGORIA", e);
+        } catch (EccezioniDatabase e) {
+            throw e;
         }
     }
 
-    public boolean eliminaCategoria(int id) {
+    public boolean eliminaCategoria(int id) throws EccezioniDatabase {
         Categoria categoria = getCategoriaById(id);
         for (Conto conto : utente.getConti()) {
             for (Transazione transazione : conto.getTransazioni()) {
@@ -354,34 +340,27 @@ public class Controller {
                         }
                     }
                     try {
-                        transazioneDAO.updateTransazione(transazione, nuovoId);
-                    } catch (SQLException e) {
-                        throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER MODIFICARE UNA TRANSAZIONE", e);
+                        daoFactory.getTransazioneDAO().updateTransazione(transazione, nuovoId);
+                    } catch (EccezioniDatabase e) {
+                        throw e;
                     }
                 }
             }
         }
         try {
-            categoriaDAO.deleteCategoria(id);
+            daoFactory.getCategoriaDAO().deleteCategoria(id);
             utente.removeCategoria(categoria);
-        } catch (SQLException e) {
-            throw new EccezioniDatabase("ERRORE DURANTE L'ACCESSO AL DATABASE PER ELIMINARE UNA CATEGORIA", e);
+        } catch (EccezioniDatabase e) {
+            throw e;
         }
         return true;
     }
 
     public static void main(String[] args) {
         try {
-            // Inizializza la connessione al database
-            DBConnection dbConnection = DBConnection.getDBConnection();
-            Connection conn = dbConnection.getConnection();
-            Controller controller = new Controller(conn);
-
-            // Avvia il WebServer
+            Controller controller = new Controller();
             new WebServer(controller);
             Thread.currentThread().join();
-        } catch (NullPointerException e) {
-            EccezioneNull.errorePWD(e);
         } catch (Exception e) {
             e.printStackTrace();
         }

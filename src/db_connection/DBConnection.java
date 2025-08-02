@@ -6,31 +6,70 @@ import java.util.Properties;
 
 public class DBConnection {
     
-	// Attributi
-	private static DBConnection dbcon = null;
+    private static volatile DBConnection dbcon = null;
+    private static final Object lock = new Object();
     private Connection conn = null;
+    private long lastUsed = 0;
+    private static final long CONNECTION_TIMEOUT = 300000; // 5 minuti
     
-    // Costruttore
     private DBConnection(){}
 
-    // Metodo per avere una sola connessione al database
     public static DBConnection getDBConnection() {
         if (dbcon == null) {
-            dbcon = new DBConnection();
+            synchronized (lock) {
+                if (dbcon == null) {
+                    dbcon = new DBConnection();
+                }
+            }
         }
         return dbcon;
     }
     
-    public Connection getConnection() throws SQLException, IOException, NullPointerException {
+    public synchronized Connection getConnection() throws SQLException, IOException, NullPointerException {
+        long currentTime = System.currentTimeMillis();
+        
+        // ✅ RIUSA LA CONNESSIONE SE È VALIDA E RECENTE
+        if (conn != null && isConnectionValid(conn) && 
+            (currentTime - lastUsed) < CONNECTION_TIMEOUT) {
+            
+            lastUsed = currentTime;
+            return conn;
+        }
+        
+        // ✅ CHIUDI E RICREA SOLO SE NECESSARIO
+        closeConnection();
+        conn = createNewConnection();
+        lastUsed = currentTime;
+        return conn;
+    }
+    
+    private boolean isConnectionValid(Connection connection) {
+        try {
+            return connection != null && 
+                   !connection.isClosed() && 
+                   connection.isValid(3);
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+    
+    public synchronized void forceReconnect() throws SQLException, IOException {
+        closeConnection();
+        // ✅ NON RICREARE SUBITO - LASCIA CHE getConnection() LO FACCIA
+    }
+    
+    private synchronized void closeConnection() {
         if (conn != null) {
             try {
                 if (!conn.isClosed()) {
                     conn.close();
                 }
-            } catch (SQLException e) {}
-            conn = null;
+            } catch (SQLException e) {
+                System.err.println("Errore nella chiusura connessione: " + e.getMessage());
+            } finally {
+                conn = null;
+            }
         }
-        return createNewConnection();
     }
 
     private Connection createNewConnection() throws SQLException, IOException {
@@ -42,7 +81,7 @@ public class DBConnection {
             }
         }
         
-        String s_url = "jdbc:postgresql://aws-0-eu-central-2.pooler.supabase.com:5432/postgres?sslmode=require&tcpKeepAlive=true&socketTimeout=30000";
+        String s_url = "jdbc:postgresql://aws-0-eu-central-2.pooler.supabase.com:5432/postgres?sslmode=require&tcpKeepAlive=true";
         String username = "postgres.essksmuwvtgqubgzokal";
         
         Properties props = new Properties();
@@ -51,10 +90,9 @@ public class DBConnection {
         props.setProperty("ssl", "true");
         props.setProperty("sslmode", "require");
         props.setProperty("tcpKeepAlive", "true");
-        props.setProperty("loginTimeout", "10");
-        props.setProperty("socketTimeout", "30");
+        props.setProperty("loginTimeout", "30");
+        props.setProperty("socketTimeout", "60");
         
-        // ✅ NON SETTARE PIÙ conn = ... MA RESTITUISCI DIRETTAMENTE
         Connection newConnection = DriverManager.getConnection(s_url, props);
         System.out.println("Nuova connessione database creata");
         return newConnection;
