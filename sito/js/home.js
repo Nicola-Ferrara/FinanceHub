@@ -10,6 +10,20 @@ const annoCorrente = now.getFullYear();
 // Variabili globali per i dati del bilancio
 let chartInstance = null;
 
+// Inizializzazione quando il DOM è caricato
+document.addEventListener("DOMContentLoaded", function() {
+    const balanceTitle = document.getElementById("balanceTitle");
+    if (balanceTitle) {
+        balanceTitle.textContent = `Bilancio ${meseCorrente} ${annoCorrente}`;
+    }
+    
+    fetchBilancio();
+    fetchConti();
+    fetchOperazioni();
+    fetchCategorie();
+    setupCategoryListeners();
+});
+
 // Funzione per recuperare i dati del bilancio dal server
 async function fetchBilancio() {
     try {
@@ -21,106 +35,46 @@ async function fetchBilancio() {
         const data = await response.json();
         const { entrate, uscite } = data;
 
-        // Calcola il bilancio netto
         const bilancioNetto = entrate - uscite;
 
-        // Aggiorna i dati nella pagina
         document.getElementById("totalIncome").textContent = entrate.toFixed(2);
         document.getElementById("totalExpenses").textContent = uscite.toFixed(2);
         
-        // Imposta il colore del totale in base al segno
         const netBalanceElement = document.getElementById("netBalance");
         netBalanceElement.textContent = bilancioNetto.toFixed(2);
         netBalanceElement.className = bilancioNetto >= 0 ? "positive" : "negative";
         
-        // Aggiorna o crea il grafico
         createOrUpdateChart(entrate, uscite);
     } catch (error) {
         console.error("Errore:", error);
     }
 }
 
-// Funzione per creare o aggiornare il grafico
-// function createOrUpdateChart(entrate, uscite) {
-//     const ctx = document.getElementById("balanceChart").getContext("2d");
-    
-//     // Se il grafico esiste già, distruggilo
-//     if (chartInstance) {
-//         chartInstance.destroy();
-//     }
-    
-//     // Crea un nuovo grafico
-//     chartInstance = new Chart(ctx, {
-//         type: "doughnut",
-//         data: {
-//             labels: ["Entrate", "Uscite"],
-//             datasets: [{
-//                 data: [entrate, uscite],
-//                 backgroundColor: ["#28a745", "#dc3545"],
-//                 borderWidth: 0,
-//                 cutout: "60%"
-//             }]
-//         },
-//         options: {
-//             responsive: true,
-//             maintainAspectRatio: true,
-//             plugins: {
-//                 legend: {
-//                     position: "bottom",
-//                     labels: {
-//                         padding: 20,
-//                         usePointStyle: true,
-//                         font: {
-//                             size: 14
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-//     });
-// }
+// Funzione per creare il grafico a torta
 function createOrUpdateChart(entrate, uscite) {
     const ctx = document.getElementById("balanceChart").getContext("2d");
     const chartContainer = document.getElementById("balanceChart");
     const balanceContainer = document.querySelector('.balance-container');
     
-    // ✅ SE NON CI SONO DATI, NASCONDI IL GRAFICO
     if (entrate === 0 && uscite === 0) {
         chartContainer.style.display = 'none';
-        
-        // Rimuovi messaggio se esiste
-        const noDataMessage = document.getElementById('noDataMessage');
-        if (noDataMessage) {
-            noDataMessage.remove();
-        }
-        
-        // Distruggi il grafico esistente se esiste
+
         if (chartInstance) {
             chartInstance.destroy();
             chartInstance = null;
         }
         
-        // ✅ FAI OCCUPARE TUTTO LO SPAZIO AI DATI DEL BILANCIO
         balanceContainer.style.justifyContent = 'center';
         return;
     }
     
-    // ✅ SE CI SONO DATI, MOSTRA IL GRAFICO
     chartContainer.style.display = 'block';
     balanceContainer.style.justifyContent = 'space-between';
     
-    // Rimuovi messaggio se esiste
-    const noDataMessage = document.getElementById('noDataMessage');
-    if (noDataMessage) {
-        noDataMessage.remove();
-    }
-    
-    // Se il grafico esiste già, distruggilo
     if (chartInstance) {
         chartInstance.destroy();
     }
     
-    // Crea un nuovo grafico
     chartInstance = new Chart(ctx, {
         type: "doughnut",
         data: {
@@ -151,7 +105,7 @@ function createOrUpdateChart(entrate, uscite) {
     });
 }
 
-// Funzione per recuperare i conti dal server
+// Funzione per recuperare i conti dell'utente
 async function fetchConti() {
     try {
         const response = await fetch("/api/conti");
@@ -161,7 +115,6 @@ async function fetchConti() {
 
         const accounts = await response.json();
         
-        // Carica la lista dei conti
         const accountsList = document.getElementById("accountsList");
         accountsList.innerHTML = ""; 
         
@@ -221,9 +174,8 @@ async function fetchOperazioni() {
 
         const operazioni = await response.json();
         
-        // Carica la lista delle operazioni
         const transactionsList = document.getElementById("transactionsList");
-        transactionsList.innerHTML = ""; // Pulisci la lista prima di aggiungere nuovi elementi
+        transactionsList.innerHTML = "";
         
         if (operazioni.length === 0) {
             const li = document.createElement("li");
@@ -233,11 +185,9 @@ async function fetchOperazioni() {
             operazioni.forEach(operazione => {
                 const li = document.createElement("li");
 
-                // Indicatore di tipo (spesa, guadagno o trasferimento)
                 const indicator = document.createElement("div");
                 indicator.classList.add("transaction-indicator");
                 
-                // Determina il colore in base al tipo
                 if (operazione.tipo === "Guadagno") {
                     indicator.classList.add("income");
                 } else if (operazione.tipo === "Spesa") {
@@ -246,15 +196,12 @@ async function fetchOperazioni() {
                     indicator.classList.add("transfer");
                 }
 
-                // Dettagli dell'operazione
                 const details = document.createElement("div");
                 details.classList.add("transaction-details");
                 
-                // Per i trasferimenti, mostra "Destinatario ← Mittente"
                 let categoriaText = operazione.categoria;
                 if (operazione.tipo === "Trasferimento") {
-                    // Assumendo che il server invii i nomi dei conti nel campo categoria
-                    categoriaText = operazione.categoria; // Il server dovrà essere modificato per inviare "ContoA ← ContoB"
+                    categoriaText = operazione.categoria;
                 }
                 
                 details.innerHTML = `
@@ -304,30 +251,14 @@ function formatDate(dateString) {
     const timeFormatted = date.toLocaleTimeString('it-IT', {
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false  // Formato 24 ore (0-23)
+        hour12: false
     });
     
     return `${dateFormatted} - ${timeFormatted}`;
 }
 
-// Inizializzazione quando il DOM è caricato
-document.addEventListener("DOMContentLoaded", function() {
-    const balanceTitle = document.getElementById("balanceTitle");
-    if (balanceTitle) {
-        balanceTitle.textContent = `Bilancio ${meseCorrente} ${annoCorrente}`;
-    }
-    
-    // Carica tutti i dati
-    fetchBilancio();
-    fetchConti();
-    fetchOperazioni();
-    fetchCategorie();
-    setupCategoryListeners();
-});
-
 // Listener per il bottone aggiungi conto
 document.addEventListener("DOMContentLoaded", function() {
-    // Aggiungi questo listener
     const addAccountBtn = document.getElementById('addAccountBtn');
     if (addAccountBtn) {
         addAccountBtn.addEventListener('click', () => {
@@ -337,31 +268,28 @@ document.addEventListener("DOMContentLoaded", function() {
     checkUrlParams();
 });
 
+// Controllo notifica
 function checkUrlParams() {
     const urlParams = new URLSearchParams(window.location.search);
     
     if (urlParams.get('success') === 'conto-aggiunto') {
         showNotification('Conto aggiunto con successo!', 'success');
         
-        // Rimuovi il parametro dall'URL
         const newUrl = window.location.pathname;
         window.history.replaceState({}, document.title, newUrl);
     } else if (urlParams.get('success') === 'conto-eliminato') {
-        // ✅ AGGIUNGI QUESTO CASO
         showNotification('Conto eliminato con successo!', 'success');
         
-        // Rimuovi il parametro dall'URL
         const newUrl = window.location.pathname;
         window.history.replaceState({}, document.title, newUrl);
     }
 }
 
+// Funzione per mostrare notifiche
 function showNotification(message, type) {
-    // Rimuovi notifiche precedenti
     const existingNotifications = document.querySelectorAll('.notification');
     existingNotifications.forEach(notif => notif.remove());
     
-    // Crea la notifica
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.innerHTML = `
@@ -372,25 +300,21 @@ function showNotification(message, type) {
         </div>
     `;
     
-    // Aggiungi al body
     document.body.appendChild(notification);
     
-    // Animazione di entrata
     setTimeout(() => {
         notification.classList.add('show');
     }, 10);
-    
-    // Rimuovi automaticamente dopo 3 secondi
     setTimeout(() => {
         hideNotification(notification);
     }, 3000);
     
-    // Event listener per chiudere manualmente
     notification.querySelector('.notification-close').addEventListener('click', () => {
         hideNotification(notification);
     });
 }
 
+// Funzione per rimuovere la notifica
 function hideNotification(notification) {
     notification.classList.remove('show');
     setTimeout(() => {

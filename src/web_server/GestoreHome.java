@@ -47,7 +47,7 @@ public class GestoreHome extends BaseGestorePagina {
         } else if ("/api/categorie/guadagno".equals(uri) && method == Method.GET) {
             return getCategorieGuadagno();
         } else if ("/api/categoria".equals(uri) && method == Method.POST) {
-            return handleAddCategoria(session);  // ✅ AGGIUNGI QUESTO
+            return handleAddCategoria(session);
         } else if (uri.startsWith("/api/categoria/") && method == Method.DELETE) {
             return handleDeleteCategoria(uri);
         } else if ("/logout".equals(uri) && method == Method.GET) {

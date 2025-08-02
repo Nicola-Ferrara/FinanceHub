@@ -35,6 +35,10 @@ public class WebServer extends NanoHTTPD {
         try {
             String uri = session.getUri();
             String method = session.getMethod().toString();
+
+            if (uri.equals("/favicon.ico")) {
+                return serveStaticFile(uri);
+            }
             
             // Cerca il gestore appropriato
             for (GestorePagina gestore : gestori) {
@@ -77,6 +81,7 @@ public class WebServer extends NanoHTTPD {
         if (uri.endsWith(".png")) return "image/png";
         if (uri.endsWith(".jpg") || uri.endsWith(".jpeg")) return "image/jpeg";
         if (uri.endsWith(".gif")) return "image/gif";
+        if (uri.endsWith(".ico")) return "image/x-icon";
         return "application/octet-stream";
     }
 
