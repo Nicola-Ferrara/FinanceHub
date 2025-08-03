@@ -54,6 +54,10 @@ function updateAccountInfo() {
     
     document.getElementById("accountName").textContent = contoData.nome;
     document.getElementById("accountType").textContent = contoData.tipo;
+
+    const initialBalanceElement = document.getElementById("accountInitialBalance");
+    const saldoIniziale = contoData.saldo_iniziale !== undefined ? contoData.saldo_iniziale : contoData.saldo;
+    initialBalanceElement.textContent = `Saldo iniziale: € ${saldoIniziale.toFixed(2)}`;
     
     const balanceElement = document.getElementById("accountBalance");
     balanceElement.textContent = `€ ${contoData.saldo.toFixed(2)}`;

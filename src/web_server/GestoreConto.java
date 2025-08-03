@@ -115,7 +115,7 @@ public class GestoreConto extends BaseGestorePagina {
                 
                 String nome = extractJsonValue(body, "nome");
                 String tipo = extractJsonValue(body, "tipo");
-                String saldoInizialeStr = extractJsonValue(body, "saldo_iniziale");
+                String saldoInizialeStr = extractJsonValueNumber(body, "saldo_iniziale");
                 
                 if (nome == null || tipo == null || saldoInizialeStr == null) {
                     return createResponse(Response.Status.BAD_REQUEST, "application/json", "{\"error\": \"Nome, tipo e saldo iniziale sono obbligatori\"}");
