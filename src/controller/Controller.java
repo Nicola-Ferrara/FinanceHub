@@ -230,11 +230,10 @@ public class Controller {
         }
     }
 
-    public void aggiungiTransazione(double importo, String descrizione, Categoria categoria, int idConto) throws EccezioniDatabase {
+    public void aggiungiTransazione(double importo, String descrizione, Categoria categoria, int idConto, Timestamp dataTransazione) throws EccezioniDatabase {
         try {
             int id = daoFactory.getTransazioneDAO().newID();
-            Timestamp data = new Timestamp(System.currentTimeMillis());
-            Transazione transazione = new Transazione(id, importo, data, descrizione, categoria);
+            Transazione transazione = new Transazione(id, importo, dataTransazione, descrizione, categoria);
             transazione.setIdCategoria(categoria.getID());
             daoFactory.getTransazioneDAO().saveTransazione(transazione, idConto, categoria.getID());
             for (Conto conto : utente.getConti()) {

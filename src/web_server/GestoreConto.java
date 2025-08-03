@@ -1,11 +1,11 @@
 package web_server;
 
-import fi.iki.elonen.NanoHTTPD.IHTTPSession;
-import fi.iki.elonen.NanoHTTPD.Method;
-import fi.iki.elonen.NanoHTTPD.Response;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.LinkedList;
+import fi.iki.elonen.NanoHTTPD.*;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.sql.Timestamp;
+
+
 import controller.Controller;
 import dto.*;
 
@@ -357,14 +357,30 @@ public class GestoreConto extends BaseGestorePagina {
                 String importoStr = extractJsonValueNumber(requestBody, "importo");
                 String descrizione = extractJsonValue(requestBody, "descrizione");
                 String categoriaIdStr = extractJsonValueNumber(requestBody, "categoriaId");
+                String dataStr = extractJsonValue(requestBody, "data");
                                 
                 if (importoStr == null || descrizione == null || categoriaIdStr == null) {
                     return createResponse(Response.Status.BAD_REQUEST, "application/json", 
-                        "{\"error\": \"Dati mancanti - importo: " + importoStr + ", descrizione: " + descrizione + ", categoriaId: " + categoriaIdStr + "\"}");
+                    "{\"error\": \"Dati mancanti - importo: " + importoStr + ", descrizione: " + descrizione + 
+                    ", categoriaId: " + categoriaIdStr + ", data: " + dataStr + "\"}");
                 }
                 
                 double importo = Double.parseDouble(importoStr);
                 int categoriaId = Integer.parseInt(categoriaIdStr);
+
+                Timestamp dataTransazione;
+                try {
+                    LocalDateTime localDateTime = LocalDateTime.parse(dataStr);
+                    dataTransazione = Timestamp.valueOf(localDateTime);
+                    Timestamp now = new Timestamp(System.currentTimeMillis());
+                    if (dataTransazione.after(now)) {
+                        return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                            "{\"error\": \"La data non può essere futura\"}");
+                    }
+                } catch (Exception e) {
+                    return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                        "{\"error\": \"Formato data non valido. Usa: YYYY-MM-DDTHH:MM\"}");
+                }
                 
                 // Trova la categoria
                 Categoria categoria = controller.getCategoriaById(categoriaId);
@@ -374,7 +390,7 @@ public class GestoreConto extends BaseGestorePagina {
                 }
                 
                 // Aggiungi la transazione
-                controller.aggiungiTransazione(importo, descrizione, categoria, contoId);
+                controller.aggiungiTransazione(importo, descrizione, categoria, contoId, dataTransazione);
                 
                 return createResponse(Response.Status.OK, "application/json", 
                     "{\"success\": true, \"message\": \"Transazione aggiunta con successo\"}");

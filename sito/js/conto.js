@@ -433,6 +433,11 @@ function openAddTransactionModal() {
     document.getElementById('addTransactionForm').reset();
     document.getElementById('categoryGroup').style.display = 'none';
     document.getElementById('transactionCategory').innerHTML = '<option value="">Seleziona una categoria</option>';
+
+    const now = new Date();
+    const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    document.getElementById('transactionDate').value = localDateTime;
+    document.getElementById('transactionDate').max = localDateTime;
     
     document.getElementById('addTransactionModal').style.display = 'block';
 }
@@ -501,7 +506,8 @@ async function handleAddTransactionSubmit(event) {
     const transactionData = {
         importo: parseFloat(formData.get('importo')),
         descrizione: formData.get('descrizione').trim(),
-        categoriaId: parseInt(formData.get('categoria'))
+        categoriaId: parseInt(formData.get('categoria')),
+        data: formData.get('data')
     };
     
     // Validazione
@@ -517,6 +523,18 @@ async function handleAddTransactionSubmit(event) {
     
     if (!transactionData.categoriaId) {
         showErrorMessage('Seleziona una categoria');
+        return;
+    }
+
+    if (!transactionData.data) {
+        showErrorMessage('Inserisci la data della transazione');
+        return;
+    }
+
+    const selectedDate = new Date(transactionData.data);
+    const now = new Date();
+    if (selectedDate > now) {
+        showErrorMessage('La data non può essere futura');
         return;
     }
     
