@@ -28,7 +28,7 @@
 
     <main class="main-content">
         <div class="form-container">
-            <form id="addAccountForm" class="account-form">
+            <form id="addAccountForm" class="account-form" novalidate>
                 <div class="form-section">
                     <h2>Informazioni del Conto</h2>
                     
@@ -57,7 +57,7 @@
                         <div class="input-group">
                             <span class="input-prefix">€</span>
                             <input type="number" id="initialBalance" name="saldo" 
-                                   step="0.01" min="0" value="0.00" required>
+                                   step="0.01" value="0.00" required>
                         </div>
                         <small class="form-help">Inserisci il saldo attuale del conto</small>
                     </div>

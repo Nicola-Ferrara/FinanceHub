@@ -84,8 +84,31 @@ public class GestoreAggiungiConto extends BaseGestorePagina {
         }
     }
     
+    // private String extractJsonValue(String json, String key) {
+    //     if (json == null) return null;
+    //     String searchKey = "\"" + key + "\"";
+    //     int keyIndex = json.indexOf(searchKey);
+    //     if (keyIndex == -1) return null;
+        
+    //     int valueStart = json.indexOf(":", keyIndex) + 1;
+    //     if (valueStart == 0) return null;
+        
+    //     while (valueStart < json.length() && (json.charAt(valueStart) == ' ' || json.charAt(valueStart) == '\t')) {
+    //         valueStart++;
+    //     }
+        
+    //     if (valueStart >= json.length() || json.charAt(valueStart) != '"') return null;
+    //     valueStart++;
+        
+    //     int valueEnd = json.indexOf("\"", valueStart);
+    //     if (valueEnd == -1) return null;
+        
+    //     return json.substring(valueStart, valueEnd);
+    // }
+
     private String extractJsonValue(String json, String key) {
         if (json == null) return null;
+        
         String searchKey = "\"" + key + "\"";
         int keyIndex = json.indexOf(searchKey);
         if (keyIndex == -1) return null;
@@ -93,16 +116,31 @@ public class GestoreAggiungiConto extends BaseGestorePagina {
         int valueStart = json.indexOf(":", keyIndex) + 1;
         if (valueStart == 0) return null;
         
-        while (valueStart < json.length() && (json.charAt(valueStart) == ' ' || json.charAt(valueStart) == '\t')) {
+        while (valueStart < json.length() && 
+            (json.charAt(valueStart) == ' ' || json.charAt(valueStart) == '\t')) {
             valueStart++;
         }
         
-        if (valueStart >= json.length() || json.charAt(valueStart) != '"') return null;
-        valueStart++;
+        if (valueStart >= json.length()) return null;
         
-        int valueEnd = json.indexOf("\"", valueStart);
-        if (valueEnd == -1) return null;
-        
-        return json.substring(valueStart, valueEnd);
+        if (json.charAt(valueStart) == '"') {
+            valueStart++; // Salta la virgoletta iniziale
+            int valueEnd = json.indexOf("\"", valueStart);
+            if (valueEnd == -1) return null;
+            return json.substring(valueStart, valueEnd);
+        } else {
+            int valueEnd = valueStart;
+            while (valueEnd < json.length()) {
+                char c = json.charAt(valueEnd);
+                if (Character.isDigit(c) || c == '.' || c == '-' || c == '+') {
+                    valueEnd++;
+                } else {
+                    break;
+                }
+            }
+            
+            if (valueEnd <= valueStart) return null;
+            return json.substring(valueStart, valueEnd);
+        }
     }
 }

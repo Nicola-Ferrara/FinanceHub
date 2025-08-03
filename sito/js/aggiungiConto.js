@@ -3,7 +3,6 @@ let isSubmitting = false;
 
 // Inizializzazione quando il DOM è caricato
 document.addEventListener("DOMContentLoaded", function() {
-    setupFormValidation();
     setupEventListeners();
 });
 
@@ -20,7 +19,60 @@ function setupEventListeners() {
     balanceInput.addEventListener('input', formatBalance);
 }
 
-// Gestisce il submit del form
+// ✅ SISTEMA NOTIFICHE IDENTICO A CONTO.JS
+function showSuccessMessage(message) {
+    showNotification(message, 'success');
+}
+
+function showErrorMessage(message) {
+    showNotification(message, 'error');
+}
+
+function showNotification(message, type) {
+    // Rimuovi notifiche precedenti
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notif => notif.remove());
+    
+    // Crea la notifica
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span class="notification-icon">${type === 'success' ? '✅' : '❌'}</span>
+            <span class="notification-message">${message}</span>
+            <button class="notification-close">&times;</button>
+        </div>
+    `;
+    
+    // Aggiungi al body
+    document.body.appendChild(notification);
+    
+    // Animazione di entrata
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    // Rimuovi automaticamente dopo 3 secondi
+    setTimeout(() => {
+        hideNotification(notification);
+    }, 3000);
+    
+    // Event listener per chiudere manualmente
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+        hideNotification(notification);
+    });
+}
+
+function hideNotification(notification) {
+    notification.classList.remove('show');
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 300);
+}
+
+// ✅ VALIDAZIONI IDENTICHE A CONTO.JS
 async function handleFormSubmit(event) {
     event.preventDefault();
     
@@ -30,11 +82,47 @@ async function handleFormSubmit(event) {
     const accountData = {
         nome: formData.get('nome').trim(),
         tipo: formData.get('tipo'),
-        saldo: formData.get('saldo')
+        saldo: parseFloat(formData.get('saldo'))
     };
     
-    // Validazione
-    if (!validateForm(accountData)) {
+    // ✅ VALIDAZIONI PERSONALIZZATE IDENTICHE
+    
+    // Validazione nome conto
+    if (!accountData.nome || accountData.nome.length === 0) {
+        showErrorMessage('Inserisci il nome del conto');
+        return;
+    }
+    
+    if (accountData.nome.length < 2) {
+        showErrorMessage('Il nome del conto deve essere di almeno 2 caratteri');
+        return;
+    }
+    
+    if (accountData.nome.length > 20) {
+        showErrorMessage('Il nome del conto non può superare i 20 caratteri');
+        return;
+    }
+    
+    // Validazione tipo conto
+    if (!accountData.tipo || accountData.tipo === '') {
+        showErrorMessage('Seleziona il tipo di conto');
+        return;
+    }
+    
+    // Validazione saldo iniziale
+    if (isNaN(accountData.saldo)) {
+        showErrorMessage('Inserisci un saldo iniziale valido');
+        return;
+    }
+    
+    // ✅ CONTROLLO LIMITE DATABASE PostgreSQL NUMERIC(15,2) - IDENTICO
+    if (accountData.saldo > 9999999999999.99) {
+        showErrorMessage(`Il saldo iniziale non può superare i 9999999999999.99 €`);
+        return;
+    }
+    
+    if (accountData.saldo < -9999999999999.99) {
+        showErrorMessage(`Il saldo iniziale non può essere inferiore a -9999999999999.99 €`);
         return;
     }
     
@@ -55,139 +143,48 @@ async function handleFormSubmit(event) {
         if (!response.ok) {
             throw new Error(result.error || 'Errore durante l\'aggiunta del conto');
         }
-        
+
         window.location.href = '/home?success=conto-aggiunto';
         
     } catch (error) {
         console.error('Errore:', error);
-        alert('❌ ' + (error.message || 'Errore durante l\'aggiunta del conto'));
+        showErrorMessage(error.message || 'Errore durante l\'aggiunta del conto');
     } finally {
         isSubmitting = false;
         showLoading(false);
     }
 }
 
-// Validazione del form
-function validateForm(data) {
-    // Rimuovi messaggi precedenti
-    removeMessages();
-    
-    const errors = [];
-    
-    if (!data.nome || data.nome.length < 2) {
-        errors.push('Il nome del conto deve contenere almeno 2 caratteri');
-    }
-    
-    if (!data.tipo) {
-        errors.push('Seleziona un tipo di conto');
-    }
-    
-    const saldo = parseFloat(data.saldo);
-    if (isNaN(saldo) || saldo < 0) {
-        errors.push('Il saldo deve essere un numero positivo');
-    }
-    
-    if (errors.length > 0) {
-        showErrorMessage(errors.join('<br>'));
-        return false;
-    }
-    
-    return true;
-}
-
-// Formatta il campo saldo
+// ✅ FORMATTAZIONE SALDO
 function formatBalance(event) {
     const input = event.target;
     let value = input.value;
-    const cursorPosition = input.selectionStart;
-    const oldLength = value.length;
     
-    let cleanValue = value.replace(/[^0-9.,]/g, '');
+    // Rimuovi caratteri non numerici eccetto punto e virgola
+    let cleanValue = value.replace(/[^0-9.,-]/g, '');
     
-    cleanValue = cleanValue.replace(/,/g, '.');
+    // Sostituisci virgola con punto
+    cleanValue = cleanValue.replace(',', '.');
     
+    // Gestisci multipli punti decimali
     const parts = cleanValue.split('.');
     if (parts.length > 2) {
         cleanValue = parts[0] + '.' + parts.slice(1).join('');
     }
     
+    // Limita a 2 decimali
     if (parts.length === 2 && parts[1].length > 2) {
         cleanValue = parts[0] + '.' + parts[1].substring(0, 2);
     }
+    
+    // Aggiorna solo se diverso
     if (cleanValue !== value) {
-        const newLength = cleanValue.length;
-        const lengthDiff = newLength - oldLength;
-        
+        const cursorPosition = input.selectionStart;
         input.value = cleanValue;
         
-        const newCursorPosition = Math.max(0, cursorPosition + lengthDiff);
-        input.setSelectionRange(newCursorPosition, newCursorPosition);
-    }
-}
-
-// Imposta la validazione del form
-function setupFormValidation() {
-    const inputs = document.querySelectorAll('input[required], select[required]');
-    
-    inputs.forEach(input => {
-        input.addEventListener('blur', validateField);
-        input.addEventListener('input', clearFieldError);
-    });
-}
-
-// Valida un singolo campo
-function validateField(event) {
-    const field = event.target;
-    const value = field.value.trim();
-    
-    // Rimuovi errori precedenti
-    clearFieldError(event);
-    
-    if (field.hasAttribute('required') && !value) {
-        showFieldError(field, 'Questo campo è obbligatorio');
-        return;
-    }
-    
-    // Validazioni specifiche
-    if (field.name === 'nome' && value.length < 2) {
-        showFieldError(field, 'Il nome deve contenere almeno 2 caratteri');
-    } else if (field.name === 'saldo') {
-        const saldo = parseFloat(value);
-        if (isNaN(saldo) || saldo < 0) {
-            showFieldError(field, 'Inserisci un importo valido');
-        }
-    }
-}
-
-// Mostra errore per un campo specifico
-function showFieldError(field, message) {
-    field.style.borderColor = '#dc3545';
-    
-    // Rimuovi messaggio precedente
-    const existingError = field.parentNode.querySelector('.field-error');
-    if (existingError) {
-        existingError.remove();
-    }
-    
-    // Aggiungi nuovo messaggio
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'field-error';
-    errorDiv.style.color = '#dc3545';
-    errorDiv.style.fontSize = '12px';
-    errorDiv.style.marginTop = '5px';
-    errorDiv.textContent = message;
-    
-    field.parentNode.appendChild(errorDiv);
-}
-
-// Rimuove errore da un campo
-function clearFieldError(event) {
-    const field = event.target;
-    field.style.borderColor = '';
-    
-    const errorDiv = field.parentNode.querySelector('.field-error');
-    if (errorDiv) {
-        errorDiv.remove();
+        // Ripristina posizione cursore
+        const newPosition = Math.min(cursorPosition, cleanValue.length);
+        input.setSelectionRange(newPosition, newPosition);
     }
 }
 
@@ -197,17 +194,12 @@ function showLoading(show) {
     const submitBtn = document.querySelector('.btn-primary');
     
     if (show) {
-        overlay.style.display = 'flex';
+        if (overlay) overlay.style.display = 'flex';
         submitBtn.disabled = true;
         submitBtn.textContent = 'Aggiunta in corso...';
     } else {
-        overlay.style.display = 'none';
+        if (overlay) overlay.style.display = 'none';
         submitBtn.disabled = false;
         submitBtn.textContent = 'Aggiungi Conto';
     }
-}
-
-function removeMessages() {
-    const messages = document.querySelectorAll('.message');
-    messages.forEach(msg => msg.remove());
 }
