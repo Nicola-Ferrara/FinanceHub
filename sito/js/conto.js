@@ -213,6 +213,10 @@ function openEditAccountModal() {
     document.getElementById('editAccountName').value = contoData.nome;
     document.getElementById('editAccountType').value = contoData.tipo;
     
+    const saldoIniziale = contoData.saldo_iniziale !== undefined ? contoData.saldo_iniziale : contoData.saldo;
+    
+    document.getElementById('editAccountBalance').value = saldoIniziale.toFixed(2);
+    
     document.getElementById('editAccountModal').style.display = 'block';
 }
 
@@ -315,6 +319,7 @@ async function handleEditAccountSubmit(event) {
     const updateData = {
         nome: formData.get('name'),
         tipo: formData.get('type'),
+        saldo_iniziale: parseFloat(formData.get('balance')) || 0
     };
     
     try {
