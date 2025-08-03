@@ -321,10 +321,46 @@ async function handleEditAccountSubmit(event) {
     
     const formData = new FormData(event.target);
     const updateData = {
-        nome: formData.get('name'),
+        nome: formData.get('name').trim(),
         tipo: formData.get('type'),
-        saldo_iniziale: parseFloat(formData.get('balance')) || 0
+        saldo_iniziale: parseFloat(formData.get('balance'))
     };
+    
+    // Validazione nome conto
+    if (!updateData.nome || updateData.nome.length === 0) {
+        showErrorMessage('Inserisci il nome del conto');
+        return;
+    }
+    
+    if (updateData.nome.length < 2) {
+        showErrorMessage('Il nome del conto deve essere di almeno 2 caratteri');
+        return;
+    }
+    
+    if (updateData.nome.length > 20) {
+        showErrorMessage('Il nome del conto non può superare i 20 caratteri');
+        return;
+    }
+    
+    if (!updateData.tipo || updateData.tipo === '') {
+        showErrorMessage('Seleziona il tipo di conto');
+        return;
+    }
+    
+    if (isNaN(updateData.saldo_iniziale)) {
+        showErrorMessage('Inserisci un saldo iniziale valido');
+        return;
+    }
+
+    if (updateData.saldo_iniziale > 9999999999999.99) {
+        showErrorMessage(`Il saldo iniziale non può superare i 9999999999999.99 €`);
+        return;
+    }
+    
+    if (updateData.saldo_iniziale < -9999999999999.99) {
+        showErrorMessage(`Il saldo iniziale non può essere inferiore a -9999999999999.99 €`);
+        return;
+    }
     
     try {
         const response = await fetch(`/api/conto/${contoId}`, {
@@ -350,7 +386,6 @@ async function handleEditAccountSubmit(event) {
     } catch (error) {
         console.error('Errore:', error);
         showErrorMessage('Errore durante la modifica del conto');
-        // Il modale resta aperto in caso di errore
     }
 }
 
@@ -510,31 +545,58 @@ async function handleAddTransactionSubmit(event) {
         data: formData.get('data')
     };
     
-    // Validazione
-    if (!transactionData.importo || transactionData.importo <= 0) {
-        showErrorMessage('Inserisci un importo valido');
+    if (!transactionData.importo || isNaN(transactionData.importo) || transactionData.importo <= 0) {
+        showErrorMessage('Inserisci un importo valido maggiore di zero');
         return;
     }
     
-    if (!transactionData.descrizione) {
-        showErrorMessage('Inserisci una descrizione');
+    if (transactionData.importo < 0.01) {
+        showErrorMessage('L\'importo minimo è €0.01');
         return;
     }
     
-    if (!transactionData.categoriaId) {
-        showErrorMessage('Seleziona una categoria');
+    if (transactionData.importo > 9999999999999.99) {
+        showErrorMessage('L\'importo è troppo grande. Limite: €9.999.999.999.999,99');
         return;
     }
-
+    
+    if (!transactionData.descrizione || transactionData.descrizione.length === 0) {
+        showErrorMessage('Inserisci una descrizione per la transazione');
+        return;
+    }
+    
+    if (transactionData.descrizione.length < 3) {
+        showErrorMessage('La descrizione deve essere di almeno 3 caratteri');
+        return;
+    }
+    
+    if (transactionData.descrizione.length > 500) {
+        showErrorMessage('La descrizione non può superare i 500 caratteri');
+        return;
+    }
+    
+    if (!transactionData.categoriaId || isNaN(transactionData.categoriaId)) {
+        showErrorMessage('Seleziona una categoria valida');
+        return;
+    }
+    
     if (!transactionData.data) {
         showErrorMessage('Inserisci la data della transazione');
         return;
     }
-
+    
     const selectedDate = new Date(transactionData.data);
     const now = new Date();
     if (selectedDate > now) {
         showErrorMessage('La data non può essere futura');
+        return;
+    }
+    
+    // ✅ OPZIONALE: Controllo data troppo vecchia (se vuoi)
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    if (selectedDate < oneYearAgo) {
+        showErrorMessage('La data non può essere più vecchia di 1 anno');
         return;
     }
     
@@ -643,25 +705,46 @@ async function handleAddTransferSubmit(event) {
         contoDestinatario: parseInt(formData.get('contoDestinatario'))
     };
     
-    // Validazione
-    if (!transferData.importo || transferData.importo <= 0) {
-        showErrorMessage('Inserisci un importo valido');
+    if (!transferData.importo || isNaN(transferData.importo) || transferData.importo <= 0) {
+        showErrorMessage('Inserisci un importo valido maggiore di zero');
         return;
     }
     
-    if (!transferData.descrizione) {
-        showErrorMessage('Inserisci una descrizione');
+    if (transferData.importo < 0.01) {
+        showErrorMessage('L\'importo minimo per un trasferimento è €0.01');
         return;
     }
     
-    if (!transferData.contoDestinatario) {
+    if (!transferData.descrizione || transferData.descrizione.length === 0) {
+        showErrorMessage('Inserisci una descrizione per il trasferimento');
+        return;
+    }
+    
+    if (transferData.descrizione.length < 3) {
+        showErrorMessage('La descrizione deve essere di almeno 3 caratteri');
+        return;
+    }
+    
+    if (transferData.descrizione.length > 500) {
+        showErrorMessage('La descrizione non può superare i 500 caratteri');
+        return;
+    }
+    
+    // Validazione conto destinazione
+    if (!transferData.contoDestinatario || isNaN(transferData.contoDestinatario)) {
         showErrorMessage('Seleziona il conto di destinazione');
         return;
     }
     
-    // Verifica che ci siano fondi sufficienti
+    // Verifica che non sia lo stesso conto
+    if (transferData.contoDestinatario === parseInt(contoId)) {
+        showErrorMessage('Non puoi trasferire denaro sullo stesso conto');
+        return;
+    }
+    
+    // Verifica fondi sufficienti
     if (transferData.importo > contoData.saldo) {
-        showErrorMessage('Fondi insufficienti per effettuare il trasferimento');
+        showErrorMessage(`Fondi insufficienti. Saldo disponibile: €${contoData.saldo.toFixed(2)}`);
         return;
     }
     
