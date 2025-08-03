@@ -314,7 +314,7 @@ async function handleEditAccountSubmit(event) {
     const formData = new FormData(event.target);
     const updateData = {
         nome: formData.get('name'),
-        tipo: formData.get('type')
+        tipo: formData.get('type'),
     };
     
     try {

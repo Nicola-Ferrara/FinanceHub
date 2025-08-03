@@ -201,12 +201,14 @@ public class Controller {
         return operazioni.toArray(new Operazione[0]);
     }
 
-    public void modificaConto(int id, String nome, boolean attivo, String tipo) throws EccezioniDatabase {
+    public void modificaConto(int id, String nome, boolean attivo, String tipo, double saldo_iniziale) throws EccezioniDatabase {
         for (Conto conto : utente.getConti()) {
             if (conto.getID() == id) {
                 conto.setNome(nome);
                 conto.setTipo(tipo);
                 conto.setAttivo(attivo);
+                conto.setSaldo_iniziale(saldo_iniziale);
+                conto.ricalcolaSaldo();
                 try {
                     daoFactory.getContoDAO().updateConto(conto);
                 } catch (EccezioniDatabase e) {
@@ -238,6 +240,18 @@ public class Controller {
             for (Conto conto : utente.getConti()) {
                 if (conto.getID() == idConto) {
                     conto.addTransazione(transazione);
+                    
+                    if (categoria.getTipo() == Categoria.TipoCategoria.Guadagno) {
+                        conto.setSaldo_attuale(conto.getSaldo_attuale() + importo);
+                    } else if (categoria.getTipo() == Categoria.TipoCategoria.Spesa) {
+                        conto.setSaldo_attuale(conto.getSaldo_attuale() - importo);
+                    }
+
+                    try {
+                        daoFactory.getContoDAO().updateConto(conto);
+                    } catch (EccezioniDatabase e) {
+                        throw e;
+                    }
                     break;
                 }
             }
@@ -255,8 +269,20 @@ public class Controller {
             for (Conto conto : utente.getConti()) {
                 if (conto.getID() == idContoMittente) {
                     conto.addTrasferimento(trasferimento);
+                    conto.setSaldo_attuale(conto.getSaldo_attuale() - importo);
+                    try {
+                        daoFactory.getContoDAO().updateConto(conto);
+                    } catch (EccezioniDatabase e) {
+                        throw e;
+                    }
                 } else if (conto.getID() == idContoDestinatario) {
                     conto.addTrasferimento(trasferimento);
+                    conto.setSaldo_attuale(conto.getSaldo_attuale() + importo);
+                    try {
+                        daoFactory.getContoDAO().updateConto(conto);
+                    } catch (EccezioniDatabase e) {
+                        throw e;
+                    }
                 }
             }
         } catch (EccezioniDatabase e) {

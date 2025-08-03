@@ -9,9 +9,9 @@ import java.util.LinkedList;
 import controller.Controller;
 import dto.*;
 
-public class GestoreConti extends BaseGestorePagina {
+public class GestoreConto extends BaseGestorePagina {
     
-    public GestoreConti(Controller controller) {
+    public GestoreConto(Controller controller) {
         super(controller);
     }
     
@@ -75,7 +75,7 @@ public class GestoreConti extends BaseGestorePagina {
                 }
                 
                 // Usa il metodo del controller per eliminare il conto
-                controller.modificaConto(conto.getID(), conto.getNome(), false, conto.getTipo());
+                controller.modificaConto(conto.getID(), conto.getNome(), false, conto.getTipo(), conto.getSaldo_iniziale());
                 
                 return createResponse(Response.Status.OK, "application/json", "{\"success\": true, \"message\": \"Conto eliminato con successo\"}");
             }
@@ -203,7 +203,7 @@ public class GestoreConti extends BaseGestorePagina {
             
             String json = String.format(java.util.Locale.US,
                 "{\"id\": %d, \"nome\": \"%s\", \"tipo\": \"%s\", \"saldo\": %.2f}",
-                conto.getID(), conto.getNome(), conto.getTipo(), conto.getSaldo());
+                conto.getID(), conto.getNome(), conto.getTipo(), conto.getSaldo_attuale());
             
             Response response = createResponse(Response.Status.OK, "application/json", json);
             return addNoCacheHeaders(response);
@@ -446,7 +446,7 @@ public class GestoreConti extends BaseGestorePagina {
                     Conto conto = contiDisponibili.get(i);
                     jsonBuilder.append(String.format(java.util.Locale.US,
                         "{\"id\": %d, \"nome\": \"%s\", \"tipo\": \"%s\", \"saldo\": %.2f}",
-                        conto.getID(), conto.getNome(), conto.getTipo(), conto.getSaldo()));
+                        conto.getID(), conto.getNome(), conto.getTipo(), conto.getSaldo_attuale()));
                     
                     if (i < contiDisponibili.size() - 1) {
                         jsonBuilder.append(",");
@@ -515,7 +515,7 @@ public class GestoreConti extends BaseGestorePagina {
                 }
                 
                 // Verifica fondi sufficienti
-                if (importo > contoMit.getSaldo()) {
+                if (importo > contoMit.getSaldo_attuale()) {
                     return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                         "{\"error\": \"Fondi insufficienti\"}");
                 }

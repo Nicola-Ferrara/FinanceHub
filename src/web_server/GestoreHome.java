@@ -104,7 +104,7 @@ public class GestoreHome extends BaseGestorePagina {
                 Conto conto = conti.get(i);
                 jsonBuilder.append(String.format(java.util.Locale.US, 
                     "{\"id\": %d, \"nome\": \"%s\", \"tipo\": \"%s\", \"saldo\": %.2f}",
-                    conto.getID(), conto.getNome(), conto.getTipo(), conto.getSaldo()));
+                    conto.getID(), conto.getNome(), conto.getTipo(), conto.getSaldo_attuale()));
                 
                 if (i < conti.size() - 1) {
                     jsonBuilder.append(",");

@@ -19,7 +19,7 @@ public class ContoDAO {
                 ps.setString(1, email_utente);
                 ResultSet rs = ps.executeQuery();
                 while (rs.next()) {
-                    conti.add(new Conto(rs.getInt("id"), rs.getString("nome"), rs.getString("tipo"), rs.getDouble("saldo"), rs.getBoolean("attivo"), null, null));
+                    conti.add(new Conto(rs.getInt("id"), rs.getString("nome"), rs.getString("tipo"), rs.getDouble("saldo_iniziale"), rs.getDouble("saldo_attuale"), rs.getBoolean("attivo"), null, null));
                 }
             }
             return conti;
@@ -28,12 +28,14 @@ public class ContoDAO {
 
     public void updateConto(Conto conto) throws EccezioniDatabase {
         DAOFactory.getInstance().executeWithRetry((conn) -> {
-            String sql = "UPDATE Conto SET nome = ?, tipo = ?, attivo = ? WHERE id = ?";
+            String sql = "UPDATE Conto SET nome = ?, tipo = ?, attivo = ?, saldo_iniziale = ?, saldo_attuale = ? WHERE id = ?";
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setString(1, conto.getNome());
                 ps.setString(2, conto.getTipo());
                 ps.setBoolean(3, conto.getAttivo());
-                ps.setInt(4, conto.getID());
+                ps.setDouble(4, conto.getSaldo_iniziale());
+                ps.setDouble(5, conto.getSaldo_attuale());
+                ps.setInt(6, conto.getID());
                 ps.executeUpdate();
             }
             return null;
@@ -42,14 +44,15 @@ public class ContoDAO {
     
     public void saveConto(Conto conto, String email_utente) throws EccezioniDatabase {
         DAOFactory.getInstance().executeWithRetry((conn) -> {
-            String sql = "INSERT INTO Conto (id, nome, tipo, saldo, attivo, email_utente) VALUES (?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO Conto (id, nome, tipo, saldo_iniziale, saldo_attuale, attivo, email_utente) VALUES (?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, conto.getID());
                 ps.setString(2, conto.getNome());
                 ps.setString(3, conto.getTipo());
-                ps.setDouble(4, conto.getSaldo());
-                ps.setBoolean(5, conto.getAttivo());
-                ps.setString(6, email_utente);
+                ps.setDouble(4, conto.getSaldo_iniziale());
+                ps.setDouble(5, conto.getSaldo_attuale());
+                ps.setBoolean(6, conto.getAttivo());
+                ps.setString(7, email_utente);
                 ps.executeUpdate();
             }
             return null;

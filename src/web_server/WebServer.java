@@ -20,7 +20,7 @@ public class WebServer extends NanoHTTPD {
         this.gestori.add(new GestoreLogin(controller));
         this.gestori.add(new GestoreHome(controller));
         this.gestori.add(new GestoreRegistrazione(controller));
-        this.gestori.add(new GestoreConti(controller));
+        this.gestori.add(new GestoreConto(controller));
         this.gestori.add(new GestoreAggiungiConto(controller));
         
         start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
