@@ -59,21 +59,6 @@ public class WebServer extends NanoHTTPD {
             return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, "text/plain", "Errore del server: " + e.getMessage());
         }
     }
-    
-    /*private Response serveStaticFile(String uri) {
-        try {
-            String filePath = "./sito" + uri;
-            String mimeType = getContentTypeForFile(uri);
-            
-            byte[] fileData = java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(filePath));
-            
-            Response response = newFixedLengthResponse(Response.Status.OK, mimeType, new String(fileData));
-            response.addHeader("Cache-Control", "max-age=86400"); // Cache per 24 ore
-            return response;
-        } catch (Exception e) {
-            return newFixedLengthResponse(Response.Status.NOT_FOUND, "text/plain", "File non trovato");
-        }
-    }*/
 
     private Response serveStaticFile(String uri) {
         try {
