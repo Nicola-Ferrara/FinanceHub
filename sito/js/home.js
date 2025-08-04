@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", function() {
     setupBalanceClickListener();
     setupCategoriesClickListener();
     setupAccountsClickListener();
+    setupTransactionsClickListener();
     setupSidebar();
     
     // Listener per il bottone aggiungi conto
@@ -180,7 +181,7 @@ async function fetchConti() {
 // Funzione per recuperare le operazioni dal server
 async function fetchOperazioni() {
     try {
-        const response = await fetch("/api/operazioni");
+        const response = await fetch("/api/operazioni-home");
         if (!response.ok) {
             throw new Error("Errore durante il recupero delle operazioni");
         }
@@ -516,6 +517,32 @@ function setupAccountsClickListener() {
         accountsSection.setAttribute('aria-label', 'Visualizza tutti i conti');
         
         accountsSection.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
+        });
+    }
+}
+
+function setupTransactionsClickListener() {
+    const transactionsSection = document.querySelector('.transactions-section');
+    if (transactionsSection) {
+        transactionsSection.addEventListener('click', function(e) {
+            
+            // Aggiungi feedback visivo
+            this.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                this.style.transform = '';
+                window.location.href = '/operazioni';
+            }, 150);
+        });
+        
+        transactionsSection.setAttribute('role', 'button');
+        transactionsSection.setAttribute('tabindex', '0');
+        transactionsSection.setAttribute('aria-label', 'Visualizza tutte le operazioni');
+        
+        transactionsSection.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 this.click();

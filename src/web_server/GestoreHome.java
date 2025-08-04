@@ -19,7 +19,7 @@ public class GestoreHome extends BaseGestorePagina {
         return "/home".equals(uri) || 
                "/api/bilancio".equals(uri) || 
                "/api/conti".equals(uri) ||
-               "/api/operazioni".equals(uri) ||
+               "/api/operazioni-home".equals(uri) ||
                "/logout".equals(uri);
     }
     
@@ -34,7 +34,7 @@ public class GestoreHome extends BaseGestorePagina {
             return handleBalance();
         } else if ("/api/conti".equals(uri) && method == Method.GET) {
             return handleAccounts();
-        } else if ("/api/operazioni".equals(uri) && method == Method.GET) {
+        } else if ("/api/operazioni-home".equals(uri) && method == Method.GET) {
             return handleOperazioni();
         } else if ("/logout".equals(uri) && method == Method.GET) {
             return handleLogout(session);

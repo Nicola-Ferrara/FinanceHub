@@ -51,6 +51,7 @@ body {
     background: rgba(255, 255, 255, 0.2);
 }
 
+/* Hamburger Menu */
 .hamburger-menu {
     background: none;
     border: none;
@@ -85,6 +86,7 @@ body {
     background: #f8f9fa;
 }
 
+/* Sidebar */
 .sidebar {
     position: fixed;
     top: 0;
@@ -255,10 +257,10 @@ body {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
-.summary-card:nth-child(1) { border-left-color: #28a745; }
-.summary-card:nth-child(2) { border-left-color: #dc3545; }
-.summary-card:nth-child(3) { border-left-color: #667eea; }
-.summary-card:nth-child(4) { border-left-color: #ffc107; }
+.summary-card:nth-child(1) { border-left-color: #fd7e14; }
+.summary-card:nth-child(2) { border-left-color: #28a745; }
+.summary-card:nth-child(3) { border-left-color: #dc3545; }
+.summary-card:nth-child(4) { border-left-color: #007bff; }
 
 .summary-icon {
     font-size: 32px;
@@ -271,10 +273,10 @@ body {
     flex-shrink: 0;
 }
 
+.summary-icon.transactions { background: linear-gradient(135deg, #fff0e6, #ffe0cc); }
 .summary-icon.income { background: linear-gradient(135deg, #d4edda, #c3e6cb); }
 .summary-icon.expense { background: linear-gradient(135deg, #f8d7da, #f1b0b7); }
-.summary-icon.balance { background: linear-gradient(135deg, #e2e6ff, #c5d0ff); }
-.summary-icon.months { background: linear-gradient(135deg, #fff3cd, #ffeaa7); }
+.summary-icon.transfers { background: linear-gradient(135deg, #d1ecf1, #bee5eb); }
 
 .summary-details h3 {
     margin: 0 0 5px 0;
@@ -291,7 +293,7 @@ body {
 
 .amount.positive { color: #28a745; }
 .amount.negative { color: #dc3545; }
-.amount.neutral { color: #667eea; }
+.amount.neutral { color: #007bff; }
 
 /* Sezione Filtri */
 .filters-section {
@@ -330,7 +332,7 @@ body {
     background: white;
     cursor: pointer;
     transition: all 0.3s ease;
-    min-width: 200px;
+    min-width: 180px;
 }
 
 .filter-group select:focus {
@@ -339,8 +341,8 @@ body {
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-/* Sezione Bilanci */
-.bilanci-section {
+/* Sezione Operazioni */
+.operations-section {
     background: white;
     border-radius: 20px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
@@ -348,11 +350,11 @@ body {
     transition: transform 0.3s ease;
 }
 
-.bilanci-section:hover {
+.operations-section:hover {
     transform: translateY(-5px);
 }
 
-.bilanci-section h2 {
+.operations-section h2 {
     margin-top: 0;
     font-size: 24px;
     color: #333;
@@ -361,88 +363,87 @@ body {
     font-weight: 300;
 }
 
-.bilanci-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 25px;
+.operations-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
-.bilancio-card {
+/* Card Operazione */
+.operation-card {
     background: #f8f9fa;
     border-radius: 15px;
-    padding: 25px;
+    padding: 20px;
     transition: all 0.3s ease;
-    cursor: pointer;
-    border: 2px solid transparent;
-    position: relative;
+    border-left: 5px solid;
 }
 
-.bilancio-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-    border-color: #667eea;
+.operation-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    background: #f1f3f4;
 }
 
-.bilancio-header {
+.operation-card.income { border-left-color: #28a745; }
+.operation-card.expense { border-left-color: #dc3545; }
+.operation-card.transfer { border-left-color: #007bff; }
+
+.operation-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
-.bilancio-title {
-    font-size: 18px;
-    font-weight: 600;
+.operation-info {
+    flex: 1;
+}
+
+.operation-type {
+    font-size: 12px;
+    color: #6c757d;
+    background: #e9ecef;
+    padding: 4px 8px;
+    border-radius: 12px;
+    display: inline-block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.operation-description {
+    font-size: 16px;
+    font-weight: 500;
     color: #333;
+    margin: 0 0 5px 0;
+}
+
+.operation-details {
+    font-size: 14px;
+    color: #6c757d;
     margin: 0;
 }
 
-.bilancio-year {
-    font-size: 14px;
-    color: #6c757d;
-    background: white;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-weight: 500;
-}
-
-.bilancio-indicator {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    z-index: 1;
-}
-
-.stat-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    padding: 10px 15px;
-    background: white;
-    border-radius: 8px;
-    font-size: 14px;
-}
-
-.stat-label {
-    font-weight: 500;
-    color: #495057;
-}
-
-.stat-value {
+.operation-amount {
+    font-size: 20px;
     font-weight: 600;
+    text-align: right;
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-.stat-value.positive { color: #28a745; }
-.stat-value.negative { color: #dc3545; }
-.stat-value.neutral { color: #6c757d; }
+.operation-amount.positive { color: #28a745; }
+.operation-amount.negative { color: #dc3545; }
+.operation-amount.neutral { color: #007bff; }
 
-.bilancio-indicator.positive { background: #28a745; }
-.bilancio-indicator.negative { background: #dc3545; }
-.bilancio-indicator.neutral { background: #6c757d; }
+.operation-date {
+    font-size: 12px;
+    color: #6c757d;
+    text-align: right;
+    margin-top: 5px;
+}
 
 /* Loading e No Data */
 .loading-message {
@@ -506,122 +507,6 @@ body {
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
-/* Modale */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(5px);
-}
-
-.modal-content {
-    background-color: white;
-    margin: 3% auto;
-    padding: 0;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 700px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    animation: modalSlideIn 0.3s ease-out;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-@keyframes modalSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 25px 30px;
-    border-bottom: 1px solid #eee;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 20px 20px 0 0;
-}
-
-.modal-header h2 {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 500;
-}
-
-.close {
-    color: white;
-    float: right;
-    font-size: 24px;
-    font-weight: bold;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 50%;
-    transition: background 0.3s ease;
-}
-
-.close:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-.modal-body {
-    padding: 30px;
-}
-
-.detail-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    align-items: center;
-}
-
-.detail-chart {
-    display: flex;
-    justify-content: center;
-}
-
-.detail-chart canvas {
-    max-width: 300px;
-    max-height: 300px;
-}
-
-.detail-stats {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.stat-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    background: #f8f9fa;
-    border-radius: 10px;
-    font-size: 16px;
-}
-
-.stat-label {
-    font-weight: 500;
-    color: #495057;
-}
-
-.stat-value {
-    font-weight: 600;
-    font-size: 18px;
-}
-
 /* Responsive */
 @media (max-width: 768px) {
     .main-content {
@@ -674,28 +559,25 @@ body {
         min-width: unset;
     }
     
-    .bilanci-container {
-        grid-template-columns: 1fr;
+    .operation-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
     }
     
-    .detail-container {
-        grid-template-columns: 1fr;
-        gap: 20px;
+    .operation-amount {
+        text-align: left;
+        margin-left: 0;
     }
     
-    .modal-content {
-        width: 95%;
-        margin: 5% auto;
-    }
-    
-    .modal-body {
-        padding: 20px;
+    .operation-date {
+        text-align: left;
     }
 }
 
 @media (max-width: 480px) {
-    .bilancio-card {
-        padding: 20px;
+    .operation-card {
+        padding: 15px;
     }
     
     .summary-card {

@@ -396,11 +396,18 @@ body {
     border-radius: 20px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
     padding: 30px;
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
 }
 
 .transactions-section:hover {
     transform: translateY(-5px);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+}
+
+.transactions-section:active {
+    transform: translateY(-3px) scale(0.98);
 }
 
 .transactions-section h2 {
@@ -426,6 +433,8 @@ body {
     border-radius: 10px;
     margin-bottom: 10px;
     background: #f8f9fa;
+    position: relative;
+    z-index: 2;
 }
 
 .transactions-list li:hover {

@@ -188,20 +188,33 @@ public class Controller {
     }
 
     public dto.Operazione[] getTutteOperazioni() {
-        if (utente == null) return new dto.Operazione[0];
-        
-        java.util.List<Operazione> tutteOperazioni = new ArrayList<>();
-        
-        for (Conto conto : utente.getConti()) {
-            tutteOperazioni.addAll(conto.getTransazioni());
-            tutteOperazioni.addAll(conto.getTrasferimenti());
+    if (utente == null) return new dto.Operazione[0];
+    
+    java.util.List<Operazione> tutteOperazioni = new ArrayList<>();
+    ArrayList<Integer> trasferimentiGiaAggiunti = new ArrayList<>();
+    
+    for (Conto conto : utente.getConti()) {
+        if (conto.getTransazioni() != null) {
+            for (Transazione transazione : conto.getTransazioni()) {
+                tutteOperazioni.add(transazione);
+            }
         }
         
-        // Ordina per data (più recenti prima)
-        tutteOperazioni.sort((a, b) -> b.getData().compareTo(a.getData()));
-        
-        return tutteOperazioni.toArray(new dto.Operazione[0]);
+        if (conto.getTrasferimenti() != null) {
+            for (Trasferimento trasferimento : conto.getTrasferimenti()) {
+                if (!trasferimentiGiaAggiunti.contains(trasferimento.getID())) {
+                    tutteOperazioni.add(trasferimento);
+                    trasferimentiGiaAggiunti.add(trasferimento.getID());
+                }
+            }
+        }
     }
+    
+    // Ordina per data (più recenti prima)
+    tutteOperazioni.sort((a, b) -> b.getData().compareTo(a.getData()));
+    
+    return tutteOperazioni.toArray(new dto.Operazione[0]);
+}
 
     public Conto getContoById(int id) {
         for (Conto conto : utente.getConti()) {
