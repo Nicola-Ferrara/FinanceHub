@@ -77,6 +77,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-gap: 30px;
+    align-items: start;
 }
 
 /* Sezione Aggiungi categoria - STILE HOME */
@@ -144,12 +145,11 @@ body {
 }
 
 .categories-container {
-    max-height: 300px;
+    max-height: none;
     overflow-y: auto;
     overflow-x: hidden;
 }
 
-/* Lista categorie - STILE HOME */
 .categories-list {
     list-style: none;
     padding: 0;

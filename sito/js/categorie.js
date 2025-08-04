@@ -237,6 +237,16 @@ async function handleAddCategorySubmit(event) {
         showNotification('Inserisci il nome della categoria', 'error');
         return;
     }
+
+    if (categoryData.nome.length < 3) {
+        showNotification('Il nome della categoria deve avere almeno 3 caratteri', 'error');
+        return;
+    }
+
+    if (categoryData.nome.length > 20) {
+        showNotification('Il nome della categoria non può superare i 20 caratteri', 'error');
+        return;
+    }
     
     if (!categoryData.tipo) {
         showNotification('Seleziona il tipo di categoria', 'error');
@@ -287,6 +297,16 @@ async function handleEditCategorySubmit(event) {
     
     if (!nuovoNome) {
         showNotification('Inserisci il nuovo nome della categoria', 'error');
+        return;
+    }
+
+    if (nuovoNome.length < 3) {
+        showNotification('Il nome della categoria deve avere almeno 3 caratteri', 'error');
+        return;
+    }
+
+    if (nuovoNome.length > 20) {
+        showNotification('Il nome della categoria non può superare i 20 caratteri', 'error');
         return;
     }
     
