@@ -198,6 +198,40 @@ async function fetchOperazioni() {
         } else {
             operazioni.forEach(operazione => {
                 const li = document.createElement("li");
+                
+                li.style.cursor = "pointer";
+                li.setAttribute('role', 'button');
+                li.setAttribute('tabindex', '0');
+                
+                li.addEventListener('click', function(e) {
+                    e.stopPropagation(); // ✅ IMPORTANTE - Previene il bubble al contenitore
+                    
+                    // Feedback visivo
+                    this.style.transform = 'scale(0.98)';
+                    this.style.transition = 'transform 0.15s ease';
+                    
+                    // Determina l'URL basato sul tipo di operazione
+                    let targetUrl;
+                    if (operazione.tipo === "Trasferimento") {
+                        targetUrl = `/trasferimento?id=${operazione.id}`;
+                    } else {
+                        // Transazione (Guadagno o Spesa)
+                        targetUrl = `/transazione?id=${operazione.id}`;
+                    }
+                    
+                    // Naviga dopo l'animazione
+                    setTimeout(() => {
+                        this.style.transform = '';
+                        window.location.href = targetUrl;
+                    }, 150);
+                });
+                
+                li.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.click();
+                    }
+                });
 
                 const indicator = document.createElement("div");
                 indicator.classList.add("transaction-indicator");
@@ -529,6 +563,10 @@ function setupTransactionsClickListener() {
     const transactionsSection = document.querySelector('.transactions-section');
     if (transactionsSection) {
         transactionsSection.addEventListener('click', function(e) {
+
+            if (e.target.closest('.transactions-list li')) {
+                return;
+            }
             
             // Aggiungi feedback visivo
             this.style.transform = 'scale(0.98)';

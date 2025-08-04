@@ -399,21 +399,6 @@ body {
 .operation-card.expense { border-left-color: #dc3545; }
 .operation-card.transfer { border-left-color: #007bff; }
 
-.operation-card::after {
-    content: '👆';
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    font-size: 16px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-}
-
-.operation-card:hover::after {
-    opacity: 0.3;
-}
-
 .operation-header {
     display: flex;
     justify-content: space-between;
