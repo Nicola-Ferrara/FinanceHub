@@ -172,6 +172,11 @@ function createOperationCard(operation) {
     const card = document.createElement('div');
     card.className = 'operation-card';
     
+    // ✅ AGGIUNTO - Rendi la card cliccabile
+    card.style.cursor = 'pointer';
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    
     if (operation.tipo === 'transazione') {
         // Transazione
         const isIncome = operation.tipoCategoria === 'Guadagno';
@@ -195,6 +200,20 @@ function createOperationCard(operation) {
                 </div>
             </div>
         `;
+        
+        // ✅ AGGIUNTO - Click handler per transazioni
+        card.addEventListener('click', function() {
+            handleOperationClick(operation, card, `/transazione?id=${operation.id}`);
+        });
+        
+        // ✅ AGGIUNTO - Keyboard accessibility
+        card.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
+        });
+        
     } else {
         // Trasferimento
         card.classList.add('transfer');
@@ -215,6 +234,19 @@ function createOperationCard(operation) {
                 </div>
             </div>
         `;
+        
+        // ✅ AGGIUNTO - Click handler per trasferimenti
+        card.addEventListener('click', function() {
+            handleOperationClick(operation, card, `/trasferimento?id=${operation.id}`);
+        });
+        
+        // ✅ AGGIUNTO - Keyboard accessibility
+        card.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
+        });
     }
     
     return card;
@@ -271,4 +303,16 @@ function showErrorMessage(message) {
         </div>
     `;
     container.style.display = 'flex';
+}
+
+function handleOperationClick(operation, cardElement, targetUrl) {
+    // Feedback visivo
+    cardElement.style.transform = 'scale(0.98)';
+    cardElement.style.transition = 'transform 0.15s ease';
+    
+    // Naviga dopo l'animazione
+    setTimeout(() => {
+        cardElement.style.transform = '';
+        window.location.href = targetUrl;
+    }, 150);
 }

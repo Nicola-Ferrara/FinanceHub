@@ -376,6 +376,8 @@ body {
     padding: 20px;
     transition: all 0.3s ease;
     border-left: 5px solid;
+    cursor: pointer;
+    position: relative;
 }
 
 .operation-card:hover {
@@ -384,9 +386,33 @@ body {
     background: #f1f3f4;
 }
 
+.operation-card:focus {
+    outline: 3px solid rgba(102, 126, 234, 0.3);
+    outline-offset: 2px;
+}
+
+.operation-card:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
 .operation-card.income { border-left-color: #28a745; }
 .operation-card.expense { border-left-color: #dc3545; }
 .operation-card.transfer { border-left-color: #007bff; }
+
+.operation-card::after {
+    content: '👆';
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 16px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.operation-card:hover::after {
+    opacity: 0.3;
+}
 
 .operation-header {
     display: flex;
@@ -572,6 +598,14 @@ body {
     
     .operation-date {
         text-align: left;
+    }
+
+    operation-card:hover::after {
+        opacity: 0.5;
+    }
+
+    .operation-card {
+        padding: 15px;
     }
 }
 
