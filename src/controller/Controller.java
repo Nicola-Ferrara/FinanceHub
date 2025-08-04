@@ -46,9 +46,22 @@ public class Controller {
                 }
                 conto.setTransazioni(transazioni);
             }
+
+            ricalcolaTuttiISaldi();
             return true;
         } catch (EccezioniDatabase e) {
             throw e;
+        }
+    }
+
+    public void ricalcolaTuttiISaldi() {
+        for (Conto conto : utente.getConti()) {
+            conto.ricalcolaSaldo();
+            try {
+                daoFactory.getContoDAO().updateConto(conto);
+            } catch (EccezioniDatabase e) {
+                e.printStackTrace();
+            }
         }
     }
 
