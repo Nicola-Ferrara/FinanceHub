@@ -775,3 +775,19 @@ body {
         gap: 20px;
     }
 }
+
+.sidebar-divider {
+    height: 1px;
+    background: #eee;
+    margin: 20px 25px;
+}
+
+.sidebar-link.logout {
+    color: #dc3545;
+    margin-top: auto;
+}
+
+.sidebar-link.logout:hover {
+    background: #ffeaea;
+    color: #c82333;
+}
