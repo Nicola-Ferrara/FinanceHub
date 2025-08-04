@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanceHub - Categorie</title>
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <link rel="stylesheet" href="../css/categorie.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="../js/categorie.js" defer></script>
+</head>
+<body>
+    <header class="header">
+        <div class="nav-buttons">
+            <h1>Gestione Categorie</h1>
+            <div class="nav-links">
+                <a href="/home" class="nav-link">🏠 Home</a>
+                <form action="/logout" method="get" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Aggiungi categoria -->
+        <section class="add-category-section">
+            <button id="addCategoryBtn" class="add-category-btn">
+                ➕ Aggiungi Categoria
+            </button>
+        </section>
+
+        <!-- Categorie di Guadagno -->
+        <section class="categories-section income-section">
+            <h2>🟢 Categorie di Guadagno</h2>
+            <div class="categories-container">
+                <ul id="incomeCategories" class="categories-list income">
+                    <!-- Le categorie di guadagno verranno caricate dinamicamente -->
+                </ul>
+            </div>
+        </section>
+
+        <!-- Categorie di Spesa -->
+        <section class="categories-section expense-section">
+            <h2>🔴 Categorie di Spesa</h2>
+            <div class="categories-container">
+                <ul id="expenseCategories" class="categories-list expense">
+                    <!-- Le categorie di spesa verranno caricate dinamicamente -->
+                </ul>
+            </div>
+        </section>
+
+        <!-- Menu contestuale -->
+        <div id="contextMenu" class="context-menu">
+            <div class="context-menu-item" id="editCategoryOption">
+                <span class="context-icon">✏️</span>
+                <span>Modifica nome</span>
+            </div>
+            <div class="context-menu-item danger" id="deleteCategoryOption">
+                <span class="context-icon">🗑️</span>
+                <span>Elimina categoria</span>
+            </div>
+        </div>
+
+        <!-- Modale per aggiungere categoria -->
+        <div id="addCategoryModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Aggiungi Categoria</h2>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="addCategoryForm">
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label for="categoryName">Nome Categoria *</label>
+                                <input type="text" id="categoryName" name="nome" 
+                                       placeholder="Es. Stipendio, Affitto, Cibo..." required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="categoryType">Tipo Categoria *</label>
+                                <select id="categoryType" name="tipo" required>
+                                    <option value="">Seleziona il tipo</option>
+                                    <option value="Spesa">Spesa</option>
+                                    <option value="Guadagno">Guadagno</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelAddCategory">Annulla</button>
+                            <button type="submit" class="btn btn-primary">Aggiungi Categoria</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modale per modificare categoria -->
+        <div id="editCategoryModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Modifica Categoria</h2>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="editCategoryForm">
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label for="editCategoryName">Nuovo Nome *</label>
+                                <input type="text" id="editCategoryName" name="nuovoNome" 
+                                       placeholder="Inserisci il nuovo nome..." required>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelEditCategory">Annulla</button>
+                            <button type="submit" class="btn btn-primary">Modifica Categoria</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modale per conferma eliminazione -->
+        <div id="deleteCategoryModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Elimina Categoria</h2>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="warning-message">
+                        <p>⚠️ <strong>Attenzione!</strong></p>
+                        <p id="deleteWarningText">Sei sicuro di voler eliminare questa categoria?</p>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancelDeleteCategory">Annulla</button>
+                        <button type="button" class="btn btn-danger" id="confirmDeleteCategory">Elimina Categoria</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

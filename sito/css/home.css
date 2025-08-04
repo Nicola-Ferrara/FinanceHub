@@ -437,12 +437,19 @@ body {
     border-radius: 20px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
     padding: 30px;
-    transition: transform 0.3s ease;
-    grid-column: 1 / -1; /* Occupa tutta la larghezza */
+    transition: all 0.3s ease;
+    grid-column: 1 / -1;
+    cursor: pointer;
+    position: relative;
 }
 
 .categories-section:hover {
     transform: translateY(-5px);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+}
+
+.categories-section:active {
+    transform: translateY(-3px) scale(0.98);
 }
 
 .categories-section h2 {
@@ -900,6 +907,49 @@ body {
     }
     
     .click-indicator .arrow {
+        font-size: 14px;
+    }
+}
+
+.categories-click-indicator {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #6c757d;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.categories-section:hover .categories-click-indicator {
+    background: #e9ecef;
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.categories-click-indicator .arrow {
+    font-size: 16px;
+    font-weight: bold;
+    transition: transform 0.3s ease;
+}
+
+.categories-section:hover .categories-click-indicator .arrow {
+    transform: translateX(5px);
+}
+
+/* ✅ RESPONSIVE PER L'INDICATORE */
+@media (max-width: 768px) {
+    .categories-click-indicator {
+        padding: 12px 15px;
+        font-size: 13px;
+    }
+    
+    .categories-click-indicator .arrow {
         font-size: 14px;
     }
 }

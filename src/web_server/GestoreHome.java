@@ -345,5 +345,4 @@ public class GestoreHome extends BaseGestorePagina {
         return json.substring(valueStart, valueEnd);
     }
 
-
 }

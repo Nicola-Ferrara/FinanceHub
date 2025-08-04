@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
     fetchCategorie();
     setupCategoryListeners();
     setupBalanceClickListener();
+    setupCategoriesClickListener();
 });
 
 // Funzione per recuperare i dati del bilancio dal server
@@ -672,6 +673,44 @@ function setupBalanceClickListener() {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 this.click();
+            }
+        });
+    }
+}
+
+function setupCategoriesClickListener() {
+    const categoriesSection = document.getElementById('categoriesSection');
+    if (categoriesSection) {
+        categoriesSection.addEventListener('click', function(e) {
+            // ✅ EVITA IL CLICK SE SI CLICCA SUI PULSANTI
+            if (e.target.closest('.category-action-btn') || 
+                e.target.closest('.modal') || 
+                e.target.closest('button')) {
+                return;
+            }
+            
+            // Aggiungi feedback visivo
+            this.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                this.style.transform = '';
+                // Naviga alla pagina Categorie
+                window.location.href = '/categorie';
+            }, 150);
+        });
+        
+        // ✅ MIGLIORA L'ACCESSIBILITÀ
+        categoriesSection.setAttribute('role', 'button');
+        categoriesSection.setAttribute('tabindex', '0');
+        categoriesSection.setAttribute('aria-label', 'Gestisci tutte le categorie');
+        
+        // ✅ SUPPORTO TASTIERA (Enter e Spacebar)
+        categoriesSection.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                // Simula il click ma evita i pulsanti
+                if (!e.target.closest('.category-action-btn')) {
+                    this.click();
+                }
             }
         });
     }

@@ -65,6 +65,18 @@ public class CategoriaDAO {
         }, "ERRORE DURANTE IL SALVATAGGIO DELLA CATEGORIA");
     }
 
+    public void updateCategoria(Categoria categoria) throws EccezioniDatabase {
+        DAOFactory.getInstance().executeWithRetry((conn) -> {
+            String sql = "UPDATE Categoria SET nome = ? WHERE id = ?";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, categoria.getNome());
+                ps.setInt(2, categoria.getID());
+                ps.executeUpdate();
+            }
+            return null;
+        }, "ERRORE DURANTE L'AGGIORNAMENTO DELLA CATEGORIA");
+    }
+
     public int newID() throws EccezioniDatabase {
         return DAOFactory.getInstance().executeWithRetry((conn) -> {
             String sql = "SELECT MAX(id) AS max_id FROM Categoria";

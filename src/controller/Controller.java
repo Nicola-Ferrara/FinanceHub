@@ -455,6 +455,21 @@ public class Controller {
         return true;
     }
 
+    public boolean modificaCategoria(int id, String nome) {
+        Categoria categoria = getCategoriaById(id);
+        if (categoria == null) {
+            return false;
+        }
+        categoria.setNome(nome);
+        try {
+            daoFactory.getCategoriaDAO().updateCategoria(categoria);
+        } catch (EccezioniDatabase e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
     public static void main(String[] args) {
         try {
             Controller controller = new Controller();
