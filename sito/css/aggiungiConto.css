@@ -10,22 +10,26 @@ body {
 
 /* Header */
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 20px 30px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.header h1 {
+.nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.nav-buttons h1 {
     margin: 0;
     font-size: 24px;
     font-weight: 300;
 }
 
-.nav-buttons {
+.nav-links {
     display: flex;
     align-items: center;
     gap: 15px;
@@ -279,48 +283,50 @@ body {
         padding: 15px 20px;
     }
     
-    .header h1 {
-        font-size: 20px;
+    .nav-buttons {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+        width: 100%;
     }
     
-    .nav-buttons {
-        position: relative;
-    }
-
-    .mobile-menu-toggle {
-        display: block;
-        background: none;
-        border: none;
-        color: white;
+    .nav-buttons h1 {
         font-size: 20px;
-        cursor: pointer;
-        padding: 8px;
+        text-align: center;
+        order: -1;
+        margin: 0;
+        width: 100%;
+    }
+    
+    .nav-links {
+        order: 1;
+        justify-content: center;
+        flex-direction: row;
+        gap: 30px;
+    }
+    
+    .nav-link {
+        padding: 10px 20px;
+        font-size: 14px;
+        border-radius: 25px;
+        white-space: nowrap;
+        min-width: 100px;
+        text-align: center;
+    }
+    
+    .logout-button {
+        padding: 12px 24px;
+        font-size: 14px;
+        border-radius: 25px;
+        min-width: 100px;
+    }
+    
+    .mobile-menu-toggle {
+        display: none;
     }
     
     .mobile-nav-menu {
         display: none;
-        position: absolute;
-        top: 100%;
-        right: 0;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: 10px;
-        padding: 10px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        min-width: 120px;
-    }
-    
-    .mobile-nav-menu.active {
-        display: block;
-    }
-    
-    .mobile-nav-menu .nav-link,
-    .mobile-nav-menu .logout-button {
-        display: block;
-        width: 100%;
-        margin-bottom: 8px;
-        text-align: center;
-        color: #333;
     }
     
     .form-actions {
