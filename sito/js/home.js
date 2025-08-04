@@ -404,8 +404,7 @@ function checkUrlParams() {
         
         const newUrl = window.location.pathname;
         window.history.replaceState({}, document.title, newUrl);
-    }
-    else if (urlParams.get('success') === 'transazione-eliminata') {
+    } else if (urlParams.get('success') === 'transazione-eliminata') {
         showNotification('Transazione eliminata con successo!', 'success');
         
         const newUrl = window.location.pathname;

@@ -29,19 +29,47 @@ function setupEventListeners() {
     document.getElementById('closeDeleteModal').addEventListener('click', closeDeleteModal);
     document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteModal);
     document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDelete);
-    
+
     // Click fuori dal modal per chiudere
     window.addEventListener('click', function(event) {
         const deleteModal = document.getElementById('deleteModal');
-        const successModal = document.getElementById('successModal');
         
         if (event.target === deleteModal) {
             closeDeleteModal();
         }
-        if (event.target === successModal) {
-            closeSuccessModal();
-        }
     });
+}
+
+function formatImporto(event) {
+    const input = event.target;
+    let value = input.value;
+    
+    // Rimuovi caratteri non validi (tranne numeri, punti e virgole)
+    let cleanValue = value.replace(/[^0-9.,]/g, '');
+    
+    // Sostituisci virgola con punto
+    cleanValue = cleanValue.replace(',', '.');
+    
+    // Gestisci multipli punti decimali
+    const parts = cleanValue.split('.');
+    if (parts.length > 2) {
+        cleanValue = parts[0] + '.' + parts.slice(1).join('');
+    }
+    
+    // Limita a 2 decimali
+    if (parts.length === 2 && parts[1].length > 2) {
+        cleanValue = parts[0] + '.' + parts[1].substring(0, 2);
+    }
+    
+    // Aggiorna solo se diverso
+    if (cleanValue !== value) {
+        const cursorPosition = input.selectionStart;
+        input.value = cleanValue;
+        
+        // Ripristina posizione cursore
+        const newPosition = Math.min(cursorPosition, cleanValue.length);
+        input.setSelectionRange(newPosition, newPosition);
+    }
 }
 
 // Carica dati transazione
@@ -163,48 +191,54 @@ async function handleSaveTransaction(event) {
             idConto: transactionData.idConto
         };
         
-        // ✅ VALIDAZIONI COMPLETE
-        
         // Validazione importo
         if (isNaN(updatedData.importo) || updatedData.importo <= 0) {
-            throw new Error('L\'importo deve essere un numero maggiore di zero');
+            showErrorMessage('L\'importo deve essere un numero maggiore di zero');
+            return;
         }
         
-        // ✅ NUOVO - Controllo limite massimo importo (PostgreSQL NUMERIC(15,2))
+        // Controllo limite massimo importo
         if (updatedData.importo > 9999999999999.99) {
-            throw new Error('L\'importo non può superare i 9.999.999.999.999,99 €');
+            showErrorMessage('L\'importo non può superare i 9.999.999.999.999,99 €');
+            return;
         }
         
         // Validazione data
         if (!updatedData.data) {
-            throw new Error('La data è obbligatoria');
+            showErrorMessage('La data è obbligatoria');
+            return;
         }
         
         if (new Date(updatedData.data) > new Date()) {
-            throw new Error('La data non può essere futura');
+            showErrorMessage('La data non può essere futura');
+            return;
         }
         
-        // ✅ NUOVO - Validazione descrizione obbligatoria
+        // Validazione descrizione obbligatoria
         if (!updatedData.descrizione || updatedData.descrizione.trim().length === 0) {
-            throw new Error('La descrizione è obbligatoria');
+            showErrorMessage('La descrizione è obbligatoria');
+            return;
         }
         
-        // ✅ NUOVO - Validazione lunghezza minima descrizione
+        // Validazione lunghezza minima descrizione
         if (updatedData.descrizione.trim().length < 3) {
-            throw new Error('La descrizione deve essere di almeno 3 caratteri');
+            showErrorMessage('La descrizione deve essere di almeno 3 caratteri');
+            return;
         }
         
-        // ✅ NUOVO - Validazione lunghezza massima descrizione
+        // Validazione lunghezza massima descrizione
         if (updatedData.descrizione.trim().length > 500) {
-            throw new Error('La descrizione non può superare i 500 caratteri');
+            showErrorMessage('La descrizione non può superare i 500 caratteri');
+            return;
         }
         
-        // ✅ NUOVO - Validazione categoria obbligatoria
+        // Validazione categoria obbligatoria
         if (isNaN(updatedData.idCategoria) || updatedData.idCategoria <= 0) {
-            throw new Error('Seleziona una categoria valida');
+            showErrorMessage('Seleziona una categoria valida');
+            return;
         }
         
-        // ✅ PULISCI la descrizione (trim)
+        // Pulisci la descrizione (trim)
         updatedData.descrizione = updatedData.descrizione.trim();
         
         const response = await fetch('/api/transazione', {
@@ -228,15 +262,11 @@ async function handleSaveTransaction(event) {
             throw new Error(errorData.error || 'Errore durante il salvataggio');
         }
         
-        showSuccessModal('Transazione modificata con successo!');
-        
-        setTimeout(() => {
-            window.location.href = '/home?success=transazione-modificata';
-        }, 2000);
+        window.location.href = '/home?success=transazione-modificata';
         
     } catch (error) {
         console.error('Errore salvataggio:', error);
-        showNotification(error.message, 'error');
+        showErrorMessage(error.message || 'Errore durante il salvataggio');
     } finally {
         isEditing = false;
         document.getElementById('saveBtn').disabled = false;
@@ -290,21 +320,6 @@ async function confirmDelete() {
     }
 }
 
-// Mostra modal successo
-function showSuccessModal(title, message = '') {
-    document.getElementById('successTitle').textContent = title;
-    document.getElementById('successMessage').textContent = message || 'Operazione completata con successo.';
-    document.getElementById('successModal').style.display = 'block';
-    
-    // Auto-chiudi dopo 3 secondi
-    setTimeout(closeSuccessModal, 3000);
-}
-
-// Chiudi modal successo
-function closeSuccessModal() {
-    document.getElementById('successModal').style.display = 'none';
-}
-
 // Utility functions
 function showLoading(show) {
     const loading = document.getElementById('loadingMessage');
@@ -349,12 +364,39 @@ function formatDateForInput(dateString) {
     return date.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:MM
 }
 
-function showNotification(message, type = 'info') {
-    // Semplice notifica console per ora
-    console.log(`${type.toUpperCase()}: ${message}`);
+function showNotification(message, type) {
+    // Rimuovi notifiche precedenti
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notif => notif.remove());
     
-    // Potresti implementare un sistema di notifiche toast qui
-    alert(message);
+    // Crea la notifica
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span class="notification-icon">${type === 'success' ? '✅' : '❌'}</span>
+            <span class="notification-message">${message}</span>
+            <button class="notification-close">&times;</button>
+        </div>
+    `;
+    
+    // Aggiungi al body
+    document.body.appendChild(notification);
+    
+    // Animazione di entrata
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    // Rimuovi automaticamente dopo 3 secondi
+    setTimeout(() => {
+        hideNotification(notification);
+    }, 3000);
+    
+    // Event listener per chiudere manualmente
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+        hideNotification(notification);
+    });
 }
 
 // Setup sidebar (stesso codice delle altre pagine)
@@ -389,4 +431,21 @@ function setupSidebar() {
             document.body.style.overflow = '';
         }
     });
+}
+
+function showSuccessMessage(message) {
+    showNotification(message, 'success');
+}
+
+function showErrorMessage(message) {
+    showNotification(message, 'error');
+}
+
+function hideNotification(notification) {
+    notification.classList.remove('show');
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 300);
 }

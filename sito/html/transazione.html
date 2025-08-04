@@ -118,7 +118,8 @@
                 <form id="editTransactionForm" class="edit-form" novalidate>
                     <div class="form-group">
                         <label for="editImporto">Importo (€)</label>
-                        <input type="number" id="editImporto" name="importo" step="0.01" min="0.01" required>
+                        <input type="number" id="editImporto" name="importo" 
+                               step="0.01" min="0.01" max="9999999999999.99" required>
                     </div>
 
                     <div class="form-group">
@@ -128,7 +129,9 @@
 
                     <div class="form-group">
                         <label for="editDescrizione">Descrizione</label>
-                        <textarea id="editDescrizione" name="descrizione" rows="3" placeholder="Inserisci una descrizione..."></textarea>
+                        <textarea id="editDescrizione" name="descrizione" rows="3" 
+                                  placeholder="Inserisci una descrizione (min. 3 caratteri)..."
+                                  minlength="3" maxlength="500" required></textarea>
                     </div>
 
                     <div class="form-group">
@@ -138,7 +141,6 @@
                         </select>
                     </div>
 
-                    <!-- ✅ MODIFICATO - Tre bottoni affiancati -->
                     <div class="form-actions">
                         <button type="button" id="cancelBtn" class="btn-secondary">Annulla</button>
                         <button type="submit" id="saveBtn" class="btn-primary">Salva Modifiche</button>
@@ -168,19 +170,6 @@
             <div class="modal-footer">
                 <button id="cancelDeleteBtn" class="btn-secondary">Annulla</button>
                 <button id="confirmDeleteBtn" class="btn-danger">Elimina</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modale Successo -->
-    <div id="successModal" class="modal">
-        <div class="modal-content success-modal">
-            <div class="modal-body">
-                <div class="success-content">
-                    <div class="success-icon">✅</div>
-                    <h3 id="successTitle">Operazione completata!</h3>
-                    <p id="successMessage">La transazione è stata modificata con successo.</p>
-                </div>
             </div>
         </div>
     </div>
