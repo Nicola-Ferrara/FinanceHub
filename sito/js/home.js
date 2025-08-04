@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
     fetchCategorie(); // ✅ MANTIENI - Solo per visualizzazione
     setupBalanceClickListener();
     setupCategoriesClickListener();
+    setupAccountsClickListener();
     setupSidebar();
     
     // Listener per il bottone aggiungi conto
@@ -490,4 +491,35 @@ function setupSidebar() {
             document.body.style.overflow = '';
         }
     });
+}
+
+function setupAccountsClickListener() {
+    const accountsSection = document.getElementById('accountsSection');
+    if (accountsSection) {
+        accountsSection.addEventListener('click', function(e) {
+            // Previeni il click se l'utente ha cliccato su un singolo conto o sul bottone aggiungi
+            if (e.target.closest('.accounts-list li') || e.target.closest('.add-account-btn')) {
+                return;
+            }
+            
+            // Aggiungi feedback visivo
+            this.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                this.style.transform = '';
+                // Naviga alla pagina lista conti
+                window.location.href = '/lista_conti';
+            }, 150);
+        });
+        
+        accountsSection.setAttribute('role', 'button');
+        accountsSection.setAttribute('tabindex', '0');
+        accountsSection.setAttribute('aria-label', 'Visualizza tutti i conti');
+        
+        accountsSection.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
+        });
+    }
 }

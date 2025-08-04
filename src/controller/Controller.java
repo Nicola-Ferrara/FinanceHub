@@ -146,11 +146,11 @@ public class Controller {
     }
 
     public LinkedList<Conto> getConti() {
-        LinkedList<Conto> contiAttivi = new LinkedList<>();
+        LinkedList<Conto> conti = new LinkedList<>();
         for (Conto conto : utente.getConti()) {
-            contiAttivi.add(conto);
+            conti.add(conto);
         }
-        return contiAttivi;
+        return conti;
     }
 
     public LinkedList<Conto> getTuttiConti() {
