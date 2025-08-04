@@ -531,16 +531,16 @@ public class Controller {
     }
 
     public LinkedList<Categoria> getTutteCategorie() {
-    if (utente == null || utente.getCategorie() == null) {
-        return new LinkedList<>();
+        if (utente == null || utente.getCategorie() == null) {
+            return new LinkedList<>();
+        }
+        
+        LinkedList<Categoria> tutteCategorie = new LinkedList<>();
+        for (Categoria categoria : utente.getCategorie()) {
+            tutteCategorie.add(categoria);
+        }
+        return tutteCategorie;
     }
-    
-    LinkedList<Categoria> tutteCategorie = new LinkedList<>();
-    for (Categoria categoria : utente.getCategorie()) {
-        tutteCategorie.add(categoria);
-    }
-    return tutteCategorie;
-}
 
     public static void main(String[] args) {
         try {
