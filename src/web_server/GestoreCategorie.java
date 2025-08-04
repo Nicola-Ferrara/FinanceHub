@@ -188,11 +188,41 @@ public class GestoreCategorie extends BaseGestorePagina {
             }
             
             // Leggi il body della richiesta
-            Map<String, String> body = new HashMap<>();
-            session.parseBody(body);
-            String requestBody = body.get("postData");
+            String requestBody = null;
             
-            if (requestBody == null || requestBody.isEmpty()) {
+            try {
+                String contentLengthHeader = session.getHeaders().get("content-length");
+                if (contentLengthHeader != null && !contentLengthHeader.equals("0")) {
+                    int contentLength = Integer.parseInt(contentLengthHeader);
+                    
+                    if (contentLength > 0) {
+                        byte[] bodyBytes = new byte[contentLength];
+                        java.io.InputStream inputStream = session.getInputStream();
+                        
+                        int totalRead = 0;
+                        while (totalRead < contentLength) {
+                            int bytesRead = inputStream.read(bodyBytes, totalRead, contentLength - totalRead);
+                            if (bytesRead == -1) break;
+                            totalRead += bytesRead;
+                        }
+                        
+                        if (totalRead > 0) {
+                            requestBody = new String(bodyBytes, 0, totalRead, "UTF-8");
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // Fallback a parseBody
+                try {
+                    Map<String, String> files = new HashMap<>();
+                    session.parseBody(files);
+                    requestBody = files.get("postData");
+                } catch (Exception e2) {
+                    // Ignore fallback errors
+                }
+            }
+            
+            if (requestBody == null || requestBody.trim().isEmpty()) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"Body della richiesta vuoto\"}");
             }

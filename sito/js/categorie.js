@@ -93,7 +93,6 @@ function renderIncomeCategories() {
                     <p>Categoria di Guadagno</p>
                 </div>
             </div>
-            <div class="category-id">#${categoria.id}</div>
             ${categoria.id !== 1 && categoria.id !== 2 ? 
                 '<button class="category-menu-btn" data-category-id="' + categoria.id + '" data-category-name="' + categoria.nome + '" data-category-type="Guadagno">⋮</button>' : 
                 ''
@@ -130,7 +129,6 @@ function renderExpenseCategories() {
                     <p>Categoria di Spesa</p>
                 </div>
             </div>
-            <div class="category-id">#${categoria.id}</div>
             ${categoria.id !== 1 && categoria.id !== 2 ? 
                 '<button class="category-menu-btn" data-category-id="' + categoria.id + '" data-category-name="' + categoria.nome + '" data-category-type="Spesa">⋮</button>' : 
                 ''

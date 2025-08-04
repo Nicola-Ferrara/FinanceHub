@@ -18,12 +18,12 @@ public class WebServer extends NanoHTTPD {
         // Registra i gestori
         this.gestori = new ArrayList<>();
         this.gestori.add(new GestoreLogin(controller));
+        this.gestori.add(new GestoreCategorie(controller));
         this.gestori.add(new GestoreHome(controller));
         this.gestori.add(new GestoreRegistrazione(controller));
         this.gestori.add(new GestoreConto(controller));
         this.gestori.add(new GestoreAggiungiConto(controller));
         this.gestori.add(new GestoreBilanci(controller));
-        this.gestori.add(new GestoreCategorie(controller));
         
         start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
         int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
