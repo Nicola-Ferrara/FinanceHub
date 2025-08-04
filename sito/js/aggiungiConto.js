@@ -3,6 +3,65 @@ let isSubmitting = false;
 
 // Inizializzazione quando il DOM è caricato
 document.addEventListener("DOMContentLoaded", function() {
+    
+    // ✅ DISABILITA COMPLETAMENTE VALIDAZIONE HTML5
+    const form = document.getElementById('addAccountForm');
+    const inputs = document.querySelectorAll('input, select');
+    
+    // Rimuovi attributi di validazione
+    inputs.forEach(input => {
+        input.removeAttribute('required');
+        input.setAttribute('novalidate', '');
+        
+        // Previeni tutti gli eventi di validazione
+        ['invalid', 'oninvalid'].forEach(event => {
+            input.addEventListener(event, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            });
+        });
+        
+        // Forza stili CSS - rimuovi bordi colorati
+        input.style.setProperty('border-color', '#e9ecef', 'important');
+        input.style.setProperty('box-shadow', 'none', 'important');
+        
+        // Focus: solo bordo blu
+        input.addEventListener('focus', function() {
+            this.style.setProperty('border-color', '#667eea', 'important');
+            this.style.setProperty('box-shadow', '0 0 0 3px rgba(102, 126, 234, 0.1)', 'important');
+        });
+        
+        input.addEventListener('blur', function() {
+            this.style.setProperty('border-color', '#e9ecef', 'important');
+            this.style.setProperty('box-shadow', 'none', 'important');
+        });
+    });
+    
+    // ✅ FIX SPECIFICO PER INPUT SALDO - CONSENTI NUMERI NEGATIVI
+    const balanceInput = document.getElementById('initialBalance');
+    
+    // Consenti tutti i caratteri necessari per numeri negativi
+    balanceInput.addEventListener('keydown', function(e) {
+        // Consenti: backspace, delete, tab, escape, enter, punto, virgola, meno
+        if ([46, 8, 9, 27, 13, 110, 190, 188, 189, 109].indexOf(e.keyCode) !== -1 ||
+            // Consenti: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+            (e.keyCode === 65 && e.ctrlKey === true) ||
+            (e.keyCode === 67 && e.ctrlKey === true) ||
+            (e.keyCode === 86 && e.ctrlKey === true) ||
+            (e.keyCode === 88 && e.ctrlKey === true) ||
+            // Consenti: home, end, left, right, frecce
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            return;
+        }
+        // Consenti numeri (sia tastiera normale che numerica)
+        if ((e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 96 && e.keyCode <= 105)) {
+            return;
+        }
+        // Blocca tutto il resto
+        e.preventDefault();
+    });
+    
     setupEventListeners();
 });
 
@@ -160,11 +219,15 @@ function formatBalance(event) {
     const input = event.target;
     let value = input.value;
     
-    // Rimuovi caratteri non numerici eccetto punto e virgola
     let cleanValue = value.replace(/[^0-9.,-]/g, '');
     
-    // Sostituisci virgola con punto
     cleanValue = cleanValue.replace(',', '.');
+    
+    // ✅ GESTISCI IL SEGNO MENO (solo all'inizio)
+    let isNegative = cleanValue.startsWith('-');
+    if (isNegative) {
+        cleanValue = cleanValue.substring(1);
+    }
     
     // Gestisci multipli punti decimali
     const parts = cleanValue.split('.');
@@ -175,6 +238,11 @@ function formatBalance(event) {
     // Limita a 2 decimali
     if (parts.length === 2 && parts[1].length > 2) {
         cleanValue = parts[0] + '.' + parts[1].substring(0, 2);
+    }
+    
+    // ✅ RIAPPLICA IL SEGNO MENO se necessario
+    if (isNegative && cleanValue !== '' && cleanValue !== '0') {
+        cleanValue = '-' + cleanValue;
     }
     
     // Aggiorna solo se diverso
