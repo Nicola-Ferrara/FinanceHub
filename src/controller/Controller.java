@@ -452,7 +452,7 @@ public class Controller {
                         }
                     }
                     try {
-                        daoFactory.getTransazioneDAO().updateTransazione(transazione, nuovoId);
+                        daoFactory.getTransazioneDAO().updateTransazioneCategoria(transazione, nuovoId);
                     } catch (EccezioniDatabase e) {
                         throw e;
                     }
@@ -482,6 +482,65 @@ public class Controller {
         }
         return true;
     }
+
+    public void eliminaTransazione(int idTransazione, int idConto) throws EccezioniDatabase {
+        Conto conto = getContoById(idConto);
+        for (Transazione transazione : conto.getTransazioni()) {
+            if (transazione.getID() == idTransazione) {
+                conto.removeTransazione(transazione);
+                conto.ricalcolaSaldo();
+                try {
+                    daoFactory.getTransazioneDAO().deleteTransazione(idTransazione);
+                    daoFactory.getContoDAO().updateConto(conto);
+                } catch (EccezioniDatabase e) {
+                    conto.addTransazione(transazione);
+                    conto.ricalcolaSaldo();
+                    throw e;
+                }
+                return;
+            }
+        }
+    }
+
+    public void modificaTransazione(int idTransazione, double importo, String descrizione, Categoria categoria, int idConto, Timestamp dataTransazione) throws EccezioniDatabase {
+        Conto conto = getContoById(idConto);
+        for (Transazione transazione : conto.getTransazioni()) {
+            if (transazione.getID() == idTransazione) {
+                Transazione transazioneOriginale = transazione;
+                transazione.setImporto(importo);
+                transazione.setDescrizione(descrizione);
+                transazione.setCategoria(categoria);
+                transazione.setIdCategoria(categoria.getID());
+                transazione.setData(dataTransazione);
+                conto.ricalcolaSaldo();
+                try {
+                    daoFactory.getTransazioneDAO().updateTransazione(transazione);
+                    daoFactory.getContoDAO().updateConto(conto);
+                } catch (EccezioniDatabase e) {
+                    transazione.setImporto(transazioneOriginale.getImporto());
+                    transazione.setDescrizione(transazioneOriginale.getDescrizione());
+                    transazione.setCategoria(transazioneOriginale.getCategoria());
+                    transazione.setIdCategoria(transazioneOriginale.getIdCategoria());
+                    transazione.setData(transazioneOriginale.getData());
+                    conto.ricalcolaSaldo();
+                    throw e;
+                }
+                return;
+            }
+        }
+    }
+
+    public LinkedList<Categoria> getTutteCategorie() {
+    if (utente == null || utente.getCategorie() == null) {
+        return new LinkedList<>();
+    }
+    
+    LinkedList<Categoria> tutteCategorie = new LinkedList<>();
+    for (Categoria categoria : utente.getCategorie()) {
+        tutteCategorie.add(categoria);
+    }
+    return tutteCategorie;
+}
 
     public static void main(String[] args) {
         try {

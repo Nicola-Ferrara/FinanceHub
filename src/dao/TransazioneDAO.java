@@ -43,7 +43,7 @@ public class TransazioneDAO {
         }, "ERRORE DURANTE IL SALVATAGGIO DELLA TRANSAZIONE");
     }
 
-    public void updateTransazione(Transazione transazione, int idCategoria) throws EccezioniDatabase {
+    public void updateTransazioneCategoria(Transazione transazione, int idCategoria) throws EccezioniDatabase {
         DAOFactory.getInstance().executeWithRetry((conn) -> {
             String sql = "UPDATE Transazione SET id_categoria = ? WHERE id = ?";
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -53,6 +53,32 @@ public class TransazioneDAO {
             }
             return null;
         }, "ERRORE DURANTE L'AGGIORNAMENTO DELLA TRANSAZIONE");
+    }
+
+    public void updateTransazione(Transazione transazione) throws EccezioniDatabase {
+        DAOFactory.getInstance().executeWithRetry((conn) -> {
+            String sql = "UPDATE Transazione SET importo = ?, data = ?, descrizione = ?, id_categoria = ? WHERE id = ?";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setDouble(1, transazione.getImporto());
+                ps.setTimestamp(2, transazione.getData());
+                ps.setString(3, transazione.getDescrizione());
+                ps.setInt(4, transazione.getIdCategoria());
+                ps.setInt(5, transazione.getID());
+                ps.executeUpdate();
+            }
+            return null;
+        }, "ERRORE DURANTE L'AGGIORNAMENTO DELLA TRANSAZIONE");
+    }
+
+    public void deleteTransazione(int id) throws EccezioniDatabase {
+        DAOFactory.getInstance().executeWithRetry((conn) -> {
+            String sql = "DELETE FROM Transazione WHERE id = ?";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, id);
+                ps.executeUpdate();
+            }
+            return null;
+        }, "ERRORE DURANTE L'ELIMINAZIONE DELLA TRANSAZIONE");
     }
 
     public int newID() throws EccezioniDatabase {
