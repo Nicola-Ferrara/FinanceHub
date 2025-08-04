@@ -301,11 +301,23 @@ body {
     border-radius: 10px;
     margin-bottom: 10px;
     background: #f8f9fa;
+    position: relative;
+    cursor: pointer;
 }
 
 .operations-list li:hover {
     background: #e9ecef;
     transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.operations-list li:focus {
+    outline: 2px solid rgba(102, 126, 234, 0.3);
+    outline-offset: 2px;
+}
+
+.operations-list li:active {
+    transform: translateX(3px) scale(0.98);
 }
 
 .operations-list li:last-child {

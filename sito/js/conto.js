@@ -119,6 +119,40 @@ function displayOperations(operations) {
     operations.forEach(operazione => {
         const li = document.createElement("li");
         
+        // ✅ ESATTAMENTE COME IN HOME.JS
+        li.style.cursor = "pointer";
+        li.setAttribute('role', 'button');
+        li.setAttribute('tabindex', '0');
+        
+        li.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            // Feedback visivo
+            this.style.transform = 'scale(0.98)';
+            this.style.transition = 'transform 0.15s ease';
+            
+            // Determina l'URL basato sul tipo di operazione
+            let targetUrl;
+            if (operazione.tipo === "Trasferimento") {
+                targetUrl = `/trasferimento?id=${operazione.id}`;
+            } else {
+                targetUrl = `/transazione?id=${operazione.id}`;
+            }
+            
+            // Naviga dopo l'animazione
+            setTimeout(() => {
+                this.style.transform = '';
+                window.location.href = targetUrl;
+            }, 150);
+        });
+        
+        li.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
+        });
+        
         // Indicatore di tipo operazione
         const indicator = document.createElement("div");
         indicator.classList.add("operation-indicator");
