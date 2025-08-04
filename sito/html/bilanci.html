@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanceHub - Bilanci</title>
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <link rel="stylesheet" href="../css/bilanci.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../js/bilanci.js" defer></script>
+</head>
+<body>
+    <header class="header">
+        <div class="nav-buttons">
+            <h1>Bilanci Mensili</h1>
+            <div class="nav-links">
+                <a href="/home" class="nav-link">🏠 Home</a>
+                <form action="/logout" method="get" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Riepilogo Generale -->
+        <section class="summary-section">
+            <h2>Riepilogo Generale</h2>
+            <div class="summary-container">
+                <div class="summary-card">
+                    <div class="summary-icon income">📈</div>
+                    <div class="summary-details">
+                        <h3>Entrate Totali</h3>
+                        <p id="totalIncomeAll" class="amount positive">0.00 €</p>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon expense">📉</div>
+                    <div class="summary-details">
+                        <h3>Uscite Totali</h3>
+                        <p id="totalExpenseAll" class="amount negative">0.00 €</p>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon balance">💰</div>
+                    <div class="summary-details">
+                        <h3>Bilancio Netto</h3>
+                        <p id="netBalanceAll" class="amount">0.00 €</p>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon months">📅</div>
+                    <div class="summary-details">
+                        <h3>Mesi Registrati</h3>
+                        <p id="monthsCount" class="amount neutral">0</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filtri -->
+        <section class="filters-section">
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label for="yearFilter">Anno:</label>
+                    <select id="yearFilter">
+                        <option value="">Tutti gli anni</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="sortFilter">Ordina per:</label>
+                    <select id="sortFilter">
+                        <option value="date-desc">Data (più recente)</option>
+                        <option value="date-asc">Data (più vecchio)</option>
+                        <option value="income-desc">Entrate (maggiori)</option>
+                        <option value="expense-desc">Uscite (maggiori)</option>
+                        <option value="balance-desc">Bilancio (migliore)</option>
+                        <option value="balance-asc">Bilancio (peggiore)</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- Lista Bilanci Mensili -->
+        <section class="bilanci-section">
+            <h2>Bilanci per Mese</h2>
+            <div id="bilanciContainer" class="bilanci-container">
+                <!-- I bilanci verranno caricati dinamicamente -->
+            </div>
+            <div id="loadingMessage" class="loading-message">
+                <div class="spinner"></div>
+                <p>Caricamento bilanci...</p>
+            </div>
+            <div id="noDataMessage" class="no-data-message" style="display: none;">
+                <div class="no-data-icon">📊</div>
+                <h3>Nessun bilancio disponibile</h3>
+                <p>Non ci sono ancora transazioni registrate.</p>
+                <button onclick="window.location.href='/home'" class="btn-primary">
+                    Torna alla Home
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modale dettaglio bilancio -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Dettaglio Bilancio</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="detail-container">
+                    <div class="detail-chart">
+                        <canvas id="detailChart"></canvas>
+                    </div>
+                    <div class="detail-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Entrate:</span>
+                            <span id="modalIncome" class="stat-value positive">0.00 €</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Uscite:</span>
+                            <span id="modalExpense" class="stat-value negative">0.00 €</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Bilancio:</span>
+                            <span id="modalBalance" class="stat-value">0.00 €</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Transazioni:</span>
+                            <span id="modalTransactions" class="stat-value neutral">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

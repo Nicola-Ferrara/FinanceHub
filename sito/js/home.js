@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", function() {
     fetchOperazioni();
     fetchCategorie();
     setupCategoryListeners();
+    setupBalanceClickListener();
 });
 
 // Funzione per recuperare i dati del bilancio dal server
@@ -646,4 +647,32 @@ function setupModalCloseListeners() {
             closeDeleteCategoryModal();
         }
     });
+}
+
+function setupBalanceClickListener() {
+    const balanceSection = document.getElementById('balanceSection');
+    if (balanceSection) {
+        balanceSection.addEventListener('click', function() {
+            // Aggiungi un piccolo feedback visivo
+            this.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                this.style.transform = '';
+                // Naviga alla pagina Bilanci
+                window.location.href = '/bilanci';
+            }, 150);
+        });
+        
+        // ✅ MIGLIORA L'ACCESSIBILITÀ
+        balanceSection.setAttribute('role', 'button');
+        balanceSection.setAttribute('tabindex', '0');
+        balanceSection.setAttribute('aria-label', 'Visualizza tutti i bilanci');
+        
+        // ✅ SUPPORTO TASTIERA (Enter e Spacebar)
+        balanceSection.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
+        });
+    }
 }

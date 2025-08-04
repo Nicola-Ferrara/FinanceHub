@@ -83,28 +83,6 @@ public class GestoreAggiungiConto extends BaseGestorePagina {
                 "{\"error\": \"Errore durante l'aggiunta del conto: " + e.getMessage() + "\"}");
         }
     }
-    
-    // private String extractJsonValue(String json, String key) {
-    //     if (json == null) return null;
-    //     String searchKey = "\"" + key + "\"";
-    //     int keyIndex = json.indexOf(searchKey);
-    //     if (keyIndex == -1) return null;
-        
-    //     int valueStart = json.indexOf(":", keyIndex) + 1;
-    //     if (valueStart == 0) return null;
-        
-    //     while (valueStart < json.length() && (json.charAt(valueStart) == ' ' || json.charAt(valueStart) == '\t')) {
-    //         valueStart++;
-    //     }
-        
-    //     if (valueStart >= json.length() || json.charAt(valueStart) != '"') return null;
-    //     valueStart++;
-        
-    //     int valueEnd = json.indexOf("\"", valueStart);
-    //     if (valueEnd == -1) return null;
-        
-    //     return json.substring(valueStart, valueEnd);
-    // }
 
     private String extractJsonValue(String json, String key) {
         if (json == null) return null;

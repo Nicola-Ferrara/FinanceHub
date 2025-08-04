@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
+import java.time.LocalDate;
 
 import exception.*;
 import web_server.*;
@@ -67,7 +68,7 @@ public class Controller {
 
     public boolean effettuaRegistrazione(String nome, String cognome, String telefono, String email, String password) throws EccezioniDatabase {
         try {
-            utente = new Utente(nome, cognome, email, password, telefono, null, null, null);
+            utente = new Utente(nome, cognome, email, password, telefono, LocalDate.now(), null, null, null);
             daoFactory.getUtenteDAO().saveUtente(utente);
         } catch (EccezioniDatabase e) {
             if (e.getMessage().contains("23505")) {
@@ -98,6 +99,10 @@ public class Controller {
 
     public String getNomeCognome() {
         return utente.getNome() + " " + utente.getCognome();
+    }
+
+    public LocalDate getDataIscrizioneUtente() {
+        return utente.getDataIscrizione();
     }
 
     public boolean isUtenteLogged() {
@@ -180,6 +185,22 @@ public class Controller {
             ultimeDieciOperazioni[i] = tutteLeOperazioni.get(i);
         }
         return ultimeDieciOperazioni;
+    }
+
+    public dto.Operazione[] getTutteOperazioni() {
+        if (utente == null) return new dto.Operazione[0];
+        
+        java.util.List<Operazione> tutteOperazioni = new ArrayList<>();
+        
+        for (Conto conto : utente.getConti()) {
+            tutteOperazioni.addAll(conto.getTransazioni());
+            tutteOperazioni.addAll(conto.getTrasferimenti());
+        }
+        
+        // Ordina per data (più recenti prima)
+        tutteOperazioni.sort((a, b) -> b.getData().compareTo(a.getData()));
+        
+        return tutteOperazioni.toArray(new dto.Operazione[0]);
     }
 
     public Conto getContoById(int id) {

@@ -18,7 +18,7 @@ public class UtenteDAO {
                 ps.setString(2, password);
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
-                    return new Utente(rs.getString("nome"), rs.getString("cognome"), rs.getString("email"), rs.getString("password"), rs.getString("telefono"), null, null, null);
+                    return new Utente(rs.getString("nome"), rs.getString("cognome"), rs.getString("email"), rs.getString("password"), rs.getString("telefono"), rs.getDate("data_iscrizione").toLocalDate(), null, null, null);
                 }
                 return null;
             }
@@ -27,13 +27,14 @@ public class UtenteDAO {
 
     public void saveUtente(Utente utente) throws EccezioniDatabase {
         DAOFactory.getInstance().executeWithRetry((conn) -> {
-            String sql = "INSERT INTO Utente (nome, cognome, email, password, telefono) VALUES (?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO Utente (nome, cognome, email, password, telefono, data_iscrizione) VALUES (?, ?, ?, ?, ?, ?)";
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setString(1, utente.getNome());
                 ps.setString(2, utente.getCognome());
                 ps.setString(3, utente.getEmail());
                 ps.setString(4, utente.getPassword());
                 ps.setString(5, utente.getNumeroTel());
+                ps.setDate(6, java.sql.Date.valueOf(utente.getDataIscrizione()));
                 ps.executeUpdate();
                 return null;
             }

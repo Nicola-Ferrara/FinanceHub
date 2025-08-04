@@ -22,6 +22,7 @@ public class WebServer extends NanoHTTPD {
         this.gestori.add(new GestoreRegistrazione(controller));
         this.gestori.add(new GestoreConto(controller));
         this.gestori.add(new GestoreAggiungiConto(controller));
+        this.gestori.add(new GestoreBilanci(controller));
         
         start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
         int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
