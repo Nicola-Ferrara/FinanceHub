@@ -20,10 +20,19 @@ document.addEventListener("DOMContentLoaded", function() {
     fetchBilancio();
     fetchConti();
     fetchOperazioni();
-    fetchCategorie();
-    setupCategoryListeners();
+    fetchCategorie(); // ✅ MANTIENI - Solo per visualizzazione
     setupBalanceClickListener();
     setupCategoriesClickListener();
+    
+    // Listener per il bottone aggiungi conto
+    const addAccountBtn = document.getElementById('addAccountBtn');
+    if (addAccountBtn) {
+        addAccountBtn.addEventListener('click', () => {
+            window.location.href = '/aggiungiConto';
+        });
+    }
+    
+    checkUrlParams();
 });
 
 // Funzione per recuperare i dati del bilancio dal server
@@ -212,7 +221,6 @@ async function fetchOperazioni() {
                     <span class="transaction-category">${categoriaText}</span>
                 `;
 
-                // Importo dell'operazione
                 const amount = document.createElement("span");
                 amount.classList.add("transaction-amount");
                 
@@ -227,7 +235,6 @@ async function fetchOperazioni() {
                     amount.textContent = `${operazione.importo.toFixed(2)} €`;
                 }
 
-                // Aggiungi gli elementi alla lista
                 li.appendChild(indicator);
                 li.appendChild(details);
                 li.appendChild(amount);
@@ -241,95 +248,9 @@ async function fetchOperazioni() {
     }
 }
 
-// Funzione helper per formattare la data
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    const dateFormatted = date.toLocaleDateString('it-IT', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
-    
-    const timeFormatted = date.toLocaleTimeString('it-IT', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-    });
-    
-    return `${dateFormatted} - ${timeFormatted}`;
-}
-
-// Listener per il bottone aggiungi conto
-document.addEventListener("DOMContentLoaded", function() {
-    const addAccountBtn = document.getElementById('addAccountBtn');
-    if (addAccountBtn) {
-        addAccountBtn.addEventListener('click', () => {
-            window.location.href = '/aggiungiConto';
-        });
-    }
-    checkUrlParams();
-});
-
-// Controllo notifica
-function checkUrlParams() {
-    const urlParams = new URLSearchParams(window.location.search);
-    
-    if (urlParams.get('success') === 'conto-aggiunto') {
-        showNotification('Conto aggiunto con successo!', 'success');
-        
-        const newUrl = window.location.pathname;
-        window.history.replaceState({}, document.title, newUrl);
-    } else if (urlParams.get('success') === 'conto-eliminato') {
-        showNotification('Conto eliminato con successo!', 'success');
-        
-        const newUrl = window.location.pathname;
-        window.history.replaceState({}, document.title, newUrl);
-    }
-}
-
-// Funzione per mostrare notifiche
-function showNotification(message, type) {
-    const existingNotifications = document.querySelectorAll('.notification');
-    existingNotifications.forEach(notif => notif.remove());
-    
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <span class="notification-icon">${type === 'success' ? '✅' : '❌'}</span>
-            <span class="notification-message">${message}</span>
-            <button class="notification-close">&times;</button>
-        </div>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 10);
-    setTimeout(() => {
-        hideNotification(notification);
-    }, 3000);
-    
-    notification.querySelector('.notification-close').addEventListener('click', () => {
-        hideNotification(notification);
-    });
-}
-
-// Funzione per rimuovere la notifica
-function hideNotification(notification) {
-    notification.classList.remove('show');
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-        }
-    }, 300);
-}
-
-// Funzione per recuperare le categorie dal server
+// ✅ MANTIENI - Solo per visualizzazione categorie
 async function fetchCategorie() {
     try {
-        // Recupera le categorie di guadagno
         const incomeResponse = await fetch("/api/categorie/guadagno");
         const expenseResponse = await fetch("/api/categorie/spesa");
         
@@ -409,266 +330,95 @@ async function fetchCategorie() {
     }
 }
 
-// Setup listeners per i modali delle categorie
-function setupCategoryListeners() {
-    // Bottoni per aprire i modali
-    document.getElementById('addCategoryBtn').addEventListener('click', openAddCategoryModal);
-    document.getElementById('deleteCategoryBtn').addEventListener('click', openDeleteCategoryModal);
-    
-    // Form submissions
-    document.getElementById('addCategoryForm').addEventListener('submit', handleAddCategorySubmit);
-    document.getElementById('deleteCategoryForm').addEventListener('submit', handleDeleteCategorySubmit);
-    
-    // Bottoni di chiusura
-    document.getElementById('cancelAddCategory').addEventListener('click', closeAddCategoryModal);
-    document.getElementById('cancelDeleteCategory').addEventListener('click', closeDeleteCategoryModal);
-    
-    // Listener per il cambio di tipo nella eliminazione
-    document.getElementById('deleteCategoryType').addEventListener('change', handleDeleteTypeChange);
-    document.getElementById('categorySelect').addEventListener('change', handleCategorySelectChange);
-    
-    // Chiudi modali con X e click fuori
-    setupModalCloseListeners();
-}
-
-// Apri modale aggiungi categoria
-function openAddCategoryModal() {
-    document.getElementById('addCategoryForm').reset();
-    document.getElementById('addCategoryModal').style.display = 'block';
-}
-
-// Chiudi modale aggiungi categoria
-function closeAddCategoryModal() {
-    document.getElementById('addCategoryModal').style.display = 'none';
-}
-
-// Apri modale elimina categoria
-function openDeleteCategoryModal() {
-    document.getElementById('deleteCategoryForm').reset();
-    document.getElementById('categorySelectGroup').style.display = 'none';
-    document.getElementById('deleteWarning').style.display = 'none';
-    document.getElementById('confirmDeleteCategory').disabled = true;
-    document.getElementById('deleteCategoryModal').style.display = 'block';
-}
-
-// Chiudi modale elimina categoria
-function closeDeleteCategoryModal() {
-    document.getElementById('deleteCategoryModal').style.display = 'none';
-}
-
-// Gestisci cambio tipo per eliminazione
-function handleDeleteTypeChange() {
-    const typeSelect = document.getElementById('deleteCategoryType');
-    const categoryGroup = document.getElementById('categorySelectGroup');
-    const categorySelect = document.getElementById('categorySelect');
-    
-    if (typeSelect.value) {
-        categoryGroup.style.display = 'block';
-        loadCategoriesForDelete(typeSelect.value);
-    } else {
-        categoryGroup.style.display = 'none';
-        document.getElementById('deleteWarning').style.display = 'none';
-        document.getElementById('confirmDeleteCategory').disabled = true;
-    }
-}
-
-// Gestisci selezione categoria per eliminazione
-function handleCategorySelectChange() {
-    const categorySelect = document.getElementById('categorySelect');
-    const deleteWarning = document.getElementById('deleteWarning');
-    const confirmButton = document.getElementById('confirmDeleteCategory');
-    const typeSelect = document.getElementById('deleteCategoryType'); // ✅ AGGIUNGI QUESTO
-    
-    if (categorySelect.value) {
-        deleteWarning.style.display = 'block';
-        confirmButton.disabled = false;
-        
-        // ✅ AGGIORNA IL MESSAGGIO ANCHE QUI (per sicurezza)
-        if (typeSelect.value === 'Spesa') {
-            deleteWarning.innerHTML = "⚠️ Attenzione: Eliminando questa categoria, tutte le transazioni associate verranno riassegnate alla categoria 'Spesa'.";
-        } else if (typeSelect.value === 'Guadagno') {
-            deleteWarning.innerHTML = "⚠️ Attenzione: Eliminando questa categoria, tutte le transazioni associate verranno riassegnate alla categoria 'Guadagno'.";
-        }
-    } else {
-        deleteWarning.style.display = 'none';
-        confirmButton.disabled = true;
-    }
-}
-
-// Carica categorie per eliminazione
-async function loadCategoriesForDelete(tipo) {
-    try {
-        const endpoint = tipo === 'Spesa' ? '/api/categorie/spesa' : '/api/categorie/guadagno';
-        const response = await fetch(endpoint);
-        
-        if (!response.ok) {
-            throw new Error('Errore durante il caricamento delle categorie');
-        }
-        
-        const categorie = await response.json();
-        const categorySelect = document.getElementById('categorySelect');
-        
-        // Svuota le opzioni esistenti
-        categorySelect.innerHTML = '<option value="">Seleziona una categoria</option>';
-        
-        // Filtra le categorie eliminabili (escludi ID 1 e 2)
-        const categorieEliminabili = categorie.filter(categoria => categoria.id !== 1 && categoria.id !== 2);
-        
-        if (categorieEliminabili.length === 0) {
-            const option = document.createElement('option');
-            option.value = '';
-            option.textContent = 'Nessuna categoria eliminabile';
-            option.disabled = true;
-            categorySelect.appendChild(option);
-        } else {
-            categorieEliminabili.forEach(categoria => {
-                const option = document.createElement('option');
-                option.value = categoria.id;
-                option.textContent = categoria.nome;
-                categorySelect.appendChild(option);
-            });
-        }
-        
-    } catch (error) {
-        console.error('Errore:', error);
-        showNotification('Errore durante il caricamento delle categorie', 'error');
-    }
-}
-
-// Gestisci submit aggiungi categoria
-async function handleAddCategorySubmit(event) {
-    event.preventDefault();
-    
-    const formData = new FormData(event.target);
-    const categoryData = {
-        nome: formData.get('nome').trim(),
-        tipo: formData.get('tipo')
-    };
-    
-    // Validazione
-    if (!categoryData.nome) {
-        showNotification('Inserisci il nome della categoria', 'error');
-        return;
-    }
-    
-    if (!categoryData.tipo) {
-        showNotification('Seleziona il tipo di categoria', 'error');
-        return;
-    }
-    
-    try {
-        const response = await fetch('/api/categoria', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(categoryData)
-        });
-        
-        if (!response.ok) {
-            throw new Error('Errore durante l\'aggiunta della categoria');
-        }
-        
-        // Chiudi il modale
-        closeAddCategoryModal();
-        
-        // ✅ RICARICA TUTTE LE CATEGORIE
-        await fetchCategorie();
-        
-        // Mostra messaggio di successo
-        showNotification('Categoria aggiunta con successo!', 'success');
-        
-    } catch (error) {
-        console.error('Errore:', error);
-        showNotification('Errore durante l\'aggiunta della categoria', 'error');
-    }
-}
-
-// Gestisci submit elimina categoria
-async function handleDeleteCategorySubmit(event) {
-    event.preventDefault();
-    
-    const formData = new FormData(event.target);
-    const categoriaId = parseInt(formData.get('categoria'));
-    
-    if (!categoriaId) {
-        showNotification('Seleziona una categoria da eliminare', 'error');
-        return;
-    }
-    
-    try {
-        const response = await fetch(`/api/categoria/${categoriaId}`, {
-            method: 'DELETE'
-        });
-        
-        if (!response.ok) {
-            const result = await response.json();
-            throw new Error(result.error || 'Errore durante l\'eliminazione della categoria');
-        }
-        
-        // Chiudi il modale
-        closeDeleteCategoryModal();
-        
-        // ✅ RICARICA TUTTI I DATI DOPO L'ELIMINAZIONE
-        await Promise.all([
-            fetchCategorie(),
-            fetchBilancio(),
-            fetchOperazioni(),
-            fetchConti()
-        ]);
-        
-        // Mostra messaggio di successo
-        showNotification('Categoria eliminata con successo!', 'success');
-        
-    } catch (error) {
-        console.error('Errore:', error);
-        showNotification(error.message || 'Errore durante l\'eliminazione della categoria', 'error');
-    }
-}
-
-// Setup listeners per chiudere modali
-function setupModalCloseListeners() {
-    // Chiudi con X
-    document.querySelectorAll('.close').forEach(closeBtn => {
-        closeBtn.addEventListener('click', () => {
-            closeAddCategoryModal();
-            closeDeleteCategoryModal();
-        });
+// Funzione helper per formattare la data
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const dateFormatted = date.toLocaleDateString('it-IT', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
     });
     
-    // Chiudi cliccando fuori
-    window.addEventListener('click', (event) => {
-        const addModal = document.getElementById('addCategoryModal');
-        const deleteModal = document.getElementById('deleteCategoryModal');
-        
-        if (event.target === addModal) {
-            closeAddCategoryModal();
-        }
-        if (event.target === deleteModal) {
-            closeDeleteCategoryModal();
-        }
+    const timeFormatted = date.toLocaleTimeString('it-IT', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
     });
+    
+    return `${dateFormatted} - ${timeFormatted}`;
+}
+
+// Controllo notifica
+function checkUrlParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.get('success') === 'conto-aggiunto') {
+        showNotification('Conto aggiunto con successo!', 'success');
+        
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+    } else if (urlParams.get('success') === 'conto-eliminato') {
+        showNotification('Conto eliminato con successo!', 'success');
+        
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+    }
+}
+
+// Funzione per mostrare notifiche
+function showNotification(message, type) {
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notif => notif.remove());
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span class="notification-icon">${type === 'success' ? '✅' : '❌'}</span>
+            <span class="notification-message">${message}</span>
+            <button class="notification-close">&times;</button>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    setTimeout(() => {
+        hideNotification(notification);
+    }, 3000);
+    
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+        hideNotification(notification);
+    });
+}
+
+// Funzione per rimuovere la notifica
+function hideNotification(notification) {
+    notification.classList.remove('show');
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 300);
 }
 
 function setupBalanceClickListener() {
     const balanceSection = document.getElementById('balanceSection');
     if (balanceSection) {
         balanceSection.addEventListener('click', function() {
-            // Aggiungi un piccolo feedback visivo
             this.style.transform = 'scale(0.98)';
             setTimeout(() => {
                 this.style.transform = '';
-                // Naviga alla pagina Bilanci
                 window.location.href = '/bilanci';
             }, 150);
         });
         
-        // ✅ MIGLIORA L'ACCESSIBILITÀ
         balanceSection.setAttribute('role', 'button');
         balanceSection.setAttribute('tabindex', '0');
         balanceSection.setAttribute('aria-label', 'Visualizza tutti i bilanci');
         
-        // ✅ SUPPORTO TASTIERA (Enter e Spacebar)
         balanceSection.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
@@ -682,13 +432,6 @@ function setupCategoriesClickListener() {
     const categoriesSection = document.getElementById('categoriesSection');
     if (categoriesSection) {
         categoriesSection.addEventListener('click', function(e) {
-            // ✅ EVITA IL CLICK SE SI CLICCA SUI PULSANTI
-            if (e.target.closest('.category-action-btn') || 
-                e.target.closest('.modal') || 
-                e.target.closest('button')) {
-                return;
-            }
-            
             // Aggiungi feedback visivo
             this.style.transform = 'scale(0.98)';
             setTimeout(() => {
@@ -698,19 +441,14 @@ function setupCategoriesClickListener() {
             }, 150);
         });
         
-        // ✅ MIGLIORA L'ACCESSIBILITÀ
         categoriesSection.setAttribute('role', 'button');
         categoriesSection.setAttribute('tabindex', '0');
         categoriesSection.setAttribute('aria-label', 'Gestisci tutte le categorie');
         
-        // ✅ SUPPORTO TASTIERA (Enter e Spacebar)
         categoriesSection.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                // Simula il click ma evita i pulsanti
-                if (!e.target.closest('.category-action-btn')) {
-                    this.click();
-                }
+                this.click();
             }
         });
     }

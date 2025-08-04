@@ -18,9 +18,13 @@
 <body>
     <header class="header">
         <h1>Benvenuto <span id="userName">{{nomeCognome}}</span></h1>
-        <form action="/logout" method="get" style="display: inline;">
-            <button type="submit" class="logout-button">Logout</button>
-        </form>
+        <div class="nav-links">
+            <a href="/categorie" class="nav-link">📂 Categorie</a>
+            <a href="/bilanci" class="nav-link">📊 Bilanci</a>
+            <form action="/logout" method="get" style="display: inline;">
+                <button type="submit" class="logout-button">Logout</button>
+            </form>
+        </div>
     </header>
 
     <main class="main-content">
@@ -56,13 +60,9 @@
             </ul>
         </section>
 
-        <!-- Categorie -->
+        <!-- Categorie - SOLO VISUALIZZAZIONE -->
         <section class="categories-section" id="categoriesSection">
             <h2>Le tue categorie</h2>
-            <div class="categories-actions">
-                <button id="addCategoryBtn" class="category-action-btn add">Aggiungi Categoria</button>
-                <button id="deleteCategoryBtn" class="category-action-btn delete">Elimina Categoria</button>
-            </div>
             <div class="categories-container">
                 <div class="categories-group">
                     <h3 class="income-title">🟢 Guadagno</h3>
@@ -79,85 +79,6 @@
                 </div>
             </div>
         </section>
-
-        <!-- Modale per aggiungere categoria -->
-        <div id="addCategoryModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Aggiungi Categoria</h2>
-                    <span class="close">&times;</span>
-                </div>
-                <div class="modal-body">
-                    <form id="addCategoryForm">
-                        <div class="form-section">
-                            <h3>Dettagli Categoria</h3>
-                            
-                            <div class="form-group">
-                                <label for="categoryName">Nome Categoria *</label>
-                                <input type="text" id="categoryName" name="nome" 
-                                       placeholder="Es. Stipendio, Affitto, Cibo..." required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="categoryType">Tipo Categoria *</label>
-                                <select id="categoryType" name="tipo" required>
-                                    <option value="">Seleziona il tipo</option>
-                                    <option value="Spesa">Spesa</option>
-                                    <option value="Guadagno">Guadagno</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-secondary" id="cancelAddCategory">Annulla</button>
-                            <button type="submit" class="btn btn-primary">Aggiungi Categoria</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modale per eliminare categoria -->
-        <div id="deleteCategoryModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Elimina Categoria</h2>
-                    <span class="close">&times;</span>
-                </div>
-                <div class="modal-body">
-                    <form id="deleteCategoryForm">
-                        <div class="form-section">
-                            <h3>Seleziona Categoria da Eliminare</h3>
-                            
-                            <div class="form-group">
-                                <label for="deleteCategoryType">Tipo Categoria *</label>
-                                <select id="deleteCategoryType" name="tipo" required>
-                                    <option value="">Seleziona il tipo</option>
-                                    <option value="Spesa">Spesa</option>
-                                    <option value="Guadagno">Guadagno</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group" id="categorySelectGroup" style="display: none;">
-                                <label for="categorySelect">Categoria *</label>
-                                <select id="categorySelect" name="categoria">
-                                    <option value="">Seleziona una categoria</option>
-                                </select>
-                            </div>
-                            
-                            <div class="warning-message" id="deleteWarning" style="display: none;">
-                                <!-- Il messaggio verrà inserito dinamicamente dal JavaScript -->
-                            </div>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-secondary" id="cancelDeleteCategory">Annulla</button>
-                            <button type="submit" class="btn btn-danger" id="confirmDeleteCategory" disabled>Elimina Categoria</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
     </main>
 </body>
 </html>
