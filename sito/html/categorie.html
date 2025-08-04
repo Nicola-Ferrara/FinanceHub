@@ -15,8 +15,41 @@
     <script src="../js/categorie.js" defer></script>
 </head>
 <body>
+    <!-- ✅ SIDEBAR AGGIUNTA -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h3>Menu</h3>
+            <button id="closeSidebar" class="close-sidebar">&times;</button>
+        </div>
+        <div class="sidebar-content">
+            <a href="/home" class="sidebar-link">
+                <span class="sidebar-icon">🏠</span>
+                <span>Home</span>
+            </a>
+            <a href="/bilanci" class="sidebar-link">
+                <span class="sidebar-icon">📊</span>
+                <span>Bilanci</span>
+            </a>
+            <a href="/lista_conti" class="sidebar-link">
+                <span class="sidebar-icon">🏦</span>
+                <span>Lista Conti</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- ✅ OVERLAY AGGIUNTO -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <!-- ✅ HEADER MODIFICATO -->
     <header class="header">
-        <h1>Gestione Categorie</h1>
+        <div class="header-left">
+            <button id="hamburgerMenu" class="hamburger-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <h1>Gestione Categorie</h1>
+        </div>
         <div class="nav-links">
             <a href="/home" class="nav-link">🏠 Home</a>
             <form action="/logout" method="get" style="display: inline;">

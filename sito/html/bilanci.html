@@ -16,15 +16,46 @@
     <script src="../js/bilanci.js" defer></script>
 </head>
 <body>
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h3>Menu</h3>
+            <button id="closeSidebar" class="close-sidebar">&times;</button>
+        </div>
+        <div class="sidebar-content">
+            <a href="/home" class="sidebar-link">
+                <span class="sidebar-icon">🏠</span>
+                <span>Home</span>
+            </a>
+            <a href="/lista_conti" class="sidebar-link">
+                <span class="sidebar-icon">🏦</span>
+                <span>Lista Conti</span>
+            </a>
+            <a href="/categorie" class="sidebar-link">
+                <span class="sidebar-icon">📂</span>
+                <span>Categorie</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- ✅ OVERLAY AGGIUNTO -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <!-- ✅ HEADER MODIFICATO -->
     <header class="header">
-        <div class="nav-buttons">
+        <div class="header-left">
+            <button id="hamburgerMenu" class="hamburger-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             <h1>Bilanci Mensili</h1>
-            <div class="nav-links">
-                <a href="/home" class="nav-link">🏠 Home</a>
-                <form action="/logout" method="get" style="display: inline;">
-                    <button type="submit" class="logout-button">Logout</button>
-                </form>
-            </div>
+        </div>
+        <div class="nav-links">
+            <a href="/home" class="nav-link">🏠 Home</a>
+            <form action="/logout" method="get" style="display: inline;">
+                <button type="submit" class="logout-button">Logout</button>
+            </form>
         </div>
     </header>
 
