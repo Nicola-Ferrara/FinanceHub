@@ -153,21 +153,20 @@ public class GestoreHome extends BaseGestorePagina {
                     // Trova i nomi dei conti mittente e destinatario
                     String nomeContoMittente = "Sconosciuto";
                     String nomeContoDestinatario = "Sconosciuto";
+
+                    if (trasferimento.getIdContoDestinatario() == 0) {
+                        nomeContoDestinatario = trasferimento.getNomeContoEliminato() + " (Eliminato)";
+                    }
+                    if (trasferimento.getIdContoMittente() == 0) {
+                        nomeContoMittente = trasferimento.getNomeContoEliminato() + " (Eliminato)";
+                    }
                     
                     for (Conto conto : controller.getTuttiConti()) {
                         if (conto.getID() == trasferimento.getIdContoMittente()) {
-                            if (conto.getAttivo()) {
-                                nomeContoMittente = conto.getNome();
-                            } else {
-                                nomeContoMittente = conto.getNome() + " (Eliminato)";
-                            }
+                            nomeContoMittente = conto.getNome();
                         }
                         if (conto.getID() == trasferimento.getIdContoDestinatario()) {
-                            if (conto.getAttivo()) {
-                                nomeContoDestinatario = conto.getNome();
-                            } else {
-                                nomeContoDestinatario = conto.getNome() + " (Eliminato)";
-                            }
+                            nomeContoDestinatario = conto.getNome();
                         }
                     }
                     

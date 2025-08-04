@@ -10,28 +10,25 @@ public class Conto {
     private String tipo;
     private double saldo_iniziale;
     private double saldo_attuale;
-    private boolean attivo;
     private LinkedList<Transazione> transazioni = new LinkedList<Transazione>();
     private LinkedList<Trasferimento> trasferimenti = new LinkedList<Trasferimento>();
 
     // Costruttori
-    public Conto(int ID, String nome, String tipo, double saldo_iniziale, boolean attivo, LinkedList<Transazione> transazioni, LinkedList<Trasferimento> trasferimenti) {
+    public Conto(int ID, String nome, String tipo, double saldo_iniziale, LinkedList<Transazione> transazioni, LinkedList<Trasferimento> trasferimenti) {
         this.ID = ID;
         this.nome = nome;
         this.tipo = tipo;
         this.saldo_iniziale = saldo_iniziale;
         this.saldo_attuale = saldo_iniziale;
-        this.attivo = attivo;
         this.transazioni = (transazioni != null) ? transazioni : new LinkedList<>();
         this.trasferimenti = (trasferimenti != null) ? trasferimenti : new LinkedList<>();
     }
-    public Conto(int ID, String nome, String tipo, double saldo_iniziale, double saldo_attuale, boolean attivo, LinkedList<Transazione> transazioni, LinkedList<Trasferimento> trasferimenti) {
+    public Conto(int ID, String nome, String tipo, double saldo_iniziale, double saldo_attuale, LinkedList<Transazione> transazioni, LinkedList<Trasferimento> trasferimenti) {
         this.ID = ID;
         this.nome = nome;
         this.tipo = tipo;
         this.saldo_iniziale = saldo_iniziale;
         this.saldo_attuale = saldo_attuale;
-        this.attivo = attivo;
         this.transazioni = (transazioni != null) ? transazioni : new LinkedList<>();
         this.trasferimenti = (trasferimenti != null) ? trasferimenti : new LinkedList<>();
     }
@@ -51,9 +48,6 @@ public class Conto {
     }
     public double getSaldo_attuale() {
         return saldo_attuale;
-    }
-    public boolean getAttivo() {
-        return attivo;
     }
     public LinkedList<Transazione> getTransazioni() {
         return transazioni;
@@ -77,9 +71,6 @@ public class Conto {
     }
     public void setSaldo_attuale(double saldo) {
         this.saldo_attuale = saldo;
-    }
-    public void setAttivo(boolean attivo) {
-        this.attivo = attivo;
     }
     public void setTransazioni(LinkedList<Transazione> transazioni) {
         this.transazioni = transazioni;

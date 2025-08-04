@@ -68,14 +68,8 @@ public class GestoreConto extends BaseGestorePagina {
                 String contoIdStr = parts[3];
                 int contoId = Integer.parseInt(contoIdStr);
                 
-                // Verifica che il conto esista
-                Conto conto = controller.getContoById(contoId);
-                if (conto == null) {
-                    return createResponse(Response.Status.NOT_FOUND, "application/json", "{\"error\": \"Conto non trovato\"}");
-                }
-                
                 // Usa il metodo del controller per eliminare il conto
-                controller.modificaConto(conto.getID(), conto.getNome(), false, conto.getTipo(), conto.getSaldo_iniziale());
+                controller.eliminaConto(contoId);
                 
                 return createResponse(Response.Status.OK, "application/json", "{\"success\": true, \"message\": \"Conto eliminato con successo\"}");
             }
@@ -122,7 +116,7 @@ public class GestoreConto extends BaseGestorePagina {
                 }
                 double saldoIniziale = Double.parseDouble(saldoInizialeStr);
                 
-                controller.modificaConto(contoId, nome, true, tipo, saldoIniziale);
+                controller.modificaConto(contoId, nome, tipo, saldoIniziale);
                 
                 return createResponse(Response.Status.OK, "application/json", "{\"success\": true, \"message\": \"Conto modificato con successo\"}");
             }

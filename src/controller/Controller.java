@@ -130,9 +130,7 @@ public class Controller {
     public LinkedList<Conto> getConti() {
         LinkedList<Conto> contiAttivi = new LinkedList<>();
         for (Conto conto : utente.getConti()) {
-            if (conto.getAttivo()) {
-                contiAttivi.add(conto);
-            }
+            contiAttivi.add(conto);
         }
         return contiAttivi;
     }
@@ -201,12 +199,11 @@ public class Controller {
         return operazioni.toArray(new Operazione[0]);
     }
 
-    public void modificaConto(int id, String nome, boolean attivo, String tipo, double saldo_iniziale) throws EccezioniDatabase {
+    public void modificaConto(int id, String nome, String tipo, double saldo_iniziale) throws EccezioniDatabase {
         for (Conto conto : utente.getConti()) {
             if (conto.getID() == id) {
                 conto.setNome(nome);
                 conto.setTipo(tipo);
-                conto.setAttivo(attivo);
                 conto.setSaldo_iniziale(saldo_iniziale);
                 conto.ricalcolaSaldo();
                 try {
@@ -222,9 +219,52 @@ public class Controller {
     public void aggiungiConto(String nome, String tipo, double saldo) throws EccezioniDatabase {
         try {
             int id = daoFactory.getContoDAO().newID();
-            Conto nuovoConto = new Conto(id, nome, tipo, saldo, true, null, null);
+            Conto nuovoConto = new Conto(id, nome, tipo, saldo, null, null);
             daoFactory.getContoDAO().saveConto(nuovoConto, utente.getEmail());
             utente.addConto(nuovoConto);
+        } catch (EccezioniDatabase e) {
+            throw e;
+        }
+    }
+
+    public void eliminaConto(int id) throws EccezioniDatabase {
+        Conto del_conto = getContoById(id);
+        if (del_conto == null) {
+            return;
+        }
+        for (Conto conto : utente.getConti()) {
+            for (Trasferimento trasferimento : conto.getTrasferimenti()) {
+                if (trasferimento.getIdContoMittente() == id) {
+                    trasferimento.setNomeContoEliminato(del_conto.getNome());
+                    trasferimento.setIdContoMittente(0);
+                    try {
+                        daoFactory.getTrasferimentoDAO().updateTrasferimento(trasferimento);
+                    } catch (EccezioniDatabase e) {
+                        throw e;
+                    }
+                }
+                if (trasferimento.getIdContoDestinatario() == id) {
+                    trasferimento.setNomeContoEliminato(del_conto.getNome());
+                    trasferimento.setIdContoDestinatario(0);
+                    try {
+                        daoFactory.getTrasferimentoDAO().updateTrasferimento(trasferimento);
+                    } catch (EccezioniDatabase e) {
+                        throw e;
+                    }
+                }
+                if (trasferimento.getIdContoMittente() == 0 && trasferimento.getIdContoDestinatario() == 0) {
+                    try {
+                        daoFactory.getTrasferimentoDAO().deleteTrasferimento(trasferimento.getID());
+                        conto.removeTrasferimento(trasferimento);
+                    } catch (EccezioniDatabase e) {
+                        throw e;
+                    }
+                }
+            }
+        }
+        try {
+            daoFactory.getContoDAO().deleteConto(id);
+            utente.removeConto(del_conto);
         } catch (EccezioniDatabase e) {
             throw e;
         }
@@ -292,7 +332,7 @@ public class Controller {
     public LinkedList<Conto> getSomeConti(int idConto) {
         LinkedList<Conto> someConti = new LinkedList<>();
         for (Conto conto : utente.getConti()) {
-            if (conto.getID() != idConto && conto.getAttivo()) {
+            if (conto.getID() != idConto) {
                 someConti.add(conto);
             }
         }
