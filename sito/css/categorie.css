@@ -20,6 +20,12 @@ body {
     backdrop-filter: blur(4px);
 }
 
+.header h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 300;
+}
+
 .nav-buttons h1 {
     margin: 0;
     font-size: 24px;
@@ -116,10 +122,10 @@ body {
 
 .categories-section h2 {
     margin-top: 0;
-    font-size: 20px;
+    font-size: 18px;
     color: #333;
-    margin-bottom: 20px;
-    font-weight: 300;
+    margin-bottom: 15px;
+    font-weight: 500;
     text-align: center;
     padding: 10px 15px;
     border-radius: 10px;
@@ -138,7 +144,7 @@ body {
 }
 
 .categories-container {
-    max-height: 400px;
+    max-height: 300px;
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -151,18 +157,18 @@ body {
 }
 
 .categories-list li {
-    padding: 20px;
-    border-bottom: 1px solid #f0f0f0;
-    font-size: 16px;
-    transition: all 0.3s ease;
+    padding: 15px;
+    margin-bottom: 8px;
     border-radius: 10px;
-    margin-bottom: 10px;
-    background: #f8f9fa;
-    position: relative;
+    font-size: 15px;
+    transition: all 0.3s ease;
     border-left: 3px solid transparent;
+    margin-right: 10px;
+    background: #f8f9fa;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    position: relative;
 }
 
 .categories-list li:last-child {
