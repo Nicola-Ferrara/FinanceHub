@@ -1,4 +1,4 @@
-* Stile generale */
+/* Stile generale - IDENTICO A HOME */
 body {
     font-family: 'Roboto', Arial, sans-serif;
     margin: 0;
@@ -18,13 +18,6 @@ body {
     padding: 20px 30px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(4px);
-}
-
-.nav-buttons {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
 }
 
 .nav-buttons h1 {
@@ -84,6 +77,7 @@ body {
 .add-category-section {
     grid-column: 1 / -1;
     text-align: center;
+    margin-bottom: 0;
 }
 
 .add-category-btn {
@@ -221,6 +215,10 @@ body {
 
 .category-icon.expense {
     background: #dc3545;
+}
+
+.category-details {
+    flex: 1;
 }
 
 .category-details h3 {
@@ -568,12 +566,20 @@ body {
     .main-content {
         grid-template-columns: 1fr;
         padding: 20px;
+        gap: 20px;
     }
     
-    .nav-buttons {
+    .header {
         flex-direction: column;
         gap: 15px;
         text-align: center;
+    }
+    
+    .nav-buttons {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
     }
     
     .nav-buttons h1 {
@@ -589,6 +595,11 @@ body {
         justify-content: center;
         flex-direction: row;
         gap: 30px;
+    }
+    
+    .add-category-btn {
+        width: 90%;
+        max-width: 300px;
     }
     
     .modal-content {
@@ -610,14 +621,64 @@ body {
     }
     
     .category-info {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
+        flex-direction: row;
+        align-items: center;
+        gap: 15px;
     }
     
     .category-id {
         position: static;
-        display: inline-block;
-        margin-top: 5px;
+        order: 3;
+        margin-left: auto;
     }
+    
+    .category-menu-btn {
+        order: 4;
+        margin-left: 10px;
+    }
+    
+    .categories-list li {
+        flex-wrap: wrap;
+        padding: 15px;
+    }
+}
+
+/* Aggiustamenti finali per allineamento con home */
+.categories-section {
+    position: relative;
+}
+
+.categories-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.categories-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.categories-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.categories-container::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Effetti finali per uniformità */
+.categories-list li {
+    cursor: default;
+}
+
+.category-menu-btn {
+    opacity: 0.7;
+}
+
+.category-menu-btn:hover {
+    opacity: 1;
+}
+
+.categories-list li:hover .category-menu-btn {
+    opacity: 1;
 }
