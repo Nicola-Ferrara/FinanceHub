@@ -16,15 +16,39 @@
     <script src="../js/home.js" defer></script>
 </head>
 <body>
-    <header class="header">
-        <h1>Benvenuto <span id="userName">{{nomeCognome}}</span></h1>
-        <div class="nav-links">
-            <a href="/categorie" class="nav-link">📂 Categorie</a>
-            <a href="/bilanci" class="nav-link">📊 Bilanci</a>
-            <form action="/logout" method="get" style="display: inline;">
-                <button type="submit" class="logout-button">Logout</button>
-            </form>
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h3>Menu</h3>
+            <button id="closeSidebar" class="close-sidebar">&times;</button>
         </div>
+        <div class="sidebar-content">
+            <a href="/bilanci" class="sidebar-link">
+                <span class="sidebar-icon">📊</span>
+                <span>Bilanci</span>
+            </a>
+            <a href="/categorie" class="sidebar-link">
+                <span class="sidebar-icon">📂</span>
+                <span>Categorie</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Overlay per chiudere sidebar -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <header class="header">
+        <div class="header-left">
+            <button id="hamburgerMenu" class="hamburger-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <h1>Benvenuto <span id="userName">{{nomeCognome}}</span></h1>
+        </div>
+        <form action="/logout" method="get" style="display: inline;">
+            <button type="submit" class="logout-button">Logout</button>
+        </form>
     </header>
 
     <main class="main-content">
