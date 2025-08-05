@@ -409,6 +409,16 @@ function checkUrlParams() {
         
         const newUrl = window.location.pathname;
         window.history.replaceState({}, document.title, newUrl);
+    } else if (urlParams.get('success') === 'trasferimento-modificato') {
+        showNotification('Trasferimento modificato con successo!', 'success');
+
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+    } else if (urlParams.get('success') === 'trasferimento-eliminato') {
+        showNotification('Trasferimento eliminato con successo!', 'success');
+
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
     }
 }
 

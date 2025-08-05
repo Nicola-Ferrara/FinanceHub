@@ -285,7 +285,7 @@ public class Controller {
                     trasferimento.setNomeContoEliminato(del_conto.getNome());
                     trasferimento.setIdContoMittente(0);
                     try {
-                        daoFactory.getTrasferimentoDAO().updateTrasferimento(trasferimento);
+                        daoFactory.getTrasferimentoDAO().updateTrasferimentoConto(trasferimento);
                     } catch (EccezioniDatabase e) {
                         throw e;
                     }
@@ -294,7 +294,7 @@ public class Controller {
                     trasferimento.setNomeContoEliminato(del_conto.getNome());
                     trasferimento.setIdContoDestinatario(0);
                     try {
-                        daoFactory.getTrasferimentoDAO().updateTrasferimento(trasferimento);
+                        daoFactory.getTrasferimentoDAO().updateTrasferimentoConto(trasferimento);
                     } catch (EccezioniDatabase e) {
                         throw e;
                     }
@@ -540,6 +540,96 @@ public class Controller {
             tutteCategorie.add(categoria);
         }
         return tutteCategorie;
+    }
+
+    public void eliminaTrasferimento(int idTrasferimento) throws EccezioniDatabase {
+        Trasferimento trasferimentoDaEliminare = null;
+        Conto contoMittente = null;
+        Conto contoDestinatario = null;
+
+        for (Conto conto : utente.getConti()) {
+            for (Trasferimento trasferimento : conto.getTrasferimenti()) {
+                if (trasferimento.getID() == idTrasferimento) {
+                    trasferimentoDaEliminare = trasferimento;
+                    if (conto.getID() == trasferimento.getIdContoMittente()) {
+                        contoMittente = conto;
+                    }
+                    if (conto.getID() == trasferimento.getIdContoDestinatario()) {
+                        contoDestinatario = conto;
+                    }
+                }
+            }
+        }
+        if (trasferimentoDaEliminare == null) return;
+
+        try {
+            if (contoMittente != null) {
+                contoMittente.removeTrasferimento(trasferimentoDaEliminare);
+                contoMittente.ricalcolaSaldo();
+            }
+            if (contoDestinatario != null && contoDestinatario != contoMittente) {
+                contoDestinatario.removeTrasferimento(trasferimentoDaEliminare);
+                contoDestinatario.ricalcolaSaldo();
+            }
+
+            daoFactory.getTrasferimentoDAO().deleteTrasferimento(idTrasferimento);
+            if (contoMittente != null) daoFactory.getContoDAO().updateConto(contoMittente);
+            if (contoDestinatario != null && contoDestinatario != contoMittente) daoFactory.getContoDAO().updateConto(contoDestinatario);
+
+        } catch (EccezioniDatabase e) {
+            // Rollback
+            if (contoMittente != null && !contoMittente.getTrasferimenti().contains(trasferimentoDaEliminare)) {
+                contoMittente.addTrasferimento(trasferimentoDaEliminare);
+                contoMittente.ricalcolaSaldo();
+            }
+            if (contoDestinatario != null && contoDestinatario != contoMittente &&
+                !contoDestinatario.getTrasferimenti().contains(trasferimentoDaEliminare)) {
+                contoDestinatario.addTrasferimento(trasferimentoDaEliminare);
+                contoDestinatario.ricalcolaSaldo();
+            }
+            throw e;
+        }
+    }
+
+    public void modificaTrasferimento(int idTrasferimento, double importo, String descrizione, Timestamp data) throws EccezioniDatabase {
+        Trasferimento trasferimentoDaAggiornare = null;
+        Conto contoMittente = null;
+        Conto contoDestinatario = null;
+
+        for (Conto conto : utente.getConti()) {
+            for (Trasferimento trasferimento : conto.getTrasferimenti()) {
+                if (trasferimento.getID() == idTrasferimento) {
+                    trasferimentoDaAggiornare = trasferimento;
+                    if (conto.getID() == trasferimento.getIdContoMittente()) {
+                        contoMittente = conto;
+                    }
+                    if (conto.getID() == trasferimento.getIdContoDestinatario()) {
+                        contoDestinatario = conto;
+                    }
+                }
+            }
+        }
+        if (trasferimentoDaAggiornare == null) return;
+
+        // Aggiorna solo i campi consentiti
+        trasferimentoDaAggiornare.setImporto(importo);
+        trasferimentoDaAggiornare.setDescrizione(descrizione);
+        trasferimentoDaAggiornare.setData(data);
+
+        try {
+            daoFactory.getTrasferimentoDAO().updateTrasferimento(trasferimentoDaAggiornare);
+
+            if (contoMittente != null) {
+                contoMittente.ricalcolaSaldo();
+                daoFactory.getContoDAO().updateConto(contoMittente);
+            }
+            if (contoDestinatario != null && contoDestinatario != contoMittente) {
+                contoDestinatario.ricalcolaSaldo();
+                daoFactory.getContoDAO().updateConto(contoDestinatario);
+            }
+        } catch (EccezioniDatabase e) {
+            throw e;
+        }
     }
 
     public static void main(String[] args) {

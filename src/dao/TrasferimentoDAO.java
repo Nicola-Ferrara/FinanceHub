@@ -71,7 +71,7 @@ public class TrasferimentoDAO {
         }, "ERRORE DURANTE L'ELIMINAZIONE DEL TRASFERIMENTO");
     }
 
-    public void updateTrasferimento(Trasferimento trasferimento) throws EccezioniDatabase {
+    public void updateTrasferimentoConto(Trasferimento trasferimento) throws EccezioniDatabase {
         DAOFactory.getInstance().executeWithRetry((conn) -> {
             String sql = "UPDATE Trasferimento SET id_conto_mittente = ?, id_conto_destinatario = ?, nome_conto_eliminato = ? WHERE id = ?";
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -87,6 +87,20 @@ public class TrasferimentoDAO {
                     ps.setInt(2, trasferimento.getIdContoDestinatario());
                 }
                 ps.setString(3, trasferimento.getNomeContoEliminato());
+                ps.setInt(4, trasferimento.getID());
+                ps.executeUpdate();
+            }
+            return null;
+        }, "ERRORE DURANTE L'AGGIORNAMENTO DEL TRASFERIMENTO");
+    }
+
+    public void updateTrasferimento(Trasferimento trasferimento) throws EccezioniDatabase {
+        DAOFactory.getInstance().executeWithRetry((conn) -> {
+            String sql = "UPDATE Trasferimento SET importo = ?, data = ?, descrizione = ? WHERE id = ?";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setDouble(1, trasferimento.getImporto());
+                ps.setTimestamp(2, trasferimento.getData());
+                ps.setString(3, trasferimento.getDescrizione());
                 ps.setInt(4, trasferimento.getID());
                 ps.executeUpdate();
             }
