@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
     fetchBilancio();
     fetchConti();
     fetchOperazioni();
-    fetchCategorie(); // ✅ MANTIENI - Solo per visualizzazione
+    fetchCategorie();
     setupBalanceClickListener();
     setupCategoriesClickListener();
     setupAccountsClickListener();
@@ -416,6 +416,11 @@ function checkUrlParams() {
         window.history.replaceState({}, document.title, newUrl);
     } else if (urlParams.get('success') === 'trasferimento-eliminato') {
         showNotification('Trasferimento eliminato con successo!', 'success');
+
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+    } else if (urlParams.get('success') === 'utente-modificato') {
+        showNotification('Profilo modificato con successo!', 'success');
 
         const newUrl = window.location.pathname;
         window.history.replaceState({}, document.title, newUrl);

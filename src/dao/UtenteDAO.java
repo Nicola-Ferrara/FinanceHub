@@ -43,17 +43,28 @@ public class UtenteDAO {
 
     public void updateUtente(Utente utente) throws EccezioniDatabase {
         DAOFactory.getInstance().executeWithRetry((conn) -> {
-            String sql = "UPDATE Utente SET nome = ?, cognome = ?, telefono = ?, password = ? WHERE email = ?";
+            String sql = "UPDATE Utente SET nome = ?, cognome = ?, telefono = ? WHERE email = ?";
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setString(1, utente.getNome());
                 ps.setString(2, utente.getCognome());
                 ps.setString(3, utente.getNumeroTel());
-                ps.setString(4, utente.getPassword());
-                ps.setString(5, utente.getEmail());
+                ps.setString(4, utente.getEmail());
                 ps.executeUpdate();
                 return null;
             }
         }, "ERRORE DURANTE L'ACCESSO AL DATABASE PER L'AGGIORNAMENTO DEI DATI DELL'UTENTE");
+    }
+
+    public void updatePassword(Utente utente) throws EccezioniDatabase {
+        DAOFactory.getInstance().executeWithRetry((conn) -> {
+            String sql = "UPDATE Utente SET password = ? WHERE email = ?";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, utente.getPassword());
+                ps.setString(2, utente.getEmail());
+                ps.executeUpdate();
+                return null;
+            }
+        }, "ERRORE DURANTE L'ACCESSO AL DATABASE PER L'AGGIORNAMENTO DELLA PASSWORD DELL'UTENTE");
     }
 
     public void deleteUtente(String email) throws EccezioniDatabase {

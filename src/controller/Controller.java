@@ -635,13 +635,21 @@ public class Controller {
         }
     }
 
-    public void modificaUtente(String nome, String cognome, String telefono, String password) throws EccezioniDatabase {
+    public void modificaUtente(String nome, String cognome, String telefono) throws EccezioniDatabase {
         try {
             utente.setNome(nome);
             utente.setCognome(cognome);
             utente.setNumeroTel(telefono);
-            utente.setPassword(password);
             daoFactory.getUtenteDAO().updateUtente(utente);
+        } catch (EccezioniDatabase e) {
+            throw e;
+        }
+    }
+
+    public void modificaPassword(String password) throws EccezioniDatabase {
+        try {
+            utente.setPassword(password);
+            daoFactory.getUtenteDAO().updatePassword(utente);
         } catch (EccezioniDatabase e) {
             throw e;
         }

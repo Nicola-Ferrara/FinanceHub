@@ -6,6 +6,7 @@
     <title>Profilo</title>
     <link rel="stylesheet" href="/css/profilo.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/profilo.js"></script>
 </head>
 <body>
     <div id="sidebarOverlay" class="sidebar-overlay"></div>
@@ -75,11 +76,7 @@
                     <label for="telefono">Telefono</label>
                     <input type="tel" id="telefono" name="telefono" required>
                 </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <div class="form-group">
+                <div class="form-group full-width">
                     <label for="dataIscrizione">Data di iscrizione</label>
                     <input type="text" id="dataIscrizione" name="dataIscrizione" disabled>
                 </div>
@@ -89,6 +86,26 @@
         </section>
     </main>
 
-    <script src="/js/profilo.js"></script>
+    <!-- Modale Conferma Eliminazione -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Conferma Eliminazione</h2>
+                <span class="close" id="closeDeleteModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-delete-content">
+                    <div class="delete-icon">🗑️</div>
+                    <h3>Sei sicuro di voler eliminare questo account?</h3>
+                    <p>Questa azione è <strong>irreversibile</strong>.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelDeleteBtn" class="btn-secondary">Annulla</button>
+                <button id="confirmDeleteBtn" class="btn-danger">Elimina</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

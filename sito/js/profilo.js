@@ -32,7 +32,6 @@ function setupFormSubmission() {
         const nome = document.getElementById("nome").value.trim();
         const cognome = document.getElementById("cognome").value.trim();
         const telefono = document.getElementById("telefono").value.trim();
-        const password = document.getElementById("password").value.trim();
 
         // Validazione lato client
         if (nome.length < 3 || nome.length > 30) {
@@ -50,16 +49,6 @@ function setupFormSubmission() {
             return;
         }
 
-        if (password.length < 6 || password.length > 30) {
-            showNotification("La password deve essere tra 6 e 30 caratteri", "error");
-            return;
-        }
-
-        if (!/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).+$/.test(password)) {
-            showNotification("La password deve contenere almeno una lettera maiuscola, un numero e un carattere speciale (@$!%*?&)", "error");
-            return;
-        }
-
         try {
             const response = await fetch("/api/profilo", {
                 method: "PUT",
@@ -70,7 +59,6 @@ function setupFormSubmission() {
                     nome,
                     cognome,
                     telefono,
-                    password
                 })
             });
 
@@ -80,7 +68,7 @@ function setupFormSubmission() {
                 throw new Error(result.error || "Errore durante l'aggiornamento del profilo");
             }
 
-            showNotification("Profilo aggiornato con successo!", "success");
+            window.location.href = '/home?success=utente-modificato';
         } catch (error) {
             console.error("Errore:", error);
             showNotification(error.message, "error");
@@ -90,33 +78,55 @@ function setupFormSubmission() {
 
 function setupDeleteAccount() {
     const deleteButton = document.getElementById("deleteAccountBtn");
-    deleteButton.addEventListener("click", async function() {
-        if (!confirm("Sei sicuro di voler eliminare il tuo account? Questa azione è irreversibile.")) {
-            return;
-        }
+    const deleteModal = document.getElementById("deleteModal");
+    const closeDeleteModalBtn = document.getElementById("closeDeleteModal");
+    const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+    const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
 
+    // Mostra la modale
+    deleteButton.addEventListener("click", function() {
+        deleteModal.style.display = "block";
+    });
+
+    // Chiudi la modale (X o Annulla)
+    closeDeleteModalBtn.addEventListener("click", closeDeleteModal);
+    cancelDeleteBtn.addEventListener("click", closeDeleteModal);
+
+    // Chiudi cliccando fuori dalla modale
+    window.addEventListener("click", function(event) {
+        if (event.target === deleteModal) {
+            closeDeleteModal();
+        }
+    });
+
+    // Conferma eliminazione
+    confirmDeleteBtn.addEventListener("click", async function() {
         try {
+            confirmDeleteBtn.disabled = true;
+            confirmDeleteBtn.textContent = "Eliminazione...";
             const response = await fetch("/api/profilo", {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json"
                 }
             });
-
             if (!response.ok) {
                 const result = await response.json();
                 throw new Error(result.error || "Errore durante l'eliminazione dell'account");
             }
-
-            showNotification("Account eliminato con successo!", "success");
-            setTimeout(() => {
-                window.location.href = "/login";
-            }, 2000);
+            closeDeleteModal();
+            window.location.href = '/login?success=utente-eliminato';
         } catch (error) {
-            console.error("Errore:", error);
             showNotification(error.message, "error");
+        } finally {
+            confirmDeleteBtn.disabled = false;
+            confirmDeleteBtn.textContent = "Elimina";
         }
     });
+
+    function closeDeleteModal() {
+        deleteModal.style.display = "none";
+    }
 }
 
 function formatDate(dateString) {

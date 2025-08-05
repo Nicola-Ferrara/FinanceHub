@@ -42,6 +42,8 @@ public class GestoreProfilo extends BaseGestorePagina {
                     return createResponse(Response.Status.METHOD_NOT_ALLOWED, "application/json", 
                         "{\"error\": \"Metodo non supportato\"}");
             }
+        } else if ("/api/profilo-password".equals(uri) && method == Method.PUT) {
+            return handleUpdateProfiloPassword(session);
         }
         
         return createResponse(Response.Status.NOT_FOUND, "text/plain", "Risorsa non trovata");
@@ -141,13 +143,11 @@ public class GestoreProfilo extends BaseGestorePagina {
             // Parse JSON
             String nome = null;
             String cognome = null;
-            String password = null;
             String telefono = null;
             
             try {
                 nome = extractStringFromJson(body, "nome");
                 cognome = extractStringFromJson(body, "cognome");
-                password = extractStringFromJson(body, "password");
                 telefono = extractStringFromJson(body, "telefono");
             } catch (Exception e) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
@@ -184,25 +184,6 @@ public class GestoreProfilo extends BaseGestorePagina {
                     "{\"error\": \"Il cognome non può superare i 30 caratteri\"}");
             }
 
-            // Validazione password
-            if (password == null || password.trim().isEmpty()) {
-                return createResponse(Response.Status.BAD_REQUEST, "application/json", 
-                    "{\"error\": \"La password è obbligatoria\"}");
-            }
-            password = password.trim();
-            if (password.length() < 6) {
-                return createResponse(Response.Status.BAD_REQUEST, "application/json", 
-                    "{\"error\": \"La password deve essere di almeno 6 caratteri\"}");
-            }
-            if (password.length() > 30) {
-                return createResponse(Response.Status.BAD_REQUEST, "application/json", 
-                    "{\"error\": \"La password non può superare i 30 caratteri\"}");
-            }
-            if (!password.matches("^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).+$")) {
-                return createResponse(Response.Status.BAD_REQUEST, "application/json",
-                    "{\"error\": \"La password deve contenere almeno una lettera maiuscola, un numero e un carattere speciale (@$!%*?&)\"}");
-            }
-
             // Validazione telefono
             if (telefono == null || telefono.trim().isEmpty()) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
@@ -218,7 +199,7 @@ public class GestoreProfilo extends BaseGestorePagina {
                     "{\"error\": \"Il telefono deve contenere solo cifre\"}");
             }
 
-            controller.modificaUtente(nome, cognome, password, telefono);
+            controller.modificaUtente(nome, cognome, telefono);
             
             Response response = createResponse(Response.Status.OK, "application/json", 
                 "{\"success\": true, \"message\": \"Utente modificato con successo\"}");
@@ -242,8 +223,7 @@ public class GestoreProfilo extends BaseGestorePagina {
             }
             controller.eliminaUtente();
 
-            Response response = createResponse(Response.Status.REDIRECT, "text/html", "{\"success\": true, \"message\": \"Utente eliminato con successo\"}");
-            response.addHeader("Location", "/login");
+            Response response = createResponse(Response.Status.OK, "application/json", "{\"success\": true, \"message\": \"Utente eliminato con successo\"}");
             return addNoCacheHeaders(response);
             
         } catch (EccezioniDatabase e) {
@@ -254,6 +234,85 @@ public class GestoreProfilo extends BaseGestorePagina {
             e.printStackTrace();
             return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
                 "{\"error\": \"Errore durante l'eliminazione dell'utente: " + escapeJson(e.getMessage()) + "\"}");
+        }
+    }
+
+    private Response handleUpdateProfiloPassword(IHTTPSession session) {
+        try {
+            if (!controller.isUtenteLogged()) {
+                return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
+                    "{\"error\": \"Utente non autorizzato\"}");
+            }
+            
+            // Leggi il body della richiesta
+            String body = null;
+            
+            try {
+                String contentLengthHeader = session.getHeaders().get("content-length");
+                int contentLength = 0;
+                
+                if (contentLengthHeader != null) {
+                    contentLength = Integer.parseInt(contentLengthHeader);
+                }
+                
+                if (contentLength > 0) {
+                    java.io.InputStream inputStream = session.getInputStream();
+                    byte[] buffer = new byte[contentLength];
+                    
+                    int totalBytesRead = 0;
+                    while (totalBytesRead < contentLength) {
+                        int bytesRead = inputStream.read(buffer, totalBytesRead, contentLength - totalBytesRead);
+                        if (bytesRead == -1) break;
+                        totalBytesRead += bytesRead;
+                    }
+                    
+                    body = new String(buffer, 0, totalBytesRead, "UTF-8");
+                } else {
+                    Map<String, String> files = new java.util.HashMap<>();
+                    session.parseBody(files);
+                    body = files.get("postData");
+                }
+                
+            } catch (Exception e) {
+                // Ignora errori di lettura e continua
+            }
+            
+            if (body == null || body.trim().isEmpty()) {
+                return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                    "{\"error\": \"Dati mancanti\"}");
+            }
+            
+            // Parse JSON
+            String password = extractStringFromJson(body, "password");
+            
+            // Validazione password
+            if (password == null || password.trim().isEmpty()) {
+                return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                    "{\"error\": \"La password è obbligatoria\"}");
+            }
+            password = password.trim();
+            if (password.length() < 6 || password.length() > 30) {
+                return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                    "{\"error\": \"La password deve essere tra 6 e 30 caratteri\"}");
+            }
+            if (!password.matches("^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).+$")) {
+                return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                    "{\"error\": \"La password deve contenere almeno una lettera maiuscola, un numero e un carattere speciale (@$!%*?&)\"}");
+            }
+            
+            controller.modificaPassword(password);
+            
+            Response response = createResponse(Response.Status.OK, "application/json", 
+                "{\"success\": true, \"message\": \"Password modificata con successo\"}");
+            return addNoCacheHeaders(response);
+        } catch (EccezioniDatabase e) {
+            e.printStackTrace();
+            return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
+                "{\"error\": \"Errore database durante la modifica della password: " + escapeJson(e.getMessage()) + "\"}");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
+                "{\"error\": \"Errore durante la modifica della password: " + escapeJson(e.getMessage()) + "\"}");
         }
     }
 
