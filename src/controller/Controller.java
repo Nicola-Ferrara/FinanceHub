@@ -108,6 +108,10 @@ public class Controller {
         return utente != null;
     }
 
+    public Utente getUtente() {
+        return utente;
+    }
+
     public double calcolaEntrate() {
         double entrate = 0.0;
         int meseCorrente = (new Timestamp(System.currentTimeMillis())).toLocalDateTime().getMonthValue();
