@@ -45,8 +45,8 @@ function setupFormSubmission() {
             return;
         }
 
-        if (telefono.length !== 10 || !/^\d{10}$/.test(telefono)) {
-            showNotification("Il telefono deve essere composto da 10 cifre", "error");
+        if (telefono.length < 8 || telefono.length > 13 || !/^\d{8,13}$/.test(telefono)) {
+            showNotification("Il telefono deve essere composto da 8 a 13 cifre", "error");
             return;
         }
 

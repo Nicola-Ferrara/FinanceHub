@@ -122,9 +122,9 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         hasErrors = true;
     }
 
-    if (!telefono || !/^[0-9]{10}$/.test(telefono)) {
-        showFieldError("telefono", "Inserisci un numero di telefono valido (10 cifre)");
-        if (!firstErrorMessage) firstErrorMessage = "Inserisci un numero di telefono valido (10 cifre)";
+    if (!telefono || !/^[0-9]{8,13}$/.test(telefono)) {
+        showFieldError("telefono", "Inserisci un numero di telefono valido (da 8 a 13 cifre)");
+        if (!firstErrorMessage) firstErrorMessage = "Inserisci un numero di telefono valido (da 8 a 13 cifre)";
         hasErrors = true;
     }
 
@@ -234,8 +234,8 @@ document.querySelectorAll('input').forEach(input => {
 // Formattazione automatica del numero di telefono
 document.getElementById("telefono").addEventListener("input", function() {
     let value = this.value.replace(/\D/g, ''); // Rimuovi tutto tranne i numeri
-    if (value.length > 10) {
-        value = value.substring(0, 10); // Limita a 10 cifre
+    if (value.length > 13) {
+        value = value.substring(0, 13); // Limita a 13 cifre
     }
     this.value = value;
 });

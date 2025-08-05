@@ -191,11 +191,11 @@ public class GestoreProfilo extends BaseGestorePagina {
                     "{\"error\": \"Il telefono è obbligatorio\"}");
             }
             telefono = telefono.trim();
-            if (telefono.length() != 10) {
+            if (telefono.length() < 8 || telefono.length() > 13) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
-                    "{\"error\": \"Il telefono deve essere composto da 10 numeri\"}");
+                    "{\"error\": \"Il telefono deve essere composto da 8 a 13 numeri\"}");
             }
-            if (!telefono.matches("\\d{10}")) {
+            if (!telefono.matches("\\d{8,13}")) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"Il telefono deve contenere solo cifre\"}");
             }
