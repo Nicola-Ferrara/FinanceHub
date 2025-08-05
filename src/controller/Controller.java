@@ -29,7 +29,6 @@ public class Controller {
             if (utente == null) {
                 return false;
             }
-            utente.setLogOperazioni(daoFactory.getLogOperazioniDAO().getLogOperazioni(utente.getEmail()));
             utente.setConti(daoFactory.getContoDAO().getConti(utente.getEmail()));
             utente.setCategorie(daoFactory.getCategoriaDAO().getCategorie(utente.getEmail()));
             LinkedList<Trasferimento> trasferimenti = daoFactory.getTrasferimentoDAO().getTrasferimenti(utente.getEmail());
@@ -68,7 +67,7 @@ public class Controller {
 
     public boolean effettuaRegistrazione(String nome, String cognome, String telefono, String email, String password) throws EccezioniDatabase {
         try {
-            utente = new Utente(nome, cognome, email, password, telefono, LocalDate.now(), null, null, null);
+            utente = new Utente(nome, cognome, email, password, telefono, LocalDate.now(), null, null);
             daoFactory.getUtenteDAO().saveUtente(utente);
         } catch (EccezioniDatabase e) {
             if (e.getMessage().contains("23505")) {
@@ -627,6 +626,27 @@ public class Controller {
                 contoDestinatario.ricalcolaSaldo();
                 daoFactory.getContoDAO().updateConto(contoDestinatario);
             }
+        } catch (EccezioniDatabase e) {
+            throw e;
+        }
+    }
+
+    public void modificaUtente(String nome, String cognome, String telefono, String password) throws EccezioniDatabase {
+        try {
+            utente.setNome(nome);
+            utente.setCognome(cognome);
+            utente.setNumeroTel(telefono);
+            utente.setPassword(password);
+            daoFactory.getUtenteDAO().updateUtente(utente);
+        } catch (EccezioniDatabase e) {
+            throw e;
+        }
+    }
+
+    public void eliminaUtente() throws EccezioniDatabase {
+        try {
+            daoFactory.getUtenteDAO().deleteUtente(utente.getEmail());
+            utente = null;
         } catch (EccezioniDatabase e) {
             throw e;
         }

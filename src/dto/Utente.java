@@ -14,10 +14,9 @@ public class Utente {
     private LocalDate data_iscrizione;
 	private LinkedList<Conto> conti = new LinkedList<Conto>();
     private LinkedList<Categoria> categorie = new LinkedList<Categoria>();
-    private LinkedList<LogOperazione> logOperazioni = new LinkedList<LogOperazione>();
 	
 	// Costruttore
-	public Utente(String nome, String cognome, String email, String password, String numero_tel, LocalDate data_iscrizione, LinkedList<Conto> conti, LinkedList<Categoria> categorie, LinkedList<LogOperazione> logOperazioni) {
+	public Utente(String nome, String cognome, String email, String password, String numero_tel, LocalDate data_iscrizione, LinkedList<Conto> conti, LinkedList<Categoria> categorie) {
 	    this.nome = nome;
 	    this.cognome = cognome;
 	    this.email = email;
@@ -26,7 +25,6 @@ public class Utente {
 	    this.data_iscrizione = data_iscrizione;
 	    this.conti = (conti != null) ? conti : new LinkedList<>();
         this.categorie = (categorie != null) ? categorie : new LinkedList<>();
-        this.logOperazioni = (logOperazioni != null) ? logOperazioni : new LinkedList<>();
 	}
 	
 	// Getters
@@ -54,9 +52,6 @@ public class Utente {
     public LinkedList<Categoria> getCategorie() {
         return categorie;
     }
-    public LinkedList<LogOperazione> getLogOperazioni() {
-        return logOperazioni;
-    }
 
     // Setters
     public void setNome(String nome) {
@@ -83,9 +78,6 @@ public class Utente {
     public void setCategorie(LinkedList<Categoria> categorie) {
         this.categorie = categorie;
     }
-    public void setLogOperazioni(LinkedList<LogOperazione> logOperazioni) {
-        this.logOperazioni = logOperazioni;
-    }
     
     // Aggiungi un conto
     public void addConto(Conto conto) {
@@ -110,19 +102,6 @@ public class Utente {
     public void removeCategoria(Categoria categoria) {
         if (categoria != null) {
             this.categorie.remove(categoria);
-        }
-    }
-
-    // Aggiungi un log operazione
-    public void addLogOperazione(LogOperazione logOperazione) {
-        if (logOperazione != null) {
-            this.logOperazioni.add(logOperazione);
-        }
-    }
-    // Rimuovi un log operazione
-    public void removeLogOperazione(LogOperazione logOperazione) {
-        if (logOperazione != null) {
-            this.logOperazioni.remove(logOperazione);
         }
     }
 

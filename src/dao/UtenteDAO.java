@@ -18,7 +18,7 @@ public class UtenteDAO {
                 ps.setString(2, password);
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
-                    return new Utente(rs.getString("nome"), rs.getString("cognome"), rs.getString("email"), rs.getString("password"), rs.getString("telefono"), rs.getDate("data_iscrizione").toLocalDate(), null, null, null);
+                    return new Utente(rs.getString("nome"), rs.getString("cognome"), rs.getString("email"), rs.getString("password"), rs.getString("telefono"), rs.getDate("data_iscrizione").toLocalDate(), null, null);
                 }
                 return null;
             }
@@ -39,6 +39,32 @@ public class UtenteDAO {
                 return null;
             }
         }, "ERRORE DURANTE L'ACCESSO AL DATABASE PER IL SALVATAGGIO DEI DATI DELL'UTENTE");
+    }
+
+    public void updateUtente(Utente utente) throws EccezioniDatabase {
+        DAOFactory.getInstance().executeWithRetry((conn) -> {
+            String sql = "UPDATE Utente SET nome = ?, cognome = ?, telefono = ?, password = ? WHERE email = ?";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, utente.getNome());
+                ps.setString(2, utente.getCognome());
+                ps.setString(3, utente.getNumeroTel());
+                ps.setString(4, utente.getPassword());
+                ps.setString(5, utente.getEmail());
+                ps.executeUpdate();
+                return null;
+            }
+        }, "ERRORE DURANTE L'ACCESSO AL DATABASE PER L'AGGIORNAMENTO DEI DATI DELL'UTENTE");
+    }
+
+    public void deleteUtente(String email) throws EccezioniDatabase {
+        DAOFactory.getInstance().executeWithRetry((conn) -> {
+            String sql = "DELETE FROM Utente WHERE email = ?";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, email);
+                ps.executeUpdate();
+                return null;
+            }
+        }, "ERRORE DURANTE L'ACCESSO AL DATABASE PER L'ELIMINAZIONE DELL'UTENTE");
     }
     
 }

@@ -15,7 +15,6 @@ public class DAOFactory {
     private UtenteDAO utenteDAO;
     private CategoriaDAO categoriaDAO;
     private ContoDAO contoDAO;
-    private LogOperazioniDAO logOperazioniDAO;
     private TransazioneDAO transazioneDAO;
     private TrasferimentoDAO trasferimentoDAO;
     
@@ -98,13 +97,6 @@ public class DAOFactory {
             contoDAO = new ContoDAO();
         }
         return contoDAO;
-    }
-    
-    public LogOperazioniDAO getLogOperazioniDAO() {
-        if (logOperazioniDAO == null) {
-            logOperazioniDAO = new LogOperazioniDAO();
-        }
-        return logOperazioniDAO;
     }
     
     public TransazioneDAO getTransazioneDAO() {
