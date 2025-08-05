@@ -53,13 +53,18 @@
             </button>
             <h1>Profilo</h1>
         </div>
-        <button id="logoutButton" class="logout-button">Logout</button>
+        <div class="nav-links">
+            <a href="/home" class="nav-link">🏠 Home</a>
+            <form action="/logout" method="get" style="display: inline;">
+                <button type="submit" class="logout-button">Logout</button>
+            </form>
+        </div>
     </header>
 
     <main class="main-content">
         <section id="profileSection" class="profile-section">
             <h2>Il tuo profilo</h2>
-            <form id="profileForm" class="profile-form">
+            <form id="profileForm" class="profile-form" novalidate>
                 <div class="form-group">
                     <label for="nome">Nome</label>
                     <input type="text" id="nome" name="nome" required>
@@ -80,9 +85,12 @@
                     <label for="dataIscrizione">Data di iscrizione</label>
                     <input type="text" id="dataIscrizione" name="dataIscrizione" disabled>
                 </div>
-                <button type="submit" class="btn-primary">Salva Modifiche</button>
+                <div class="profile-actions">
+                    <button type="submit" class="btn-primary">Salva Modifiche</button>
+                    <button type="button" id="changePasswordBtn" class="btn-secondary">Cambia Password</button>
+                    <button type="button" id="deleteAccountBtn" class="btn-danger">Elimina Account</button>
+                </div>
             </form>
-            <button id="deleteAccountBtn" class="delete-account-btn">Elimina Account</button>
         </section>
     </main>
 
@@ -103,6 +111,29 @@
             <div class="modal-footer">
                 <button id="cancelDeleteBtn" class="btn-secondary">Annulla</button>
                 <button id="confirmDeleteBtn" class="btn-danger">Elimina</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale Cambia Password -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cambia Password</h2>
+                <span class="close" id="closePasswordModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="passwordForm" novalidate>
+                    <div class="form-group">
+                        <label for="newPassword">Nuova Password</label>
+                        <input type="password" id="newPassword" required autocomplete="new-password" placeholder="Nuova password">
+                        <small class="password-hint">Min. 6 caratteri, almeno una maiuscola, un numero e un carattere speciale (@$!%*?&)</small>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" id="cancelPasswordBtn">Annulla</button>
+                        <button type="submit" class="btn-primary">Salva</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

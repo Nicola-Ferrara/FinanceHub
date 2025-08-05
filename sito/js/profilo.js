@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function() {
     fetchProfilo();
     setupFormSubmission();
     setupDeleteAccount();
+    setupChangePassword();
 });
 
 async function fetchProfilo() {
@@ -204,6 +205,65 @@ function setupSidebar() {
             sidebar.classList.remove('open');
             sidebarOverlay.classList.remove('show');
             document.body.style.overflow = '';
+        }
+    });
+}
+
+function setupChangePassword() {
+    const changePasswordBtn = document.getElementById("changePasswordBtn");
+    const passwordModal = document.getElementById("passwordModal");
+    const closePasswordModal = document.getElementById("closePasswordModal");
+    const cancelPasswordBtn = document.getElementById("cancelPasswordBtn");
+    const passwordForm = document.getElementById("passwordForm");
+    const newPasswordInput = document.getElementById("newPassword");
+
+    // Mostra modale
+    changePasswordBtn.addEventListener("click", () => {
+        passwordModal.style.display = "block";
+        newPasswordInput.value = "";
+    });
+
+    // Chiudi modale
+    closePasswordModal.addEventListener("click", closeModal);
+    cancelPasswordBtn.addEventListener("click", closeModal);
+
+    window.addEventListener("click", function(event) {
+        if (event.target === passwordModal) closeModal();
+    });
+
+    function closeModal() {
+        passwordModal.style.display = "none";
+        newPasswordInput.value = "";
+    }
+
+    // Gestione submit cambio password
+    passwordForm.addEventListener("submit", async function(event) {
+        event.preventDefault();
+        const password = newPasswordInput.value.trim();
+
+        // Validazione
+        if (password.length < 6 || password.length > 30) {
+            showNotification("La password deve essere tra 6 e 30 caratteri", "error");
+            return;
+        }
+        if (!/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).+$/.test(password)) {
+            showNotification("La password deve contenere almeno una maiuscola, un numero e un carattere speciale (@$!%*?&)", "error");
+            return;
+        }
+
+        try {
+            const response = await fetch("/api/profilo-password", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ password })
+            });
+            const result = await response.json();
+
+            if (!response.ok) throw new Error(result.error || "Errore durante il cambio password");
+            closeModal();
+            showNotification("Password aggiornata con successo!", "success");
+        } catch (error) {
+            showNotification(error.message, "error");
         }
     });
 }

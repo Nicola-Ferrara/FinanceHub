@@ -20,7 +20,8 @@ public class GestoreProfilo extends BaseGestorePagina {
     @Override
     public boolean canHandle(String uri, String method) {
         return "/profilo".equals(uri) 
-            || "/api/profilo".equals(uri);
+            || "/api/profilo".equals(uri)
+            || "/api/profilo-password".equals(uri);
     }
 
     @Override
