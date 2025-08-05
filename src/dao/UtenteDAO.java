@@ -77,5 +77,19 @@ public class UtenteDAO {
             }
         }, "ERRORE DURANTE L'ACCESSO AL DATABASE PER L'ELIMINAZIONE DELL'UTENTE");
     }
+
+    public boolean esistenzaUtente(String email) throws EccezioniDatabase {
+        return DAOFactory.getInstance().executeWithRetry((conn) -> {
+            String sql = "SELECT COUNT(*) FROM Utente WHERE email = ?";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, email);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+                return false;
+            }
+        }, "ERRORE DURANTE IL CONTROLLO DELL'ESISTENZA DELL'EMAIL NEL DATABASE");
+    }
     
 }

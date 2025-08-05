@@ -67,6 +67,9 @@ public class Controller {
 
     public boolean effettuaRegistrazione(String nome, String cognome, String telefono, String email, String password) throws EccezioniDatabase {
         try {
+            if (daoFactory.getUtenteDAO().esistenzaUtente(email)) {
+                return false;
+            }
             utente = new Utente(nome, cognome, email, password, telefono, LocalDate.now(), null, null);
             daoFactory.getUtenteDAO().saveUtente(utente);
         } catch (EccezioniDatabase e) {
