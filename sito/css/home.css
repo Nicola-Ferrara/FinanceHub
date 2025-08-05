@@ -724,14 +724,43 @@ body {
         grid-template-columns: 1fr;
         padding: 20px;
     }
+
+    .logout-button {
+        display: none;
+    }
+
+    .header {
+        justify-content: flex-start;
+        position: relative;
+        min-height: 72px;
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
     
     .header-left {
+        position: static;
         gap: 10px;
     }
     
     .header h1 {
-        font-size: 20px;
-    }
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    text-align: center;
+    margin: 0;
+    width: 60vw;
+    max-width: calc(100vw - 100px);
+    z-index: 1;
+    flex: none;
+    white-space: normal; 
+    overflow: visible;
+    text-overflow: unset;
+    pointer-events: none;
+    line-height: 1.2;
+    word-break: break-word;
+}
     
     .hamburger-menu {
         padding: 15px 18px;
