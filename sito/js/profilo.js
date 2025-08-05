@@ -221,6 +221,7 @@ function setupChangePassword() {
     changePasswordBtn.addEventListener("click", () => {
         passwordModal.style.display = "block";
         newPasswordInput.value = "";
+        resetPasswordRequirements();
     });
 
     // Chiudi modale
@@ -234,6 +235,56 @@ function setupChangePassword() {
     function closeModal() {
         passwordModal.style.display = "none";
         newPasswordInput.value = "";
+        resetPasswordRequirements();
+    }
+
+    // Controllo requisiti password in tempo reale
+    newPasswordInput.addEventListener("input", function() {
+        const password = newPasswordInput.value;
+
+        const lengthReq = document.getElementById("req-length-pw");
+        if (password.length >= 6) {
+            lengthReq.classList.add("valid");
+            lengthReq.querySelector(".requirement-icon").textContent = "✅";
+        } else {
+            lengthReq.classList.remove("valid");
+            lengthReq.querySelector(".requirement-icon").textContent = "⚪";
+        }
+
+        const uppercaseReq = document.getElementById("req-uppercase-pw");
+        if (/[A-Z]/.test(password)) {
+            uppercaseReq.classList.add("valid");
+            uppercaseReq.querySelector(".requirement-icon").textContent = "✅";
+        } else {
+            uppercaseReq.classList.remove("valid");
+            uppercaseReq.querySelector(".requirement-icon").textContent = "⚪";
+        }
+
+        const numberReq = document.getElementById("req-number-pw");
+        if (/\d/.test(password)) {
+            numberReq.classList.add("valid");
+            numberReq.querySelector(".requirement-icon").textContent = "✅";
+        } else {
+            numberReq.classList.remove("valid");
+            numberReq.querySelector(".requirement-icon").textContent = "⚪";
+        }
+
+        const specialReq = document.getElementById("req-special-pw");
+        if (/[@$!%*?&]/.test(password)) {
+            specialReq.classList.add("valid");
+            specialReq.querySelector(".requirement-icon").textContent = "✅";
+        } else {
+            specialReq.classList.remove("valid");
+            specialReq.querySelector(".requirement-icon").textContent = "⚪";
+        }
+    });
+
+    function resetPasswordRequirements() {
+        ["req-length-pw", "req-uppercase-pw", "req-number-pw", "req-special-pw"].forEach(id => {
+            const el = document.getElementById(id);
+            el.classList.remove("valid");
+            el.querySelector(".requirement-icon").textContent = "⚪";
+        });
     }
 
     // Gestione submit cambio password
@@ -257,7 +308,15 @@ function setupChangePassword() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ password })
             });
-            const result = await response.json();
+
+            // Gestione robusta della risposta
+            const contentType = response.headers.get("content-type");
+            let result = {};
+            if (contentType && contentType.includes("application/json")) {
+                result = await response.json();
+            } else {
+                result = { error: await response.text() };
+            }
 
             if (!response.ok) throw new Error(result.error || "Errore durante il cambio password");
             closeModal();

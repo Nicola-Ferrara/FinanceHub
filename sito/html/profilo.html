@@ -127,7 +127,24 @@
                     <div class="form-group">
                         <label for="newPassword">Nuova Password</label>
                         <input type="password" id="newPassword" required autocomplete="new-password" placeholder="Nuova password">
-                        <small class="password-hint">Min. 6 caratteri, almeno una maiuscola, un numero e un carattere speciale (@$!%*?&)</small>
+                        <div class="password-requirements" id="passwordRequirements">
+                            <div class="requirement" id="req-length-pw">
+                                <span class="requirement-icon">⚪</span>
+                                Almeno 6 caratteri
+                            </div>
+                            <div class="requirement" id="req-uppercase-pw">
+                                <span class="requirement-icon">⚪</span>
+                                Una lettera maiuscola
+                            </div>
+                            <div class="requirement" id="req-number-pw">
+                                <span class="requirement-icon">⚪</span>
+                                Un numero
+                            </div>
+                            <div class="requirement" id="req-special-pw">
+                                <span class="requirement-icon">⚪</span>
+                                Un carattere speciale (@$!%*?&)
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn-secondary" id="cancelPasswordBtn">Annulla</button>

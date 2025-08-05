@@ -518,7 +518,6 @@ body {
     justify-content: center;
     gap: 15px;
     padding: 20px 30px;
-    border-top: 1px solid #eee;
 }
 
 /* Delete Modal Content */
@@ -561,6 +560,36 @@ body {
     background: white;
     border-radius: 8px;
     text-align: left;
+}
+
+.password-requirements {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    font-size: 13px;
+}
+
+.requirement {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #6b7280;
+    transition: color 0.2s;
+}
+.requirement.valid {
+    color: #10b981;
+}
+.requirement.valid .requirement-icon {
+    color: #10b981;
+}
+.requirement-icon {
+    font-size: 12px;
+    transition: color 0.2s;
 }
 
 /* Responsive */
