@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profilo</title>
+    <link rel="stylesheet" href="/css/profilo.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h3>Menu</h3>
+            <button id="closeSidebar" class="close-sidebar">&times;</button>
+        </div>
+        <div class="sidebar-content">
+            <a href="/home" class="sidebar-link">
+                <span class="sidebar-icon">🏠</span>
+                Home
+            <a href="/bilanci" class="sidebar-link">
+                <span class="sidebar-icon">📊</span>
+                Bilanci
+            </a>
+            <a href="/lista_conti" class="sidebar-link">
+                <span class="sidebar-icon">🏦</span>
+                Conti
+            </a>
+            <a href="/operazioni" class="sidebar-link">
+                <span class="sidebar-icon">📈</span>
+                Operazioni
+            </a>
+            <a href="/categorie" class="sidebar-link">
+                <span class="sidebar-icon">📂</span>
+                Categorie
+            </a>
+            <div class="sidebar-divider"></div>
+            <a href="/logout" class="sidebar-link logout">
+                <span class="sidebar-icon">🚪</span>
+                Logout
+            </a>
+        </div>
+    </aside>
+
+    <header class="header">
+        <div class="header-left">
+            <button id="hamburgerMenu" class="hamburger-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <h1>Profilo</h1>
+        </div>
+        <button id="logoutButton" class="logout-button">Logout</button>
+    </header>
+
+    <main class="main-content">
+        <section id="profileSection" class="profile-section">
+            <h2>Il tuo profilo</h2>
+            <form id="profileForm" class="profile-form">
+                <div class="form-group">
+                    <label for="nome">Nome</label>
+                    <input type="text" id="nome" name="nome" required>
+                </div>
+                <div class="form-group">
+                    <label for="cognome">Cognome</label>
+                    <input type="text" id="cognome" name="cognome" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="telefono">Telefono</label>
+                    <input type="tel" id="telefono" name="telefono" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="dataIscrizione">Data di iscrizione</label>
+                    <input type="text" id="dataIscrizione" name="dataIscrizione" disabled>
+                </div>
+                <button type="submit" class="btn-primary">Salva Modifiche</button>
+            </form>
+            <button id="deleteAccountBtn" class="delete-account-btn">Elimina Account</button>
+        </section>
+    </main>
+
+    <script src="/js/profilo.js"></script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+document.addEventListener("DOMContentLoaded", function() {
+    setupSidebar();
+    fetchProfilo();
+    setupFormSubmission();
+    setupDeleteAccount();
+});
+
+async function fetchProfilo() {
+    try {
+        const response = await fetch("/api/profilo");
+        if (!response.ok) {
+            throw new Error("Errore durante il recupero dei dati del profilo");
+        }
+
+        const data = await response.json();
+        document.getElementById("nome").value = data.nome || "";
+        document.getElementById("cognome").value = data.cognome || "";
+        document.getElementById("email").value = data.email || "";
+        document.getElementById("telefono").value = data.telefono || "";
+        document.getElementById("dataIscrizione").value = formatDate(data.data) || "";
+    } catch (error) {
+        console.error("Errore:", error);
+        showNotification("Errore durante il caricamento del profilo", "error");
+    }
+}
+
+function setupFormSubmission() {
+    const form = document.getElementById("profileForm");
+    form.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const nome = document.getElementById("nome").value.trim();
+        const cognome = document.getElementById("cognome").value.trim();
+        const telefono = document.getElementById("telefono").value.trim();
+        const password = document.getElementById("password").value.trim();
+
+        // Validazione lato client
+        if (nome.length < 3 || nome.length > 30) {
+            showNotification("Il nome deve essere tra 3 e 30 caratteri", "error");
+            return;
+        }
+
+        if (cognome.length < 3 || cognome.length > 30) {
+            showNotification("Il cognome deve essere tra 3 e 30 caratteri", "error");
+            return;
+        }
+
+        if (telefono.length !== 10 || !/^\d{10}$/.test(telefono)) {
+            showNotification("Il telefono deve essere composto da 10 cifre", "error");
+            return;
+        }
+
+        if (password.length < 6 || password.length > 30) {
+            showNotification("La password deve essere tra 6 e 30 caratteri", "error");
+            return;
+        }
+
+        if (!/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).+$/.test(password)) {
+            showNotification("La password deve contenere almeno una lettera maiuscola, un numero e un carattere speciale (@$!%*?&)", "error");
+            return;
+        }
+
+        try {
+            const response = await fetch("/api/profilo", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    nome,
+                    cognome,
+                    telefono,
+                    password
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || "Errore durante l'aggiornamento del profilo");
+            }
+
+            showNotification("Profilo aggiornato con successo!", "success");
+        } catch (error) {
+            console.error("Errore:", error);
+            showNotification(error.message, "error");
+        }
+    });
+}
+
+function setupDeleteAccount() {
+    const deleteButton = document.getElementById("deleteAccountBtn");
+    deleteButton.addEventListener("click", async function() {
+        if (!confirm("Sei sicuro di voler eliminare il tuo account? Questa azione è irreversibile.")) {
+            return;
+        }
+
+        try {
+            const response = await fetch("/api/profilo", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                const result = await response.json();
+                throw new Error(result.error || "Errore durante l'eliminazione dell'account");
+            }
+
+            showNotification("Account eliminato con successo!", "success");
+            setTimeout(() => {
+                window.location.href = "/login";
+            }, 2000);
+        } catch (error) {
+            console.error("Errore:", error);
+            showNotification(error.message, "error");
+        }
+    });
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('it-IT', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+}
+
+function showNotification(message, type) {
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notif => notif.remove());
+
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span class="notification-icon">${type === 'success' ? '✅' : '❌'}</span>
+            <span class="notification-message">${message}</span>
+            <button class="notification-close">&times;</button>
+        </div>
+    `;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    setTimeout(() => {
+        hideNotification(notification);
+    }, 3000);
+
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+        hideNotification(notification);
+    });
+}
+
+function hideNotification(notification) {
+    notification.classList.remove('show');
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 300);
+}
+
+function setupSidebar() {
+    const hamburgerMenu = document.getElementById('hamburgerMenu');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const closeSidebar = document.getElementById('closeSidebar');
+
+    hamburgerMenu.addEventListener('click', function() {
+        sidebar.classList.add('open');
+        sidebarOverlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    });
+
+    closeSidebar.addEventListener('click', function() {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('show');
+        document.body.style.overflow = '';
+    });
+
+    sidebarOverlay.addEventListener('click', function() {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('show');
+        document.body.style.overflow = '';
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+    });
+}

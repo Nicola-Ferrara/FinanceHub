@@ -241,9 +241,9 @@ public class GestoreProfilo extends BaseGestorePagina {
                     "{\"error\": \"Utente non autorizzato\"}");
             }
             controller.eliminaUtente();
-            
-            Response response = createResponse(Response.Status.OK, "application/json", 
-                "{\"success\": true, \"message\": \"Utente eliminato con successo\"}");
+
+            Response response = createResponse(Response.Status.REDIRECT, "text/html", "{\"success\": true, \"message\": \"Utente eliminato con successo\"}");
+            response.addHeader("Location", "/login");
             return addNoCacheHeaders(response);
             
         } catch (EccezioniDatabase e) {
