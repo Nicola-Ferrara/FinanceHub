@@ -216,11 +216,13 @@ function setupChangePassword() {
     const cancelPasswordBtn = document.getElementById("cancelPasswordBtn");
     const passwordForm = document.getElementById("passwordForm");
     const newPasswordInput = document.getElementById("newPassword");
+    const currentPasswordInput = document.getElementById("currentPassword");
 
     // Mostra modale
     changePasswordBtn.addEventListener("click", () => {
         passwordModal.style.display = "block";
         newPasswordInput.value = "";
+        if (currentPasswordInput) currentPasswordInput.value = "";
         resetPasswordRequirements();
     });
 
@@ -235,7 +237,60 @@ function setupChangePassword() {
     function closeModal() {
         passwordModal.style.display = "none";
         newPasswordInput.value = "";
+        if (currentPasswordInput) currentPasswordInput.value = "";
         resetPasswordRequirements();
+    }
+
+    // Occhio per password attuale
+    const toggleCurrentPassword = document.getElementById("toggleCurrentPassword");
+    const eyeIconCurrentPassword = document.getElementById("eyeIconCurrentPassword");
+    if (toggleCurrentPassword && currentPasswordInput && eyeIconCurrentPassword) {
+        toggleCurrentPassword.addEventListener("click", function() {
+            const isPassword = currentPasswordInput.getAttribute("type") === "password";
+            currentPasswordInput.setAttribute("type", isPassword ? "text" : "password");
+            if (isPassword) {
+                eyeIconCurrentPassword.innerHTML = `
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94l.94.94A15.85 15.85 0 0 0 3.59 12s3.14 7 8.41 7a9.26 9.26 0 0 0 5.94-2.07l1 1Z"></path>
+                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19l-.98-.98A16.5 16.5 0 0 0 22.14 12S19 5 12 5c-.69 0-1.36.07-2 .24l-1.1-1Z"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                `;
+            } else {
+                eyeIconCurrentPassword.innerHTML = `
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                `;
+            }
+            this.style.transform = "scale(0.95)";
+            setTimeout(() => {
+                this.style.transform = "scale(1)";
+            }, 150);
+        });
+    }
+
+    // Occhio per nuova password (già presente)
+    const toggleNewPassword = document.getElementById("toggleNewPassword");
+    const eyeIconNewPassword = document.getElementById("eyeIconNewPassword");
+    if (toggleNewPassword && newPasswordInput && eyeIconNewPassword) {
+        toggleNewPassword.addEventListener("click", function() {
+            const isPassword = newPasswordInput.getAttribute("type") === "password";
+            newPasswordInput.setAttribute("type", isPassword ? "text" : "password");
+            if (isPassword) {
+                eyeIconNewPassword.innerHTML = `
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94l.94.94A15.85 15.85 0 0 0 3.59 12s3.14 7 8.41 7a9.26 9.26 0 0 0 5.94-2.07l1 1Z"></path>
+                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19l-.98-.98A16.5 16.5 0 0 0 22.14 12S19 5 12 5c-.69 0-1.36.07-2 .24l-1.1-1Z"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                `;
+            } else {
+                eyeIconNewPassword.innerHTML = `
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                `;
+            }
+            this.style.transform = "scale(0.95)";
+            setTimeout(() => {
+                this.style.transform = "scale(1)";
+            }, 150);
+        });
     }
 
     // Controllo requisiti password in tempo reale
@@ -291,8 +346,13 @@ function setupChangePassword() {
     passwordForm.addEventListener("submit", async function(event) {
         event.preventDefault();
         const password = newPasswordInput.value.trim();
+        const currentPassword = currentPasswordInput ? currentPasswordInput.value.trim() : "";
 
         // Validazione
+        if (!currentPassword) {
+            showNotification("Inserisci la password attuale", "error");
+            return;
+        }
         if (password.length < 6 || password.length > 30) {
             showNotification("La password deve essere tra 6 e 30 caratteri", "error");
             return;
@@ -306,7 +366,7 @@ function setupChangePassword() {
             const response = await fetch("/api/profilo-password", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ password })
+                body: JSON.stringify({ currentPassword, password })
             });
 
             // Gestione robusta della risposta
@@ -326,34 +386,3 @@ function setupChangePassword() {
         }
     });
 }
-
-document.addEventListener("DOMContentLoaded", function() {
-    const toggleNewPassword = document.getElementById("toggleNewPassword");
-    const newPasswordInput = document.getElementById("newPassword");
-    const eyeIconNewPassword = document.getElementById("eyeIconNewPassword");
-
-    if (toggleNewPassword && newPasswordInput && eyeIconNewPassword) {
-        toggleNewPassword.addEventListener("click", function() {
-            const isPassword = newPasswordInput.getAttribute("type") === "password";
-            newPasswordInput.setAttribute("type", isPassword ? "text" : "password");
-
-            if (isPassword) {
-                eyeIconNewPassword.innerHTML = `
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94l.94.94A15.85 15.85 0 0 0 3.59 12s3.14 7 8.41 7a9.26 9.26 0 0 0 5.94-2.07l1 1Z"></path>
-                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19l-.98-.98A16.5 16.5 0 0 0 22.14 12S19 5 12 5c-.69 0-1.36.07-2 .24l-1.1-1Z"></path>
-                    <line x1="1" y1="1" x2="23" y2="23"></line>
-                `;
-            } else {
-                eyeIconNewPassword.innerHTML = `
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                `;
-            }
-
-            this.style.transform = "scale(0.95)";
-            setTimeout(() => {
-                this.style.transform = "scale(1)";
-            }, 150);
-        });
-    }
-});

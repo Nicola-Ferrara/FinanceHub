@@ -635,6 +635,10 @@ body {
     stroke-width: 2;
 }
 
+#passwordModal .form-group + .form-group {
+    margin-top: 22px; /* Puoi aumentare o diminuire a piacere */
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .main-content {

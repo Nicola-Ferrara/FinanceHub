@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.time.LocalDate;
+import org.mindrot.jbcrypt.BCrypt;
 
 import exception.*;
 import web_server.*;
@@ -660,6 +661,10 @@ public class Controller {
         } catch (EccezioniDatabase e) {
             throw e;
         }
+    }
+
+    public boolean checkPassword(String password) {
+        return BCrypt.checkpw(password, utente.getPassword());
     }
 
     public static void main(String[] args) {

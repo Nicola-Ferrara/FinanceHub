@@ -125,6 +125,18 @@
             <div class="modal-body">
                 <form id="passwordForm" novalidate>
                     <div class="form-group">
+                        <label for="currentPassword">Password Attuale</label>
+                        <div class="password-container">
+                            <input type="password" id="currentPassword" required autocomplete="current-password" placeholder="Password attuale">
+                            <button type="button" id="toggleCurrentPassword" class="toggle-password">
+                                <svg id="eyeIconCurrentPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label for="newPassword">Nuova Password</label>
                         <div class="password-container">
                             <input type="password" id="newPassword" required autocomplete="new-password" placeholder="Nuova password">

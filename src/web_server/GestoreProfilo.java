@@ -284,8 +284,18 @@ public class GestoreProfilo extends BaseGestorePagina {
             }
             
             // Parse JSON
+            String currentPassword = extractStringFromJson(body, "currentPassword");
             String password = extractStringFromJson(body, "password");
             
+            // Validazione password attuale
+            if (currentPassword == null || currentPassword.trim().isEmpty()) {
+                return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                    "{\"error\": \"La password attuale è obbligatoria\"}");
+            }
+            if (!controller.checkPassword(currentPassword)) {
+                return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                    "{\"error\": \"La password attuale non è corretta\"}");
+            }
             // Validazione password
             if (password == null || password.trim().isEmpty()) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
