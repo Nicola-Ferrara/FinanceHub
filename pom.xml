@@ -34,7 +34,6 @@
         <resources>
             <resource>
                 <directory>sito</directory>
-                <targetPath>static</targetPath>
             </resource>
             <resource>
                 <directory>src</directory>
