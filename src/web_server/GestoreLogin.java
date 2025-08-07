@@ -24,6 +24,9 @@ public class GestoreLogin extends BaseGestorePagina {
     public Response handle(IHTTPSession session) throws Exception {
         if (session.getMethod() == Method.GET) {
             return serveLoginPage();
+        } else if (session.getMethod() == Method.HEAD) {
+            Response response = createResponse(Response.Status.OK, "text/html", "");
+            return addNoCacheHeaders(response);
         } else if (session.getMethod() == Method.POST) {
             return handleLoginAttempt(session);
         }
