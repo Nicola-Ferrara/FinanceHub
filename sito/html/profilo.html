@@ -126,7 +126,15 @@
                 <form id="passwordForm" novalidate>
                     <div class="form-group">
                         <label for="newPassword">Nuova Password</label>
-                        <input type="password" id="newPassword" required autocomplete="new-password" placeholder="Nuova password">
+                        <div class="password-container">
+                            <input type="password" id="newPassword" required autocomplete="new-password" placeholder="Nuova password">
+                            <button type="button" id="toggleNewPassword" class="toggle-password">
+                                <svg id="eyeIconNewPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
                         <div class="password-requirements" id="passwordRequirements">
                             <div class="requirement" id="req-length-pw">
                                 <span class="requirement-icon">⚪</span>
