@@ -70,26 +70,21 @@ public class Controller {
             if (daoFactory.getUtenteDAO().esistenzaUtente(email)) {
                 return false;
             }
-            utente = new Utente(nome, cognome, email, password, telefono, LocalDate.now(), null, null);
-            daoFactory.getUtenteDAO().saveUtente(utente);
+            Utente nuovoUtente = new Utente(nome, cognome, email, password, telefono, LocalDate.now(), null, null);
+            daoFactory.getUtenteDAO().saveUtente(nuovoUtente);
         } catch (EccezioniDatabase e) {
-            if (e.getMessage().contains("23505")) {
-                return false;
-            }
             throw e;
         }
-        setCategorieBase();
+        setCategorieBase(email);
         return true;
     }
 
-    public void setCategorieBase() throws EccezioniDatabase {
+    public void setCategorieBase(String email) throws EccezioniDatabase {
         try {
             Categoria categoria1 = new Categoria(daoFactory.getCategoriaDAO().newID(), "Guadagno", Categoria.TipoCategoria.Guadagno);
-            daoFactory.getCategoriaDAO().saveCategoria(categoria1, utente.getEmail());
-            utente.addCategoria(categoria1);
+            daoFactory.getCategoriaDAO().saveCategoria(categoria1, email);
             Categoria categoria2 = new Categoria(daoFactory.getCategoriaDAO().newID(), "Spesa", Categoria.TipoCategoria.Spesa);
-            daoFactory.getCategoriaDAO().saveCategoria(categoria2, utente.getEmail());
-            utente.addCategoria(categoria2);
+            daoFactory.getCategoriaDAO().saveCategoria(categoria2, email);
         } catch (EccezioniDatabase e) {
             throw e;
         }

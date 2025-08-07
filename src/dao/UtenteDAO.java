@@ -1,6 +1,7 @@
 package dao;
 
 import java.sql.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 import dto.Utente;
 import exception.EccezioniDatabase;
@@ -12,13 +13,15 @@ public class UtenteDAO {
 
     public Utente getUtente(String email, String password) throws EccezioniDatabase {
         return DAOFactory.getInstance().executeWithRetry((conn) -> {
-            String sql = "SELECT * FROM Utente WHERE email = ? AND password = ?";
+            String sql = "SELECT * FROM Utente WHERE email = ?";
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setString(1, email);
-                ps.setString(2, password);
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
-                    return new Utente(rs.getString("nome"), rs.getString("cognome"), rs.getString("email"), rs.getString("password"), rs.getString("telefono"), rs.getDate("data_iscrizione").toLocalDate(), null, null);
+                    String hashedPassword = rs.getString("password");
+                    if (BCrypt.checkpw(password, hashedPassword)) {
+                        return new Utente(rs.getString("nome"), rs.getString("cognome"), rs.getString("email"), hashedPassword, rs.getString("telefono"), rs.getDate("data_iscrizione").toLocalDate(), null, null);
+                    }
                 }
                 return null;
             }
@@ -32,7 +35,8 @@ public class UtenteDAO {
                 ps.setString(1, utente.getNome());
                 ps.setString(2, utente.getCognome());
                 ps.setString(3, utente.getEmail());
-                ps.setString(4, utente.getPassword());
+                String hashedPassword = BCrypt.hashpw(utente.getPassword(), BCrypt.gensalt());
+                ps.setString(4, hashedPassword);
                 ps.setString(5, utente.getNumeroTel());
                 ps.setDate(6, java.sql.Date.valueOf(utente.getDataIscrizione()));
                 ps.executeUpdate();
@@ -59,7 +63,8 @@ public class UtenteDAO {
         DAOFactory.getInstance().executeWithRetry((conn) -> {
             String sql = "UPDATE Utente SET password = ? WHERE email = ?";
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setString(1, utente.getPassword());
+                String hashedPassword = BCrypt.hashpw(utente.getPassword(), BCrypt.gensalt());
+                ps.setString(1, hashedPassword);
                 ps.setString(2, utente.getEmail());
                 ps.executeUpdate();
                 return null;
