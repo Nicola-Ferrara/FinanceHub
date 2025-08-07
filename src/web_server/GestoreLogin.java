@@ -17,7 +17,7 @@ public class GestoreLogin extends BaseGestorePagina {
     
     @Override
     public boolean canHandle(String uri, String method) {
-        return ("/login".equals(uri) || "/".equals(uri)) && ("POST".equals(method) || "GET".equals(method));
+        return ("/login".equals(uri) || "/".equals(uri)) && ("POST".equals(method) || "GET".equals(method) || "HEAD".equals(method));
     }
     
     @Override
