@@ -94,7 +94,7 @@ function renderIncomeCategories() {
                     <p>Categoria di Guadagno</p>
                 </div>
             </div>
-            ${categoria.id !== 1 && categoria.id !== 2 ? 
+            ${categoria.nome !== "Guadagno" && categoria.nome !== "Spesa" ? 
                 '<button class="category-menu-btn" data-category-id="' + categoria.id + '" data-category-name="' + categoria.nome + '" data-category-type="Guadagno">⋮</button>' : 
                 ''
             }
@@ -130,7 +130,7 @@ function renderExpenseCategories() {
                     <p>Categoria di Spesa</p>
                 </div>
             </div>
-            ${categoria.id !== 1 && categoria.id !== 2 ? 
+            ${categoria.nome !== "Guadagno" && categoria.nome !== "Spesa" ? 
                 '<button class="category-menu-btn" data-category-id="' + categoria.id + '" data-category-name="' + categoria.nome + '" data-category-type="Spesa">⋮</button>' : 
                 ''
             }
@@ -248,7 +248,17 @@ async function handleAddCategorySubmit(event) {
         showNotification('Il nome della categoria non può superare i 20 caratteri', 'error');
         return;
     }
-    
+
+    if (categoryData.nome.toLowerCase() === 'guadagno') {
+        showNotification('Il nome della categoria non può essere "Guadagno"', 'error');
+        return;
+    }
+
+    if (categoryData.nome.toLowerCase() === 'spesa') {
+        showNotification('Il nome della categoria non può essere "Spesa"', 'error');
+        return;
+    }
+
     if (!categoryData.tipo) {
         showNotification('Seleziona il tipo di categoria', 'error');
         return;
