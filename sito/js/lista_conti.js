@@ -60,7 +60,7 @@ function setupSidebar() {
 // Funzione per recuperare tutti i conti dal server
 async function fetchConti() {
     try {
-        const response = await fetch("/api/conti-nascosti");
+        const response = await fetch("/api/conti");
         if (!response.ok) {
             throw new Error("Errore durante il recupero dei conti");
         }

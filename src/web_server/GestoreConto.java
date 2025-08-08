@@ -17,7 +17,7 @@ public class GestoreConto extends BaseGestorePagina {
     
     @Override
     public boolean canHandle(String uri, String method) {
-        return uri.startsWith("/conti") || 
+        return "/conti".equals(uri) || 
                uri.startsWith("/api/conto/") ||
                uri.startsWith("/api/categorie");
     }

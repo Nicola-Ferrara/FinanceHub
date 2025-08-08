@@ -210,38 +210,6 @@ body {
     margin: 0 auto;
 }
 
-/* Sezione Aggiungi Conto */
-.add-account-section {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.add-account-btn {
-    padding: 15px 30px;
-    background: linear-gradient(135deg, #28a745, #20c997);
-    color: white;
-    border: none;
-    border-radius: 15px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.add-account-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
-}
-
-.add-icon {
-    font-size: 20px;
-    font-weight: bold;
-}
-
 /* Sezione Conti */
 .accounts-section {
     background: white;

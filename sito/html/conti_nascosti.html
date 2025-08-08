@@ -30,6 +30,10 @@
                 <span class="sidebar-icon">📊</span>
                 <span>Bilanci</span>
             </a>
+            <a href="/lista_conti" class="sidebar-link">
+                <span class="sidebar-icon">🏦</span>
+                <span>Conti</span>
+            </a>
             <a href="/operazioni" class="sidebar-link">
                 <span class="sidebar-icon">📈</span>
                 <span>Operazioni</span>
@@ -61,7 +65,7 @@
                 <span></span>
                 <span></span>
             </button>
-            <h1>I tuoi conti</h1>
+            <h1>I tuoi conti nascosti</h1>
         </div>
         <div class="nav-links">
             <a href="/home" class="nav-link">🏠 Home</a>
@@ -72,14 +76,6 @@
     </header>
 
     <main class="main-content">
-        <!-- Sezione Aggiungi Conto -->
-        <section class="add-account-section">
-            <button id="addAccountBtn" class="add-account-btn">
-                <span class="add-icon">+</span>
-                Aggiungi Nuovo Conto
-            </button>
-        </section>
-
         <!-- Lista Conti -->
         <section class="accounts-section">
             <div class="accounts-grid" id="accountsGrid">
@@ -89,8 +85,8 @@
             <!-- Messaggio vuoto -->
             <div id="emptyMessage" class="empty-message" style="display: none;">
                 <div class="empty-icon">🏦</div>
-                <h3>Nessun conto disponibile</h3>
-                <p>Aggiungi il tuo primo conto per iniziare a gestire le tue finanze!</p>
+                <h3>Nessun conto nascosto</h3>
+                <p>I conti nascosti verranno mostrati in questa pagina!</p>
             </div>
         </section>
     </main>
