@@ -734,7 +734,11 @@ async function loadDestinationAccounts() {
             conti.forEach(conto => {
                 const option = document.createElement('option');
                 option.value = conto.id;
-                option.textContent = `${conto.nome} (${conto.tipo}) - €${conto.saldo.toFixed(2)}`;
+                if (conto.visibilita === `true`) {
+                    option.textContent = `${conto.nome} (${conto.tipo}) - €${conto.saldo.toFixed(2)}`;
+                } else {
+                    option.textContent = `${conto.nome} (${conto.tipo}) - € ******`;
+                }
                 destinationSelect.appendChild(option);
             });
         }

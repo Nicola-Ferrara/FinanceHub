@@ -458,8 +458,8 @@ public class GestoreConto extends BaseGestorePagina {
                 for (int i = 0; i < contiDisponibili.size(); i++) {
                     Conto conto = contiDisponibili.get(i);
                     jsonBuilder.append(String.format(java.util.Locale.US,
-                        "{\"id\": %d, \"nome\": \"%s\", \"tipo\": \"%s\", \"saldo\": %.2f}",
-                        conto.getID(), conto.getNome(), conto.getTipo(), conto.getSaldo_attuale()));
+                        "{\"id\": %d, \"nome\": \"%s\", \"tipo\": \"%s\", \"saldo\": %.2f, \"visibilita\": \"%s\"}",
+                        conto.getID(), conto.getNome(), conto.getTipo(), conto.getSaldo_attuale(), conto.getVisibilità() ? "true" : "false"));
                     
                     if (i < contiDisponibili.size() - 1) {
                         jsonBuilder.append(",");
