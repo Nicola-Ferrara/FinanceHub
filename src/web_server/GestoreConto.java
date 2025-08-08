@@ -110,13 +110,14 @@ public class GestoreConto extends BaseGestorePagina {
                 String nome = extractJsonValue(body, "nome");
                 String tipo = extractJsonValue(body, "tipo");
                 String saldoInizialeStr = extractJsonValueNumber(body, "saldo_iniziale");
-                
-                if (nome == null || tipo == null || saldoInizialeStr == null) {
+                String visibilitàStr = extractJsonValue(body, "visibilita");
+
+                if (nome == null || tipo == null || saldoInizialeStr == null || visibilitàStr == null) {
                     return createResponse(Response.Status.BAD_REQUEST, "application/json", "{\"error\": \"Nome, tipo e saldo iniziale sono obbligatori\"}");
                 }
                 double saldoIniziale = Double.parseDouble(saldoInizialeStr);
-                
-                controller.modificaConto(contoId, nome, tipo, saldoIniziale);
+                boolean visibilità = Boolean.parseBoolean(visibilitàStr);
+                controller.modificaConto(contoId, nome, tipo, saldoIniziale, visibilità);
                 
                 return createResponse(Response.Status.OK, "application/json", "{\"success\": true, \"message\": \"Conto modificato con successo\"}");
             }
@@ -198,8 +199,8 @@ public class GestoreConto extends BaseGestorePagina {
             }
             
             String json = String.format(java.util.Locale.US,
-                "{\"id\": %d, \"nome\": \"%s\", \"tipo\": \"%s\", \"saldo\": %.2f, \"saldo_iniziale\": %.2f}",
-                conto.getID(), conto.getNome(), conto.getTipo(), conto.getSaldo_attuale(), conto.getSaldo_iniziale());
+                "{\"id\": %d, \"nome\": \"%s\", \"tipo\": \"%s\", \"saldo\": %.2f, \"saldo_iniziale\": %.2f, \"visibilita\": %s}",
+                conto.getID(), conto.getNome(), conto.getTipo(), conto.getSaldo_attuale(), conto.getSaldo_iniziale(), conto.getVisibilità() ? "true" : "false");
             
             Response response = createResponse(Response.Status.OK, "application/json", json);
             return addNoCacheHeaders(response);

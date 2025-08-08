@@ -120,7 +120,8 @@ async function handleFormSubmit(event) {
     const accountData = {
         nome: formData.get('nome').trim(),
         tipo: formData.get('tipo'),
-        saldo: parseFloat(formData.get('saldo'))
+        saldo: parseFloat(formData.get('saldo')),
+        visibilita: document.getElementById('visibilita').checked.toString()
     };
     
     // ✅ VALIDAZIONI PERSONALIZZATE IDENTICHE

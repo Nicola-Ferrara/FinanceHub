@@ -61,15 +61,17 @@ public class GestoreAggiungiConto extends BaseGestorePagina {
             String nome = extractJsonValue(requestBody, "nome");
             String tipo = extractJsonValue(requestBody, "tipo");
             String saldoStr = extractJsonValue(requestBody, "saldo");
+            String visibilitàStr = extractJsonValue(requestBody, "visibilita");
             
-            if (nome == null || tipo == null || saldoStr == null) {
+            if (nome == null || tipo == null || saldoStr == null || visibilitàStr == null) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"Dati mancanti\"}");
             }
             
             double saldo = Double.parseDouble(saldoStr);
+            boolean visibilità = Boolean.parseBoolean(visibilitàStr);
             
-            controller.aggiungiConto(nome, tipo, saldo);
+            controller.aggiungiConto(nome, tipo, saldo, visibilità);
             
             return createResponse(Response.Status.OK, "application/json", 
                 "{\"success\": true, \"message\": \"Conto aggiunto con successo\"}");

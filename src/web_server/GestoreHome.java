@@ -83,7 +83,7 @@ public class GestoreHome extends BaseGestorePagina {
     
     private Response handleAccounts() {
         try {
-            List<Conto> conti = controller.getConti();
+            List<Conto> conti = controller.getContiVisibili();
             
             StringBuilder jsonBuilder = new StringBuilder("[");
             for (int i = 0; i < conti.size(); i++) {

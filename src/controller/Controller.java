@@ -155,6 +155,26 @@ public class Controller {
         return conti;
     }
 
+    public LinkedList<Conto> getContiVisibili() {
+        LinkedList<Conto> conti = new LinkedList<>();
+        for (Conto conto : utente.getConti()) {
+            if (conto.getVisibilità()) {
+                conti.add(conto);
+            }
+        }
+        return conti;
+    }
+
+    public LinkedList<Conto> getContiNonVisibili() {
+        LinkedList<Conto> conti = new LinkedList<>();
+        for (Conto conto : utente.getConti()) {
+            if (!conto.getVisibilità()) {
+                conti.add(conto);
+            }
+        }
+        return conti;
+    }
+
     public LinkedList<Conto> getTuttiConti() {
         return utente.getConti();
     }
@@ -248,12 +268,13 @@ public class Controller {
         return operazioni.toArray(new Operazione[0]);
     }
 
-    public void modificaConto(int id, String nome, String tipo, double saldo_iniziale) throws EccezioniDatabase {
+    public void modificaConto(int id, String nome, String tipo, double saldo_iniziale, boolean visibilità) throws EccezioniDatabase {
         for (Conto conto : utente.getConti()) {
             if (conto.getID() == id) {
                 conto.setNome(nome);
                 conto.setTipo(tipo);
                 conto.setSaldo_iniziale(saldo_iniziale);
+                conto.setVisibilità(visibilità);
                 conto.ricalcolaSaldo();
                 try {
                     daoFactory.getContoDAO().updateConto(conto);
@@ -265,10 +286,10 @@ public class Controller {
         }
     }
 
-    public void aggiungiConto(String nome, String tipo, double saldo) throws EccezioniDatabase {
+    public void aggiungiConto(String nome, String tipo, double saldo, boolean visibilità) throws EccezioniDatabase {
         try {
             int id = daoFactory.getContoDAO().newID();
-            Conto nuovoConto = new Conto(id, nome, tipo, saldo, null, null);
+            Conto nuovoConto = new Conto(id, nome, tipo, saldo, visibilità, null, null);
             daoFactory.getContoDAO().saveConto(nuovoConto, utente.getEmail());
             utente.addConto(nuovoConto);
         } catch (EccezioniDatabase e) {
