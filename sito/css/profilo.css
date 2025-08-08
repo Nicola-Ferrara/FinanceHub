@@ -809,4 +809,17 @@ body {
         padding: 14px 0;
         font-size: 16px;
     }
+
+    .hidden-accounts-link {
+        min-width: 0;
+        width: 97%;
+        box-sizing: border-box;
+        padding: 14px 0 !important;
+        font-size: 16px !important;
+        background: linear-gradient(135deg, #667eea, #764ba2) !important;
+        border-radius: 25px !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08) !important;
+        margin-top: 10px;
+    }
+
 }
