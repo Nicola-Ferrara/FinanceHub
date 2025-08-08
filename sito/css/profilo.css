@@ -358,6 +358,12 @@ body {
     background: linear-gradient(135deg, #ee5253, #ff6b6b);
 }
 
+.btn-primary:hover,
+.btn-secondary:hover,
+.btn-danger:hover {
+    transform: translateY(-2px) scale(1.04);
+}
+
 .delete-account-btn {
     background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
     color: white;
@@ -637,6 +643,57 @@ body {
 
 #passwordModal .form-group + .form-group {
     margin-top: 22px; /* Puoi aumentare o diminuire a piacere */
+}
+
+.hidden-accounts-section.profile-section {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 0;
+    box-sizing: border-box;
+}
+
+.hidden-accounts-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.hidden-accounts-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 300;
+    margin-bottom: 30px;
+    color: #333;
+    width: 100%;
+}
+
+.hidden-accounts-section {
+    margin: 40px auto 0 auto;
+    display: flex;
+    justify-content: center;
+}
+
+.hidden-accounts-link {
+    display: inline-block;
+    padding: 16px 32px;
+    font-size: 17px;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.08);
+    transition: background 0.3s, transform 0.2s;
+    margin-top: 10px;
+}
+
+.hidden-accounts-link:hover {
+    background: linear-gradient(135deg, #5a67d8, #6b46c1);
+    transform: translateY(-2px) scale(1.04);
 }
 
 /* Responsive */

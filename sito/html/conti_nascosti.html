@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanceHub - Lista Conti</title>
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <link rel="stylesheet" href="../css/conti_nascosti.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="../js/conti_nascosti.js" defer></script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h3>Menu</h3>
+            <button id="closeSidebar" class="close-sidebar">&times;</button>
+        </div>
+        <div class="sidebar-content">
+            <a href="/home" class="sidebar-link">
+                <span class="sidebar-icon">🏠</span>
+                <span>Home</span>
+            </a>
+            <a href="/bilanci" class="sidebar-link">
+                <span class="sidebar-icon">📊</span>
+                <span>Bilanci</span>
+            </a>
+            <a href="/operazioni" class="sidebar-link">
+                <span class="sidebar-icon">📈</span>
+                <span>Operazioni</span>
+            </a>
+            <a href="/categorie" class="sidebar-link">
+                <span class="sidebar-icon">📂</span>
+                <span>Categorie</span>
+            </a>
+            <div class="sidebar-divider"></div>
+            <a href="/profilo" class="sidebar-link">
+                <span class="sidebar-icon">🧑🏻</span>
+                <span>Profilo</span>
+            </a>
+            <a href="/logout" class="sidebar-link logout">
+                <span class="sidebar-icon">🚪</span>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Overlay per chiudere sidebar -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <button id="hamburgerMenu" class="hamburger-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <h1>I tuoi conti</h1>
+        </div>
+        <div class="nav-links">
+            <a href="/home" class="nav-link">🏠 Home</a>
+            <form action="/logout" method="get" style="display: inline;">
+                <button type="submit" class="logout-button">Logout</button>
+            </form>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Sezione Aggiungi Conto -->
+        <section class="add-account-section">
+            <button id="addAccountBtn" class="add-account-btn">
+                <span class="add-icon">+</span>
+                Aggiungi Nuovo Conto
+            </button>
+        </section>
+
+        <!-- Lista Conti -->
+        <section class="accounts-section">
+            <div class="accounts-grid" id="accountsGrid">
+                <!-- I conti verranno caricati dinamicamente -->
+            </div>
+            
+            <!-- Messaggio vuoto -->
+            <div id="emptyMessage" class="empty-message" style="display: none;">
+                <div class="empty-icon">🏦</div>
+                <h3>Nessun conto disponibile</h3>
+                <p>Aggiungi il tuo primo conto per iniziare a gestire le tue finanze!</p>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

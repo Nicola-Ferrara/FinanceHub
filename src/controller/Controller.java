@@ -165,7 +165,7 @@ public class Controller {
         return conti;
     }
 
-    public LinkedList<Conto> getContiNonVisibili() {
+    public LinkedList<Conto> getContiNascosti() {
         LinkedList<Conto> conti = new LinkedList<>();
         for (Conto conto : utente.getConti()) {
             if (!conto.getVisibilità()) {

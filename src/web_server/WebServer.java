@@ -12,7 +12,6 @@ public class WebServer extends NanoHTTPD {
     private List<GestorePagina> gestori;
 
     public WebServer(Controller controller) throws IOException {
-        // ✅ LEGGI LA PORTA DALL'AMBIENTE (Render usa PORT)
         super(Integer.parseInt(System.getenv().getOrDefault("PORT", "8080")));
         
         // Registra i gestori
@@ -29,7 +28,8 @@ public class WebServer extends NanoHTTPD {
         this.gestori.add(new GestoreTransazione(controller));
         this.gestori.add(new GestoreTrasferimento(controller));
         this.gestori.add(new GestoreProfilo(controller));
-        
+        this.gestori.add(new GestoreContiNascosti(controller));
+
         start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
         int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
         System.out.println("FinanceHub Server avviato su porta: " + port);
