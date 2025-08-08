@@ -21,7 +21,8 @@ public class GestoreProfilo extends BaseGestorePagina {
     public boolean canHandle(String uri, String method) {
         return "/profilo".equals(uri) 
             || "/api/profilo".equals(uri)
-            || "/api/profilo-password".equals(uri);
+            || "/api/profilo-password".equals(uri)
+            || "/api/verifica-password".equals(uri);
     }
 
     @Override
@@ -45,6 +46,8 @@ public class GestoreProfilo extends BaseGestorePagina {
             }
         } else if ("/api/profilo-password".equals(uri) && method == Method.PUT) {
             return handleUpdateProfiloPassword(session);
+        } else if ("/api/verifica-password".equals(uri) && method == Method.POST) {
+            return handleVerificaPassword(session);
         }
         
         return createResponse(Response.Status.NOT_FOUND, "text/plain", "Risorsa non trovata");
@@ -324,6 +327,65 @@ public class GestoreProfilo extends BaseGestorePagina {
             e.printStackTrace();
             return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
                 "{\"error\": \"Errore durante la modifica della password: " + escapeJson(e.getMessage()) + "\"}");
+        }
+    }
+
+    private Response handleVerificaPassword(IHTTPSession session) {
+        try {
+            if (!controller.isUtenteLogged()) {
+                return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
+                    "{\"success\": false, \"error\": \"Utente non autorizzato\"}");
+            }
+
+            // Leggi il body della richiesta
+            String body = null;
+            try {
+                String contentLengthHeader = session.getHeaders().get("content-length");
+                int contentLength = 0;
+                if (contentLengthHeader != null) {
+                    contentLength = Integer.parseInt(contentLengthHeader);
+                }
+                if (contentLength > 0) {
+                    java.io.InputStream inputStream = session.getInputStream();
+                    byte[] buffer = new byte[contentLength];
+                    int totalBytesRead = 0;
+                    while (totalBytesRead < contentLength) {
+                        int bytesRead = inputStream.read(buffer, totalBytesRead, contentLength - totalBytesRead);
+                        if (bytesRead == -1) break;
+                        totalBytesRead += bytesRead;
+                    }
+                    body = new String(buffer, 0, totalBytesRead, "UTF-8");
+                } else {
+                    Map<String, String> files = new java.util.HashMap<>();
+                    session.parseBody(files);
+                    body = files.get("postData");
+                }
+            } catch (Exception e) {
+                // Ignora errori di lettura e continua
+            }
+
+            if (body == null || body.trim().isEmpty()) {
+                return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                    "{\"success\": false, \"error\": \"Dati mancanti\"}");
+            }
+
+            String password = extractStringFromJson(body, "password");
+            if (password == null || password.trim().isEmpty()) {
+                return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                    "{\"success\": false, \"error\": \"Password mancante\"}");
+            }
+
+            if (controller.checkPassword(password)) {
+                controller.setVisibilità(true);
+                return createResponse(Response.Status.OK, "application/json", "{\"success\": true}");
+            } else {
+                return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
+                    "{\"success\": false, \"error\": \"Password errata\"}");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
+                "{\"success\": false, \"error\": \"Errore durante la verifica della password\"}");
         }
     }
 

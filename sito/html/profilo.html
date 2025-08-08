@@ -95,9 +95,9 @@
         <section class="hidden-accounts-section profile-section">
             <div class="hidden-accounts-content">
                 <h2 class="hidden-accounts-title">Conti Nascosti</h2>
-                <a href="/conti_nascosti" class="btn-primary hidden-accounts-link">
-                    🔒 Conti nascosti
-                </a>
+                <button type="button" id="openHiddenAccountsModal" class="btn-primary hidden-accounts-link">
+                    🔒 Accedi ai conti nascosti
+                </button>
             </div>
         </section>
     </main>
@@ -114,6 +114,18 @@
                     <div class="delete-icon">🗑️</div>
                     <h3>Sei sicuro di voler eliminare questo account?</h3>
                     <p>Questa azione è <strong>irreversibile</strong>.</p>
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label for="deletePassword">Password</label>
+                        <div class="password-container">
+                            <input type="password" id="deletePassword" required autocomplete="current-password" placeholder="Inserisci la password">
+                            <button type="button" id="toggleDeletePassword" class="toggle-password">
+                                <svg id="eyeIconDeletePassword" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -177,6 +189,36 @@
                     <div class="modal-footer">
                         <button type="button" class="btn-secondary" id="cancelPasswordBtn">Annulla</button>
                         <button type="submit" class="btn-primary">Salva</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale Accesso Conti Nascosti -->
+    <div id="hiddenAccountsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Accedi ai Conti Nascosti</h2>
+                <span class="close" id="closeHiddenAccountsModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="hiddenAccountsForm" novalidate>
+                    <div class="form-group">
+                        <label for="hiddenAccountsPassword">Password</label>
+                        <div class="password-container">
+                            <input type="password" id="hiddenAccountsPassword" required autocomplete="current-password" placeholder="Inserisci la password">
+                            <button type="button" id="toggleHiddenAccountsPassword" class="toggle-password">
+                                <svg id="eyeIconHiddenAccountsPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" id="cancelHiddenAccountsBtn">Annulla</button>
+                        <button type="submit" class="btn-primary">Accedi</button>
                     </div>
                 </form>
             </div>

@@ -102,14 +102,29 @@ function setupDeleteAccount() {
 
     // Conferma eliminazione
     confirmDeleteBtn.addEventListener("click", async function() {
+        const deletePasswordInput = document.getElementById("deletePassword");
+        const password = deletePasswordInput ? deletePasswordInput.value.trim() : "";
+        if (!password) {
+            showNotification("Inserisci la password per eliminare l'account", "error");
+            return;
+        }
         try {
             confirmDeleteBtn.disabled = true;
             confirmDeleteBtn.textContent = "Eliminazione...";
+            // Verifica password prima di eliminare
+            const verifyResponse = await fetch("/api/verifica-password", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ password })
+            });
+            const verifyResult = await verifyResponse.json();
+            if (!verifyResponse.ok || !verifyResult.success) {
+                throw new Error(verifyResult.error || "Password errata");
+            }
+            // Se la password è corretta, elimina l'account
             const response = await fetch("/api/profilo", {
                 method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json"
-                }
+                headers: { "Content-Type": "application/json" }
             });
             if (!response.ok) {
                 const result = await response.json();
@@ -122,11 +137,21 @@ function setupDeleteAccount() {
         } finally {
             confirmDeleteBtn.disabled = false;
             confirmDeleteBtn.textContent = "Elimina";
+            if (deletePasswordInput) deletePasswordInput.value = "";
         }
     });
 
     function closeDeleteModal() {
         deleteModal.style.display = "none";
+    }
+
+    const toggleDeletePassword = document.getElementById("toggleDeletePassword");
+    const deletePasswordInput = document.getElementById("deletePassword");
+    if (toggleDeletePassword && deletePasswordInput) {
+        toggleDeletePassword.addEventListener("click", function() {
+            const isPassword = deletePasswordInput.getAttribute("type") === "password";
+            deletePasswordInput.setAttribute("type", isPassword ? "text" : "password");
+        });
     }
 }
 
@@ -386,3 +411,74 @@ function setupChangePassword() {
         }
     });
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    // ...già presente...
+
+    // Gestione modale conti nascosti
+    const openHiddenAccountsModalBtn = document.getElementById("openHiddenAccountsModal");
+    const hiddenAccountsModal = document.getElementById("hiddenAccountsModal");
+    const closeHiddenAccountsModal = document.getElementById("closeHiddenAccountsModal");
+    const cancelHiddenAccountsBtn = document.getElementById("cancelHiddenAccountsBtn");
+    const hiddenAccountsForm = document.getElementById("hiddenAccountsForm");
+    const hiddenAccountsPassword = document.getElementById("hiddenAccountsPassword");
+    const toggleHiddenAccountsPassword = document.getElementById("toggleHiddenAccountsPassword");
+    const eyeIconHiddenAccountsPassword = document.getElementById("eyeIconHiddenAccountsPassword");
+
+    if (openHiddenAccountsModalBtn) {
+        openHiddenAccountsModalBtn.addEventListener("click", function() {
+            hiddenAccountsModal.style.display = "block";
+            hiddenAccountsPassword.value = "";
+        });
+    }
+    if (closeHiddenAccountsModal) {
+        closeHiddenAccountsModal.addEventListener("click", closeModal);
+    }
+    if (cancelHiddenAccountsBtn) {
+        cancelHiddenAccountsBtn.addEventListener("click", closeModal);
+    }
+    window.addEventListener("click", function(event) {
+        if (event.target === hiddenAccountsModal) closeModal();
+    });
+    function closeModal() {
+        hiddenAccountsModal.style.display = "none";
+        hiddenAccountsPassword.value = "";
+    }
+
+    // Mostra/nascondi password
+    if (toggleHiddenAccountsPassword && hiddenAccountsPassword && eyeIconHiddenAccountsPassword) {
+        toggleHiddenAccountsPassword.addEventListener("click", function() {
+            const isPassword = hiddenAccountsPassword.getAttribute("type") === "password";
+            hiddenAccountsPassword.setAttribute("type", isPassword ? "text" : "password");
+            // Cambia icona se vuoi
+        });
+    }
+
+    // Gestione submit form
+    if (hiddenAccountsForm) {
+        hiddenAccountsForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const password = hiddenAccountsPassword.value.trim();
+            if (!password) {
+                showNotification("Inserisci la password", "error");
+                return;
+            }
+            // Chiamata API per verifica password
+            try {
+                const response = await fetch("/api/verifica-password", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ password })
+                });
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    throw new Error(result.error || "Password errata");
+                }
+                // Password corretta, vai alla pagina conti nascosti
+                window.location.href = "/conti_nascosti";
+            } catch (error) {
+                showNotification(error.message, "error");
+            }
+        });
+    }
+});

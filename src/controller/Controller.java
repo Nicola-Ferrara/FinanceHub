@@ -18,10 +18,12 @@ public class Controller {
     // Attributi
     private DAOFactory daoFactory;
     private Utente utente;
+    private boolean contiNascostiVisibility;
 
     // Costruttore
     public Controller() {
         this.daoFactory = DAOFactory.getInstance();
+        this.contiNascostiVisibility = false;
     }
 
     public boolean effettuaLogin(String email, String password) throws EccezioniDatabase {
@@ -686,6 +688,14 @@ public class Controller {
 
     public boolean checkPassword(String password) {
         return BCrypt.checkpw(password, utente.getPassword());
+    }
+
+    public boolean getVisibilità() {
+        return contiNascostiVisibility;
+    }
+
+    public void setVisibilità(boolean visibilità) {
+        this.contiNascostiVisibility = visibilità;
     }
 
     public static void main(String[] args) {

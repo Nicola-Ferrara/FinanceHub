@@ -42,11 +42,18 @@ public class GestoreContiNascosti extends BaseGestorePagina {
             response.addHeader("Location", "/login");
             return addNoCacheHeaders(response);
         }
+        if (!controller.getVisibilità()) {
+            // Se l'utente ha già autorizzato la visibilità dei conti nascosti, reindirizza alla pagina dei conti nascosti
+            Response response = createResponse(Response.Status.REDIRECT, "text/html", "");
+            response.addHeader("Location", "/home");
+            return addNoCacheHeaders(response);
+        }
         
         try {
             // Carica il file HTML
             String filePath = "./sito/html/conti_nascosti.html";
             String content = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(filePath)));
+            controller.setVisibilità(false);
             
             Response response = createResponse(Response.Status.OK, "text/html", content);
             return addNoCacheHeaders(response);
