@@ -1,0 +1,214 @@
+/* Stile generale */
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color: #333;
+    min-height: 100vh;
+}
+
+/* Main content */
+.main-content {
+    padding: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Sezione Aggiungi Conto */
+.add-account-section {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.add-account-btn {
+    padding: 15px 30px;
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.add-account-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.add-icon {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Sezione Conti */
+.accounts-section {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    min-height: 400px;
+}
+
+.accounts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* Card Conto */
+.account-card {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 25px;
+    border-left: 5px solid #667eea;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.account-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    background: #f1f3f4;
+}
+
+.account-card:active {
+    transform: translateY(-3px) scale(0.98);
+}
+
+.account-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.account-info h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.account-type {
+    font-size: 14px;
+    color: #6c757d;
+    background: #e9ecef;
+    padding: 4px 12px;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+.account-balance {
+    font-size: 24px;
+    font-weight: 600;
+    text-align: right;
+    margin-top: 20px;
+}
+
+.account-balance.positive {
+    color: #28a745;
+}
+
+.account-balance.negative {
+    color: #dc3545;
+}
+
+.account-balance.zero {
+    color: #6c757d;
+}
+
+/* Decorazione card */
+.account-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border-radius: 0 15px 0 50px;
+}
+
+.account-card::after {
+    content: '🏦';
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    opacity: 0.3;
+}
+
+/* Messaggio vuoto */
+.empty-message {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+}
+
+.empty-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-message h3 {
+    font-size: 24px;
+    font-weight: 300;
+    margin: 0 0 10px 0;
+    color: #495057;
+}
+
+.empty-message p {
+    font-size: 16px;
+    margin: 0;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .main-content {
+        padding: 20px;
+    }
+    
+    .accounts-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .account-card {
+        padding: 20px;
+    }
+    
+    .account-info h3 {
+        font-size: 18px;
+    }
+    
+    .account-balance {
+        font-size: 20px;
+    }
+    
+    .empty-icon {
+        font-size: 48px;
+    }
+    
+    .empty-message h3 {
+        font-size: 20px;
+    }
+    
+    .empty-message p {
+        font-size: 14px;
+    }
+}

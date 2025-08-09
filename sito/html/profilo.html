@@ -4,9 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profilo</title>
-    <link rel="stylesheet" href="/css/profilo.css">
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <link rel="stylesheet" href="../css/pagine/profilo.css">
+    <link rel="stylesheet" href="../css/componenti/header.css">
+    <link rel="stylesheet" href="../css/componenti/sidebar.css">
+    <link rel="stylesheet" href="../css/componenti/notifiche.css">
+    <link rel="stylesheet" href="../css/componenti/footer.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="/js/profilo.js"></script>
+
+    <script src="/js/componenti/notifiche.js"></script>
+    <script src="/js/componenti/sidebar.js"></script>
+    <script src="../js/pagine/profilo.js" defer></script>
 </head>
 <body>
     <div id="sidebarOverlay" class="sidebar-overlay"></div>
@@ -20,6 +35,7 @@
             <a href="/home" class="sidebar-link">
                 <span class="sidebar-icon">🏠</span>
                 Home
+            </a>
             <a href="/bilanci" class="sidebar-link">
                 <span class="sidebar-icon">📊</span>
                 Bilanci
@@ -101,6 +117,17 @@
             </div>
         </section>
     </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <img src="/img/Logo.png" alt="FinanceHub Logo" class="footer-logo">
+            <div class="footer-text">
+                <span class="footer-title">FinanceHub</span>
+                <span class="footer-desc">Gestione semplice e sicura delle tue finanze</span>
+            </div>
+            <span class="footer-copyright">&copy; 2025</span>
+        </div>
+    </footer>
 
     <!-- Modale Conferma Eliminazione -->
     <div id="deleteModal" class="modal">

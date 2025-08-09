@@ -10,14 +10,20 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
     <link rel="shortcut icon" href="/img/favicon.ico">
 
-    <link rel="stylesheet" href="../css/bilanci.css">
+    <link rel="stylesheet" href="../css/pagine/bilanci.css">
+    <link rel="stylesheet" href="../css/componenti/header.css">
+    <link rel="stylesheet" href="../css/componenti/sidebar.css">
+    <link rel="stylesheet" href="../css/componenti/footer.css">
+
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../js/bilanci.js" defer></script>
+    
+    <script src="/js/componenti/sidebar.js"></script>
+    <script src="../js/pagine/bilanci.js" defer></script>
 </head>
 <body>
     <!-- Sidebar -->
-    <div id="sidebar" class="sidebar">
+    <aside id="sidebar" class="sidebar">
         <div class="sidebar-header">
             <h3>Menu</h3>
             <button id="closeSidebar" class="close-sidebar">&times;</button>
@@ -49,7 +55,7 @@
                 <span>Logout</span>
             </a>
         </div>
-    </div>
+    </aside>
 
     <!-- ✅ OVERLAY AGGIUNTO -->
     <div id="sidebarOverlay" class="sidebar-overlay"></div>
@@ -151,6 +157,17 @@
             </div>
         </section>
     </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <img src="/img/Logo.png" alt="FinanceHub Logo" class="footer-logo">
+            <div class="footer-text">
+                <span class="footer-title">FinanceHub</span>
+                <span class="footer-desc">Gestione semplice e sicura delle tue finanze</span>
+            </div>
+            <span class="footer-copyright">&copy; 2025</span>
+        </div>
+    </footer>
 
     <!-- Modale dettaglio bilancio -->
     <div id="detailModal" class="modal">

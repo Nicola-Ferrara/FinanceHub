@@ -7,43 +7,6 @@ document.addEventListener("DOMContentLoaded", function() {
     setupEventListeners();
 });
 
-function setupSidebar() {
-    const hamburgerMenu = document.getElementById('hamburgerMenu');
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    const closeSidebar = document.getElementById('closeSidebar');
-    
-    // Apri sidebar
-    hamburgerMenu.addEventListener('click', function() {
-        sidebar.classList.add('open');
-        sidebarOverlay.classList.add('show');
-        document.body.style.overflow = 'hidden';
-    });
-    
-    // Chiudi sidebar con X
-    closeSidebar.addEventListener('click', function() {
-        sidebar.classList.remove('open');
-        sidebarOverlay.classList.remove('show');
-        document.body.style.overflow = '';
-    });
-    
-    // Chiudi sidebar cliccando overlay
-    sidebarOverlay.addEventListener('click', function() {
-        sidebar.classList.remove('open');
-        sidebarOverlay.classList.remove('show');
-        document.body.style.overflow = '';
-    });
-    
-    // Chiudi sidebar con ESC
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && sidebar.classList.contains('open')) {
-            sidebar.classList.remove('open');
-            sidebarOverlay.classList.remove('show');
-            document.body.style.overflow = '';
-        }
-    });
-}
-
 // Imposta i listener per gli eventi
 function setupEventListeners() {
     const form = document.getElementById('addAccountForm');
@@ -55,59 +18,6 @@ function setupEventListeners() {
     // Formattazione automatica del saldo
     const balanceInput = document.getElementById('initialBalance');
     balanceInput.addEventListener('input', formatBalance);
-}
-
-// ✅ SISTEMA NOTIFICHE IDENTICO A CONTO.JS
-function showSuccessMessage(message) {
-    showNotification(message, 'success');
-}
-
-function showErrorMessage(message) {
-    showNotification(message, 'error');
-}
-
-function showNotification(message, type) {
-    // Rimuovi notifiche precedenti
-    const existingNotifications = document.querySelectorAll('.notification');
-    existingNotifications.forEach(notif => notif.remove());
-    
-    // Crea la notifica
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <span class="notification-icon">${type === 'success' ? '✅' : '❌'}</span>
-            <span class="notification-message">${message}</span>
-            <button class="notification-close">&times;</button>
-        </div>
-    `;
-    
-    // Aggiungi al body
-    document.body.appendChild(notification);
-    
-    // Animazione di entrata
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 10);
-    
-    // Rimuovi automaticamente dopo 3 secondi
-    setTimeout(() => {
-        hideNotification(notification);
-    }, 3000);
-    
-    // Event listener per chiudere manualmente
-    notification.querySelector('.notification-close').addEventListener('click', () => {
-        hideNotification(notification);
-    });
-}
-
-function hideNotification(notification) {
-    notification.classList.remove('show');
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-        }
-    }, 300);
 }
 
 // ✅ VALIDAZIONI IDENTICHE A CONTO.JS
@@ -128,40 +38,40 @@ async function handleFormSubmit(event) {
     
     // Validazione nome conto
     if (!accountData.nome || accountData.nome.length === 0) {
-        showErrorMessage('Inserisci il nome del conto');
+        showNotification('Inserisci il nome del conto', 'error');
         return;
     }
     
     if (accountData.nome.length < 2) {
-        showErrorMessage('Il nome del conto deve essere di almeno 2 caratteri');
+        showNotification('Il nome del conto deve essere di almeno 2 caratteri', 'error');
         return;
     }
     
     if (accountData.nome.length > 20) {
-        showErrorMessage('Il nome del conto non può superare i 20 caratteri');
+        showNotification('Il nome del conto non può superare i 20 caratteri', 'error');
         return;
     }
     
     // Validazione tipo conto
     if (!accountData.tipo || accountData.tipo === '') {
-        showErrorMessage('Seleziona il tipo di conto');
+        showNotification('Seleziona il tipo di conto', 'error');
         return;
     }
     
     // Validazione saldo iniziale
     if (isNaN(accountData.saldo)) {
-        showErrorMessage('Inserisci un saldo iniziale valido');
+        showNotification('Inserisci un saldo iniziale valido', 'error');
         return;
     }
     
     // ✅ CONTROLLO LIMITE DATABASE PostgreSQL NUMERIC(15,2) - IDENTICO
     if (accountData.saldo > 9999999999999.99) {
-        showErrorMessage(`Il saldo iniziale non può superare i 9999999999999.99 €`);
+        showNotification(`Il saldo iniziale non può superare i 9999999999999.99 €`, 'error');
         return;
     }
     
     if (accountData.saldo < -9999999999999.99) {
-        showErrorMessage(`Il saldo iniziale non può essere inferiore a -9999999999999.99 €`);
+        showNotification(`Il saldo iniziale non può essere inferiore a -9999999999999.99 €`, 'error');
         return;
     }
     
@@ -187,7 +97,7 @@ async function handleFormSubmit(event) {
         
     } catch (error) {
         console.error('Errore:', error);
-        showErrorMessage(error.message || 'Errore durante l\'aggiunta del conto');
+        showNotification(error.message || 'Errore durante l\'aggiunta del conto', 'error');
     } finally {
         isSubmitting = false;
         showLoading(false);

@@ -17,50 +17,12 @@ document.addEventListener("DOMContentLoaded", function() {
     checkUrlParams();
 });
 
-// ✅ RIMETTI setupSidebar - COPIATO DA HOME.JS
-function setupSidebar() {
-    const hamburgerMenu = document.getElementById('hamburgerMenu');
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    const closeSidebar = document.getElementById('closeSidebar');
-    
-    // Apri sidebar
-    hamburgerMenu.addEventListener('click', function() {
-        sidebar.classList.add('open');
-        sidebarOverlay.classList.add('show');
-        document.body.style.overflow = 'hidden';
-    });
-    
-    // Chiudi sidebar con X
-    closeSidebar.addEventListener('click', function() {
-        sidebar.classList.remove('open');
-        sidebarOverlay.classList.remove('show');
-        document.body.style.overflow = '';
-    });
-    
-    // Chiudi sidebar cliccando overlay
-    sidebarOverlay.addEventListener('click', function() {
-        sidebar.classList.remove('open');
-        sidebarOverlay.classList.remove('show');
-        document.body.style.overflow = '';
-    });
-    
-    // Chiudi sidebar con ESC
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && sidebar.classList.contains('open')) {
-            sidebar.classList.remove('open');
-            sidebarOverlay.classList.remove('show');
-            document.body.style.overflow = '';
-        }
-    });
-}
-
 // ...resto del codice esistente rimane identico...
 
 // Funzione per recuperare tutti i conti dal server
 async function fetchConti() {
     try {
-        const response = await fetch("/api/conti-nascosti");
+        const response = await fetch("/api/conti");
         if (!response.ok) {
             throw new Error("Errore durante il recupero dei conti");
         }
@@ -170,48 +132,4 @@ function checkUrlParams() {
         const newUrl = window.location.pathname;
         window.history.replaceState({}, document.title, newUrl);
     }
-}
-
-// Funzione per mostrare notifiche
-function showNotification(message, type) {
-    // Rimuovi notifiche esistenti
-    const existingNotifications = document.querySelectorAll('.notification');
-    existingNotifications.forEach(notif => notif.remove());
-    
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <span class="notification-icon">${type === 'success' ? '✅' : '❌'}</span>
-            <span class="notification-message">${message}</span>
-            <button class="notification-close">&times;</button>
-        </div>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // Mostra la notifica
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 10);
-    
-    // Nascondi automaticamente dopo 3 secondi
-    setTimeout(() => {
-        hideNotification(notification);
-    }, 3000);
-    
-    // Listener per chiudere manualmente
-    notification.querySelector('.notification-close').addEventListener('click', () => {
-        hideNotification(notification);
-    });
-}
-
-// Funzione per nascondere notifiche
-function hideNotification(notification) {
-    notification.classList.remove('show');
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-        }
-    }, 300);
 }

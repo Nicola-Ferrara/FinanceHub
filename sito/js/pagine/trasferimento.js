@@ -1,5 +1,5 @@
 // Variabili globali
-let transactionData = null;
+let transferData = null;
 let originalData = null;
 let isEditing = false;
 
@@ -7,11 +7,11 @@ let isEditing = false;
 document.addEventListener("DOMContentLoaded", function() {
     setupEventListeners();
     setupSidebar();
-    loadTransaction();
+    loadTransfer();
 });
 
-// Ottieni ID transazione dall'URL
-function getTransactionIdFromUrl() {
+// Ottieni ID trasferimento dall'URL
+function getTransferIdFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('id');
 }
@@ -19,7 +19,7 @@ function getTransactionIdFromUrl() {
 // Setup event listeners
 function setupEventListeners() {
     // Form
-    document.getElementById('editTransactionForm').addEventListener('submit', handleSaveTransaction);
+    document.getElementById('editTransferForm').addEventListener('submit', handleSaveTransfer);
     document.getElementById('cancelBtn').addEventListener('click', handleCancelEdit);
     
     // Delete button
@@ -40,97 +40,86 @@ function setupEventListeners() {
     });
 }
 
-// Carica dati transazione
-async function loadTransaction() {
-    try {
-        const transactionId = getTransactionIdFromUrl();
+function formatImporto(event) {
+    const input = event.target;
+    let value = input.value;
+    
+    // Rimuovi caratteri non validi (tranne numeri, punti e virgole)
+    let cleanValue = value.replace(/[^0-9.,]/g, '');
+    
+    // Sostituisci virgola con punto
+    cleanValue = cleanValue.replace(',', '.');
+    
+    // Gestisci multipli punti decimali
+    const parts = cleanValue.split('.');
+    if (parts.length > 2) {
+        cleanValue = parts[0] + '.' + parts.slice(1).join('');
+    }
+    
+    // Limita a 2 decimali
+    if (parts.length === 2 && parts[1].length > 2) {
+        cleanValue = parts[0] + '.' + parts[1].substring(0, 2);
+    }
+    
+    // Aggiorna solo se diverso
+    if (cleanValue !== value) {
+        const cursorPosition = input.selectionStart;
+        input.value = cleanValue;
         
-        if (!transactionId) {
-            showError('ID transazione mancante nell\'URL');
+        // Ripristina posizione cursore
+        const newPosition = Math.min(cursorPosition, cleanValue.length);
+        input.setSelectionRange(newPosition, newPosition);
+    }
+}
+
+// Carica dati trasferimento
+async function loadTransfer() {
+    try {
+        const transferId = getTransferIdFromUrl();
+        
+        if (!transferId) {
+            showError('ID trasferimento mancante nell\'URL');
             return;
         }
         
         showLoading(true);
         
-        const response = await fetch(`/api/transazione?id=${transactionId}`);
+        const response = await fetch(`/api/trasferimento?id=${transferId}`);
         
         if (!response.ok) {
-            throw new Error('Transazione non trovata');
+            throw new Error('Trasferimento non trovato');
         }
         
         transferData = await response.json();
-        originalData = JSON.parse(JSON.stringify(transferData));
+        originalData = JSON.parse(JSON.stringify(transferData)); // Deep copy
         
-        await loadCategories();
-        displayTransaction();
+        displayTransfer();
         showMainContent();
         
     } catch (error) {
-        console.error('Errore caricamento transazione:', error);
+        console.error('Errore caricamento trasferimento:', error);
         showError(error.message);
     } finally {
         showLoading(false);
     }
 }
 
-// Carica categorie
-async function loadCategories() {
-    try {
-        const response = await fetch('/api/transazione-categorie');
-        
-        if (!response.ok) {
-            throw new Error('Errore nel caricamento delle categorie');
-        }
-        
-        const categories = await response.json();
-        const select = document.getElementById('editCategoria');
-        
-        // Pulisci opzioni esistenti (tranne la prima)
-        while (select.children.length > 1) {
-            select.removeChild(select.lastChild);
-        }
-        
-        // Filtra categorie dello stesso tipo della transazione corrente
-        const currentType = transferData.tipoCategoria;
-        const filteredCategories = categories.filter(cat => cat.tipo === currentType);
-        
-        filteredCategories.forEach(category => {
-            const option = document.createElement('option');
-            option.value = category.id;
-            option.textContent = category.nome;
-            select.appendChild(option);
-        });
-        
-    } catch (error) {
-        console.error('Errore caricamento categorie:', error);
-        showNotification('Errore nel caricamento delle categorie', 'error');
-    }
-}
-
-// Mostra dati transazione
-function displayTransaction() {
-    const isIncome = transferData.tipoCategoria === 'Guadagno';
-    
+// Mostra dati trasferimento
+function displayTransfer() {
     // Header
-    const typeBadge = document.getElementById('transactionTypeBadge');
-    const typeText = document.getElementById('transactionTypeText');
-    const amount = document.getElementById('transactionAmount');
+    const amount = document.getElementById('transferAmount');
     
-    typeBadge.className = `transaction-type-badge ${isIncome ? 'income' : 'expense'}`;
-    typeText.textContent = isIncome ? 'Entrata' : 'Uscita';
-    
-    amount.textContent = `${isIncome ? '+' : '-'}${transferData.importo.toFixed(2)} €`;
-    amount.className = `transaction-amount ${isIncome ? 'positive' : 'negative'}`;
+    amount.textContent = `${transferData.importo.toFixed(2)} €`;
+    amount.className = `transfer-amount`;
     
     // Meta informazioni
-    document.getElementById('transactionAccount').textContent = transferData.conto || 'N/D';
-    document.getElementById('transactionCreatedDate').textContent = formatDate(transferData.data);
-    
+    document.getElementById('transferAccount').textContent = (transferData.contoDestinatario || 'N/D') + ' ⭠ ' + (transferData.contoMittente || 'N/D');
+    document.getElementById('transferCreatedDate').textContent = formatDate(transferData.data);
+
     // Form
     document.getElementById('editImporto').value = transferData.importo;
     document.getElementById('editData').value = formatDateForInput(transferData.data);
     document.getElementById('editDescrizione').value = transferData.descrizione || '';
-    document.getElementById('editCategoria').value = transferData.idCategoria;
     
     // Imposta data massima ad ora
     const now = new Date();
@@ -138,8 +127,8 @@ function displayTransaction() {
     document.getElementById('editData').max = maxDate;
 }
 
-// Gestisce salvataggio transazione
-async function handleSaveTransaction(event) {
+// Gestisce salvataggio trasferimento
+async function handleSaveTransfer(event) {
     event.preventDefault();
     
     if (isEditing) return;
@@ -155,61 +144,56 @@ async function handleSaveTransaction(event) {
             importo: parseFloat(formData.get('importo')),
             data: formData.get('data'),
             descrizione: formData.get('descrizione') || '',
-            idCategoria: parseInt(formData.get('categoria')),
-            idConto: transferData.idConto
+            idContoMittente: transferData.idContoMittente,
+            idContoDestinatario: transferData.idContoDestinatario,
+
         };
         
         // Validazione importo
         if (isNaN(updatedData.importo) || updatedData.importo <= 0) {
-            showErrorMessage('L\'importo deve essere un numero maggiore di zero');
+            showNotification('L\'importo deve essere un numero maggiore di zero', 'error');
             return;
         }
         
         // Controllo limite massimo importo
         if (updatedData.importo > 9999999999999.99) {
-            showErrorMessage('L\'importo non può superare i 9.999.999.999.999,99 €');
+            showNotification('L\'importo non può superare i 9.999.999.999.999,99 €', 'error');
             return;
         }
         
         // Validazione data
         if (!updatedData.data) {
-            showErrorMessage('La data è obbligatoria');
+            showNotification('La data è obbligatoria', 'error');
             return;
         }
         
         if (new Date(updatedData.data) > new Date()) {
-            showErrorMessage('La data non può essere futura');
+            showNotification('La data non può essere futura', 'error');
             return;
         }
         
         // Validazione descrizione obbligatoria
         if (!updatedData.descrizione || updatedData.descrizione.trim().length === 0) {
-            showErrorMessage('La descrizione è obbligatoria');
+            showNotification('La descrizione è obbligatoria', 'error');
             return;
         }
         
         // Validazione lunghezza minima descrizione
         if (updatedData.descrizione.trim().length < 3) {
-            showErrorMessage('La descrizione deve essere di almeno 3 caratteri');
+            showNotification('La descrizione deve essere di almeno 3 caratteri', 'error');
             return;
         }
         
         // Validazione lunghezza massima descrizione
         if (updatedData.descrizione.trim().length > 500) {
-            showErrorMessage('La descrizione non può superare i 500 caratteri');
-            return;
-        }
-        
-        // Validazione categoria obbligatoria
-        if (isNaN(updatedData.idCategoria) || updatedData.idCategoria <= 0) {
-            showErrorMessage('Seleziona una categoria valida');
+            showNotification('La descrizione non può superare i 500 caratteri', 'error');
             return;
         }
         
         // Pulisci la descrizione (trim)
         updatedData.descrizione = updatedData.descrizione.trim();
         
-        const response = await fetch('/api/transazione', {
+        const response = await fetch('/api/trasferimento', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -230,11 +214,11 @@ async function handleSaveTransaction(event) {
             throw new Error(errorData.error || 'Errore durante il salvataggio');
         }
         
-        window.location.href = '/home?success=transazione-modificata';
+        window.location.href = '/home?success=trasferimento-modificato';
         
     } catch (error) {
         console.error('Errore salvataggio:', error);
-        showErrorMessage(error.message || 'Errore durante il salvataggio');
+        showNotification(error.message || 'Errore durante il salvataggio', 'error');
     } finally {
         isEditing = false;
         document.getElementById('saveBtn').disabled = false;
@@ -244,7 +228,6 @@ async function handleSaveTransaction(event) {
 
 // Gestisce annullamento modifiche
 function handleCancelEdit() {
-    // ✅ CAMBIATO - Torna direttamente alla home
     window.location.href = '/home';
 }
 
@@ -265,7 +248,7 @@ async function confirmDelete() {
         document.getElementById('confirmDeleteBtn').disabled = true;
         document.getElementById('confirmDeleteBtn').textContent = 'Eliminazione...';
         
-        const response = await fetch(`/api/transazione?id=${transferData.id}&idConto=${transferData.idConto}`, {
+        const response = await fetch(`/api/trasferimento?id=${transferData.id}`, {
             method: 'DELETE'
         });
         
@@ -277,7 +260,7 @@ async function confirmDelete() {
         closeDeleteModal();
         
         // ✅ CAMBIATO - Vai alla home con notifica di successo
-        window.location.href = '/home?success=transazione-eliminata';
+        window.location.href = '/home?success=trasferimento-eliminato';
         
     } catch (error) {
         console.error('Errore eliminazione:', error);
@@ -336,90 +319,4 @@ function formatDateForInput(dateString) {
         return `${year}-${month}-${day}T${hour}:${minute}`;
     }
     return '';
-}
-
-function showNotification(message, type) {
-    // Rimuovi notifiche precedenti
-    const existingNotifications = document.querySelectorAll('.notification');
-    existingNotifications.forEach(notif => notif.remove());
-    
-    // Crea la notifica
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <span class="notification-icon">${type === 'success' ? '✅' : '❌'}</span>
-            <span class="notification-message">${message}</span>
-            <button class="notification-close">&times;</button>
-        </div>
-    `;
-    
-    // Aggiungi al body
-    document.body.appendChild(notification);
-    
-    // Animazione di entrata
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 10);
-    
-    // Rimuovi automaticamente dopo 3 secondi
-    setTimeout(() => {
-        hideNotification(notification);
-    }, 3000);
-    
-    // Event listener per chiudere manualmente
-    notification.querySelector('.notification-close').addEventListener('click', () => {
-        hideNotification(notification);
-    });
-}
-
-// Setup sidebar (stesso codice delle altre pagine)
-function setupSidebar() {
-    const hamburgerMenu = document.getElementById('hamburgerMenu');
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    const closeSidebar = document.getElementById('closeSidebar');
-    
-    hamburgerMenu.addEventListener('click', function() {
-        sidebar.classList.add('open');
-        sidebarOverlay.classList.add('show');
-        document.body.style.overflow = 'hidden';
-    });
-    
-    closeSidebar.addEventListener('click', function() {
-        sidebar.classList.remove('open');
-        sidebarOverlay.classList.remove('show');
-        document.body.style.overflow = '';
-    });
-    
-    sidebarOverlay.addEventListener('click', function() {
-        sidebar.classList.remove('open');
-        sidebarOverlay.classList.remove('show');
-        document.body.style.overflow = '';
-    });
-    
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && sidebar.classList.contains('open')) {
-            sidebar.classList.remove('open');
-            sidebarOverlay.classList.remove('show');
-            document.body.style.overflow = '';
-        }
-    });
-}
-
-function showSuccessMessage(message) {
-    showNotification(message, 'success');
-}
-
-function showErrorMessage(message) {
-    showNotification(message, 'error');
-}
-
-function hideNotification(notification) {
-    notification.classList.remove('show');
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-        }
-    }, 300);
 }

@@ -22,43 +22,6 @@ document.addEventListener("DOMContentLoaded", function() {
     setupActionListeners();
 });
 
-function setupSidebar() {
-    const hamburgerMenu = document.getElementById('hamburgerMenu');
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    const closeSidebar = document.getElementById('closeSidebar');
-    
-    // Apri sidebar
-    hamburgerMenu.addEventListener('click', function() {
-        sidebar.classList.add('open');
-        sidebarOverlay.classList.add('show');
-        document.body.style.overflow = 'hidden';
-    });
-    
-    // Chiudi sidebar con X
-    closeSidebar.addEventListener('click', function() {
-        sidebar.classList.remove('open');
-        sidebarOverlay.classList.remove('show');
-        document.body.style.overflow = '';
-    });
-    
-    // Chiudi sidebar cliccando overlay
-    sidebarOverlay.addEventListener('click', function() {
-        sidebar.classList.remove('open');
-        sidebarOverlay.classList.remove('show');
-        document.body.style.overflow = '';
-    });
-    
-    // Chiudi sidebar con ESC
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && sidebar.classList.contains('open')) {
-            sidebar.classList.remove('open');
-            sidebarOverlay.classList.remove('show');
-            document.body.style.overflow = '';
-        }
-    });
-}
-
 // Funzione per recuperare i dati del conto specifico
 async function fetchContoData() {
     try {
@@ -396,37 +359,37 @@ async function handleEditAccountSubmit(event) {
     
     // Validazione nome conto
     if (!updateData.nome || updateData.nome.length === 0) {
-        showErrorMessage('Inserisci il nome del conto');
+        showNotification('Inserisci il nome del conto', 'error');
         return;
     }
     
     if (updateData.nome.length < 2) {
-        showErrorMessage('Il nome del conto deve essere di almeno 2 caratteri');
+        showNotification('Il nome del conto deve essere di almeno 2 caratteri', 'error');
         return;
     }
     
     if (updateData.nome.length > 20) {
-        showErrorMessage('Il nome del conto non può superare i 20 caratteri');
+        showNotification('Il nome del conto non può superare i 20 caratteri', 'error');
         return;
     }
     
     if (!updateData.tipo || updateData.tipo === '') {
-        showErrorMessage('Seleziona il tipo di conto');
+        showNotification('Seleziona il tipo di conto', 'error');
         return;
     }
     
     if (isNaN(updateData.saldo_iniziale)) {
-        showErrorMessage('Inserisci un saldo iniziale valido');
+        showNotification('Inserisci un saldo iniziale valido', 'error');
         return;
     }
 
     if (updateData.saldo_iniziale > 9999999999999.99) {
-        showErrorMessage(`Il saldo iniziale non può superare i 9999999999999.99 €`);
+        showNotification(`Il saldo iniziale non può superare i 9999999999999.99 €`, 'error');
         return;
     }
     
     if (updateData.saldo_iniziale < -9999999999999.99) {
-        showErrorMessage(`Il saldo iniziale non può essere inferiore a -9999999999999.99 €`);
+        showNotification(`Il saldo iniziale non può essere inferiore a -9999999999999.99 €`, 'error');
         return;
     }
     
@@ -449,11 +412,11 @@ async function handleEditAccountSubmit(event) {
         await fetchContoData();
         
         // Mostra messaggio di successo
-        showSuccessMessage('Conto modificato con successo!');
-        
+        showNotification('Conto modificato con successo!', 'success');
+
     } catch (error) {
         console.error('Errore:', error);
-        showErrorMessage('Errore durante la modifica del conto');
+        showNotification('Errore durante la modifica del conto', 'error');
     }
 }
 
@@ -473,61 +436,8 @@ async function handleDeleteAccount() {
         
     } catch (error) {
         console.error('Errore:', error);
-        showErrorMessage('Errore durante l\'eliminazione del conto');
+        showNotification('Errore durante l\'eliminazione del conto', 'error');
     }
-}
-
-// Funzioni per mostrare messaggi
-function showSuccessMessage(message) {
-    showNotification(message, 'success');
-}
-
-function showErrorMessage(message) {
-    showNotification(message, 'error');
-}
-
-function showNotification(message, type) {
-    // Rimuovi notifiche precedenti
-    const existingNotifications = document.querySelectorAll('.notification');
-    existingNotifications.forEach(notif => notif.remove());
-    
-    // Crea la notifica
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <span class="notification-icon">${type === 'success' ? '✅' : '❌'}</span>
-            <span class="notification-message">${message}</span>
-            <button class="notification-close">&times;</button>
-        </div>
-    `;
-    
-    // Aggiungi al body
-    document.body.appendChild(notification);
-    
-    // Animazione di entrata
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 10);
-    
-    // Rimuovi automaticamente dopo 3 secondi
-    setTimeout(() => {
-        hideNotification(notification);
-    }, 3000);
-    
-    // Event listener per chiudere manualmente
-    notification.querySelector('.notification-close').addEventListener('click', () => {
-        hideNotification(notification);
-    });
-}
-
-function hideNotification(notification) {
-    notification.classList.remove('show');
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-        }
-    }, 300);
 }
 
 // Funzione per aprire il modale aggiungi transazione
@@ -597,7 +507,7 @@ async function loadCategories(tipo) {
         
     } catch (error) {
         console.error('Errore:', error);
-        showErrorMessage('Errore durante il caricamento delle categorie');
+        showNotification('Errore durante il caricamento delle categorie', 'error');
     }
 }
 
@@ -614,49 +524,49 @@ async function handleAddTransactionSubmit(event) {
     };
     
     if (!transactionData.importo || isNaN(transactionData.importo) || transactionData.importo <= 0) {
-        showErrorMessage('Inserisci un importo valido maggiore di zero');
+        showNotification('Inserisci un importo valido maggiore di zero', 'error');
         return;
     }
     
     if (transactionData.importo < 0.01) {
-        showErrorMessage('L\'importo minimo è €0.01');
+        showNotification('L\'importo minimo è €0.01', 'error');
         return;
     }
     
     if (transactionData.importo > 9999999999999.99) {
-        showErrorMessage('L\'importo è troppo grande. Limite: €9.999.999.999.999,99');
+        showNotification('L\'importo è troppo grande. Limite: €9.999.999.999.999,99', 'error');
         return;
     }
     
     if (!transactionData.descrizione || transactionData.descrizione.length === 0) {
-        showErrorMessage('Inserisci una descrizione per la transazione');
+        showNotification('Inserisci una descrizione per la transazione', 'error');
         return;
     }
     
     if (transactionData.descrizione.length < 3) {
-        showErrorMessage('La descrizione deve essere di almeno 3 caratteri');
+        showNotification('La descrizione deve essere di almeno 3 caratteri', 'error');
         return;
     }
     
     if (transactionData.descrizione.length > 500) {
-        showErrorMessage('La descrizione non può superare i 500 caratteri');
+        showNotification('La descrizione non può superare i 500 caratteri', 'error');
         return;
     }
     
     if (!transactionData.categoriaId || isNaN(transactionData.categoriaId)) {
-        showErrorMessage('Seleziona una categoria valida');
+        showNotification('Seleziona una categoria valida', 'error');
         return;
     }
     
     if (!transactionData.data) {
-        showErrorMessage('Inserisci la data della transazione');
+        showNotification('Inserisci la data della transazione', 'error');
         return;
     }
     
     const selectedDate = new Date(transactionData.data);
     const now = new Date();
     if (selectedDate > now) {
-        showErrorMessage('La data non può essere futura');
+        showNotification('La data non può essere futura', 'error');
         return;
     }
     
@@ -664,7 +574,7 @@ async function handleAddTransactionSubmit(event) {
     const oneYearAgo = new Date();
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
     if (selectedDate < oneYearAgo) {
-        showErrorMessage('La data non può essere più vecchia di 1 anno');
+        showNotification('La data non può essere più vecchia di 1 anno', 'error');
         return;
     }
     
@@ -689,11 +599,11 @@ async function handleAddTransactionSubmit(event) {
         await fetchOperazioni();
         
         // Mostra messaggio di successo
-        showSuccessMessage('Transazione aggiunta con successo!');
-        
+        showNotification('Transazione aggiunta con successo!', 'success');
+
     } catch (error) {
         console.error('Errore:', error);
-        showErrorMessage('Errore durante l\'aggiunta della transazione');
+        showNotification('Errore durante l\'aggiunta della transazione', 'error');
     }
 }
 
@@ -745,7 +655,7 @@ async function loadDestinationAccounts() {
         
     } catch (error) {
         console.error('Errore Completo:', error);
-        showErrorMessage('Errore durante il caricamento dei conti');
+        showNotification('Errore durante il caricamento dei conti', 'error');
     }
 }
 
@@ -778,45 +688,45 @@ async function handleAddTransferSubmit(event) {
     };
     
     if (!transferData.importo || isNaN(transferData.importo) || transferData.importo <= 0) {
-        showErrorMessage('Inserisci un importo valido maggiore di zero');
+        showNotification('Inserisci un importo valido maggiore di zero', 'error');
         return;
     }
     
     if (transferData.importo < 0.01) {
-        showErrorMessage('L\'importo minimo per un trasferimento è €0.01');
+        showNotification('L\'importo minimo per un trasferimento è €0.01', 'error');
         return;
     }
     
     if (!transferData.descrizione || transferData.descrizione.length === 0) {
-        showErrorMessage('Inserisci una descrizione per il trasferimento');
+        showNotification('Inserisci una descrizione per il trasferimento', 'error');
         return;
     }
     
     if (transferData.descrizione.length < 3) {
-        showErrorMessage('La descrizione deve essere di almeno 3 caratteri');
+        showNotification('La descrizione deve essere di almeno 3 caratteri', 'error');
         return;
     }
     
     if (transferData.descrizione.length > 500) {
-        showErrorMessage('La descrizione non può superare i 500 caratteri');
+        showNotification('La descrizione non può superare i 500 caratteri', 'error');
         return;
     }
     
     // Validazione conto destinazione
     if (!transferData.contoDestinatario || isNaN(transferData.contoDestinatario)) {
-        showErrorMessage('Seleziona il conto di destinazione');
+        showNotification('Seleziona il conto di destinazione', 'error');
         return;
     }
     
     // Verifica che non sia lo stesso conto
     if (transferData.contoDestinatario === parseInt(contoId)) {
-        showErrorMessage('Non puoi trasferire denaro sullo stesso conto');
+        showNotification('Non puoi trasferire denaro sullo stesso conto', 'error');
         return;
     }
     
     // Verifica fondi sufficienti
     if (transferData.importo > contoData.saldo) {
-        showErrorMessage(`Fondi insufficienti. Saldo disponibile: €${contoData.saldo.toFixed(2)}`);
+        showNotification(`Fondi insufficienti. Saldo disponibile: €${contoData.saldo.toFixed(2)}`, 'error');
         return;
     }
     
@@ -842,10 +752,10 @@ async function handleAddTransferSubmit(event) {
         await fetchOperazioni();
         
         // Mostra messaggio di successo
-        showSuccessMessage('Trasferimento effettuato con successo!');
-        
+        showNotification('Trasferimento effettuato con successo!', 'success');
+
     } catch (error) {
         console.error('Errore:', error);
-        showErrorMessage(error.message || 'Errore durante il trasferimento');
+        showNotification(error.message || 'Errore durante il trasferimento', 'error');
     }
 }

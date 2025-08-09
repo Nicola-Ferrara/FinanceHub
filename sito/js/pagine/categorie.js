@@ -416,50 +416,6 @@ function setupModalCloseListeners() {
     });
 }
 
-// Funzione per mostrare notifiche
-function showNotification(message, type) {
-    // Rimuovi notifiche esistenti
-    const existingNotifications = document.querySelectorAll('.notification');
-    existingNotifications.forEach(notif => notif.remove());
-    
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <span class="notification-icon">${type === 'success' ? '✅' : '❌'}</span>
-            <span class="notification-message">${message}</span>
-            <button class="notification-close">&times;</button>
-        </div>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // Mostra la notifica
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 10);
-    
-    // Nascondi automaticamente dopo 5 secondi
-    setTimeout(() => {
-        hideNotification(notification);
-    }, 5000);
-    
-    // Listener per chiudere manualmente
-    notification.querySelector('.notification-close').addEventListener('click', () => {
-        hideNotification(notification);
-    });
-}
-
-// Funzione per nascondere notifiche
-function hideNotification(notification) {
-    notification.classList.remove('show');
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-        }
-    }, 300);
-}
-
 // Funzioni per loading
 function showLoading() {
     const incomeContainer = document.getElementById("incomeCategories");
@@ -478,40 +434,3 @@ window.addEventListener('unhandledrejection', function(event) {
     console.error('Errore non gestito:', event.reason);
     showNotification('Si è verificato un errore imprevisto', 'error');
 });
-
-function setupSidebar() {
-    const hamburgerMenu = document.getElementById('hamburgerMenu');
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    const closeSidebar = document.getElementById('closeSidebar');
-    
-    // Apri sidebar
-    hamburgerMenu.addEventListener('click', function() {
-        sidebar.classList.add('open');
-        sidebarOverlay.classList.add('show');
-        document.body.style.overflow = 'hidden';
-    });
-    
-    // Chiudi sidebar con X
-    closeSidebar.addEventListener('click', function() {
-        sidebar.classList.remove('open');
-        sidebarOverlay.classList.remove('show');
-        document.body.style.overflow = '';
-    });
-    
-    // Chiudi sidebar cliccando overlay
-    sidebarOverlay.addEventListener('click', function() {
-        sidebar.classList.remove('open');
-        sidebarOverlay.classList.remove('show');
-        document.body.style.overflow = '';
-    });
-    
-    // Chiudi sidebar con ESC
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && sidebar.classList.contains('open')) {
-            sidebar.classList.remove('open');
-            sidebarOverlay.classList.remove('show');
-            document.body.style.overflow = '';
-        }
-    });
-}

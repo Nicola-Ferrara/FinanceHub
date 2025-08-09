@@ -82,9 +82,12 @@ body {
 }
 
 .logo-icon {
-    font-size: 28px;
+    width: 32px;
+    height: 32px;
+    font-size: 32px;
     color: #667eea;
     animation: bounce 2s infinite;
+    object-fit: contain;
 }
 
 @keyframes bounce {
