@@ -115,7 +115,7 @@ function displayTransfer() {
     // Meta informazioni
     document.getElementById('transferAccount').textContent = (transferData.contoDestinatario || 'N/D') + ' ⭠ ' + (transferData.contoMittente || 'N/D');
     document.getElementById('transferCreatedDate').textContent = formatDate(transferData.data);
-    
+
     // Form
     document.getElementById('editImporto').value = transferData.importo;
     document.getElementById('editData').value = formatDateForInput(transferData.data);
@@ -311,8 +311,14 @@ function formatDate(dateString) {
 }
 
 function formatDateForInput(dateString) {
-    const date = new Date(dateString);
-    return date.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:MM
+    if (!dateString) return '';
+    dateString = dateString.replace(' ', 'T').replace('Z', '');
+    const match = dateString.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+    if (match) {
+        const [, year, month, day, hour, minute] = match;
+        return `${year}-${month}-${day}T${hour}:${minute}`;
+    }
+    return '';
 }
 
 function showNotification(message, type) {
