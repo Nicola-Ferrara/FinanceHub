@@ -16,6 +16,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-gap: 30px;
+    min-height: calc(100vh - 255px);
 }
 
 /* Bilancio del mese corrente */

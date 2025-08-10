@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="../css/componenti/header.css">
     <link rel="stylesheet" href="../css/componenti/sidebar.css">
     <link rel="stylesheet" href="../css/componenti/notifiche.css">
+    <link rel="stylesheet" href="../css/componenti/footer.css">
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
 
@@ -22,155 +23,168 @@
     <script src="../js/pagine/trasferimento.js" defer></script>
 </head>
 <body>
-    <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <h3>Menu</h3>
-            <button id="closeSidebar" class="close-sidebar">&times;</button>
-        </div>
-        <div class="sidebar-content">
-            <a href="/home" class="sidebar-link">
-                <span class="sidebar-icon">🏠</span>
-                <span>Home</span>
-            </a>
-            <a href="/bilanci" class="sidebar-link">
-                <span class="sidebar-icon">📊</span>
-                <span>Bilanci</span>
-            </a>
-            <a href="/lista_conti" class="sidebar-link">
-                <span class="sidebar-icon">🏦</span>
-                <span>Conti</span>
-            </a>
-            <a href="/operazioni" class="sidebar-link">
-                <span class="sidebar-icon">📈</span>
-                <span>Operazioni</span>
-            </a>
-            <a href="/categorie" class="sidebar-link">
-                <span class="sidebar-icon">📂</span>
-                <span>Categorie</span>
-            </a>
-            <div class="sidebar-divider"></div>
-            <a href="/profilo" class="sidebar-link">
-                <span class="sidebar-icon">🧑🏻</span>
-                <span>Profilo</span>
-            </a>
-            <a href="/logout" class="sidebar-link logout">
-                <span class="sidebar-icon">🚪</span>
-                <span>Logout</span>
-            </a>
-        </div>
-    </aside>
+    <div class="page-wrapper">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>Menu</h3>
+                <button id="closeSidebar" class="close-sidebar">&times;</button>
+            </div>
+            <div class="sidebar-content">
+                <a href="/home" class="sidebar-link">
+                    <span class="sidebar-icon">🏠</span>
+                    <span>Home</span>
+                </a>
+                <a href="/bilanci" class="sidebar-link">
+                    <span class="sidebar-icon">📊</span>
+                    <span>Bilanci</span>
+                </a>
+                <a href="/lista_conti" class="sidebar-link">
+                    <span class="sidebar-icon">🏦</span>
+                    <span>Conti</span>
+                </a>
+                <a href="/operazioni" class="sidebar-link">
+                    <span class="sidebar-icon">📈</span>
+                    <span>Operazioni</span>
+                </a>
+                <a href="/categorie" class="sidebar-link">
+                    <span class="sidebar-icon">📂</span>
+                    <span>Categorie</span>
+                </a>
+                <div class="sidebar-divider"></div>
+                <a href="/profilo" class="sidebar-link">
+                    <span class="sidebar-icon">🧑🏻</span>
+                    <span>Profilo</span>
+                </a>
+                <a href="/logout" class="sidebar-link logout">
+                    <span class="sidebar-icon">🚪</span>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
 
-    <!-- Overlay -->
-    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+        <!-- Overlay -->
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-    <!-- Header -->
-    <header class="header">
-        <div class="header-left">
-            <button id="hamburgerMenu" class="hamburger-menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <h1>Dettaglio Trasferimento</h1>
-        </div>
-        <div class="nav-links">
-            <a href="/home" class="nav-link">🏠 Home</a>
-            <form action="/logout" method="get" style="display: inline;">
-                <button type="submit" class="logout-button">Logout</button>
-            </form>
-        </div>
-    </header>
-
-    <main class="main-content">
-        <!-- Loading -->
-        <div id="loadingMessage" class="loading-message">
-            <div class="spinner"></div>
-            <p>Caricamento trasferimento...</p>
-        </div>
-
-        <!-- Errore -->
-        <div id="errorMessage" class="error-message" style="display: none;">
-            <div class="error-icon">❌</div>
-            <h2>Errore</h2>
-            <p id="errorText">Trasferimento non trovato</p>
-            <button onclick="window.location.href='/home'" class="btn-secondary">
-                Torna alla home
-            </button>
-        </div>
-
-        <!-- Contenuto principale -->
-        <div id="mainContent" style="display: none;">
-            <!-- Informazioni Trasferimento -->
-            <section class="transfer-info-section">
-                <div class="transfer-header">
-                    <div class="transfer-amount" id="transferAmount">
-                        +0.00 €
-                    </div>
-                </div>
-                <div class="transfer-meta">
-                    <div class="meta-item">
-                        <span class="meta-label">Conti:</span>
-                        <span id="transferAccount" class="meta-value">-</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">Data creazione:</span>
-                        <span id="transferCreatedDate" class="meta-value">-</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Form Modifica -->
-            <section class="edit-section">
-                <h2>Modifica Trasferimento</h2>
-                <form id="editTransferForm" class="edit-form" novalidate>
-                    <div class="form-group">
-                        <label for="editImporto">Importo (€)</label>
-                        <input type="number" id="editImporto" name="importo" 
-                               step="0.01" min="0.01" max="9999999999999.99" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="editData">Data</label>
-                        <input type="datetime-local" id="editData" name="data" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="editDescrizione">Descrizione</label>
-                        <textarea id="editDescrizione" name="descrizione" rows="3" 
-                                  placeholder="Inserisci una descrizione (min. 3 caratteri)..."
-                                  minlength="3" maxlength="500" required></textarea>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" id="cancelBtn" class="btn-secondary">Annulla</button>
-                        <button type="submit" id="saveBtn" class="btn-primary">Salva Modifiche</button>
-                        <button type="button" id="deleteBtn" class="btn-danger">
-                            🗑️ Elimina
-                        </button>
-                    </div>
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button id="hamburgerMenu" class="hamburger-menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <h1>Dettaglio Trasferimento</h1>
+            </div>
+            <div class="nav-links">
+                <a href="/home" class="nav-link">🏠 Home</a>
+                <form action="/logout" method="get" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
                 </form>
-            </section>
-        </div>
-    </main>
+            </div>
+        </header>
 
-    <!-- Modale Conferma Eliminazione -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Conferma Eliminazione</h2>
-                <span class="close" id="closeDeleteModal">&times;</span>
+        <main class="main-content">
+            <!-- Loading -->
+            <div id="loadingMessage" class="loading-message">
+                <div class="spinner"></div>
+                <p>Caricamento trasferimento...</p>
             </div>
-            <div class="modal-body">
-                <div class="confirm-delete-content">
-                    <div class="delete-icon">🗑️</div>
-                    <h3>Sei sicuro di voler eliminare questo trasferimento?</h3>
-                    <p>Questa azione è <strong>irreversibile</strong>.</p>
+
+            <!-- Errore -->
+            <div id="errorMessage" class="error-message" style="display: none;">
+                <div class="error-icon">❌</div>
+                <h2>Errore</h2>
+                <p id="errorText">Trasferimento non trovato</p>
+                <button onclick="window.location.href='/home'" class="btn-secondary">
+                    Torna alla home
+                </button>
+            </div>
+
+            <!-- Contenuto principale -->
+            <div id="mainContent" style="display: none;">
+                <!-- Informazioni Trasferimento -->
+                <section class="transfer-info-section">
+                    <div class="transfer-header">
+                        <div class="transfer-amount" id="transferAmount">
+                            +0.00 €
+                        </div>
+                    </div>
+                    <div class="transfer-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Conti:</span>
+                            <span id="transferAccount" class="meta-value">-</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Data creazione:</span>
+                            <span id="transferCreatedDate" class="meta-value">-</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Form Modifica -->
+                <section class="edit-section">
+                    <h2>Modifica Trasferimento</h2>
+                    <form id="editTransferForm" class="edit-form" novalidate>
+                        <div class="form-group">
+                            <label for="editImporto">Importo (€)</label>
+                            <input type="number" id="editImporto" name="importo" 
+                                step="0.01" min="0.01" max="9999999999999.99" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editData">Data</label>
+                            <input type="datetime-local" id="editData" name="data" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editDescrizione">Descrizione</label>
+                            <textarea id="editDescrizione" name="descrizione" rows="3" 
+                                    placeholder="Inserisci una descrizione (min. 3 caratteri)..."
+                                    minlength="3" maxlength="500" required></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" id="cancelBtn" class="btn-secondary">Annulla</button>
+                            <button type="submit" id="saveBtn" class="btn-primary">Salva Modifiche</button>
+                            <button type="button" id="deleteBtn" class="btn-danger">
+                                🗑️ Elimina
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <img src="/img/Logo.png" alt="FinanceHub Logo" class="footer-logo">
+                <div class="footer-text">
+                    <span class="footer-title">FinanceHub</span>
+                    <span class="footer-desc">Gestione semplice e sicura delle tue finanze</span>
                 </div>
+                <span class="footer-copyright">&copy; 2025</span>
             </div>
-            <div class="modal-footer">
-                <button id="cancelDeleteBtn" class="btn-secondary">Annulla</button>
-                <button id="confirmDeleteBtn" class="btn-danger">Elimina</button>
+        </footer>
+
+        <!-- Modale Conferma Eliminazione -->
+        <div id="deleteModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Conferma Eliminazione</h2>
+                    <span class="close" id="closeDeleteModal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="confirm-delete-content">
+                        <div class="delete-icon">🗑️</div>
+                        <h3>Sei sicuro di voler eliminare questo trasferimento?</h3>
+                        <p>Questa azione è <strong>irreversibile</strong>.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="cancelDeleteBtn" class="btn-secondary">Annulla</button>
+                    <button id="confirmDeleteBtn" class="btn-danger">Elimina</button>
+                </div>
             </div>
         </div>
     </div>

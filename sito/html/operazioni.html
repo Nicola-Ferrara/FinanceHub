@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="../css/pagine/operazioni.css">
     <link rel="stylesheet" href="../css/componenti/header.css">
     <link rel="stylesheet" href="../css/componenti/sidebar.css">
+    <link rel="stylesheet" href="../css/componenti/footer.css">
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
     
@@ -20,149 +21,161 @@
     <script src="../js/pagine/operazioni.js" defer></script>
 </head>
 <body>
-    <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <h3>Menu</h3>
-            <button id="closeSidebar" class="close-sidebar">&times;</button>
-        </div>
-        <div class="sidebar-content">
-            <a href="/home" class="sidebar-link">
-                <span class="sidebar-icon">🏠</span>
-                <span>Home</span>
-            </a>
-            <a href="/bilanci" class="sidebar-link">
-                <span class="sidebar-icon">📊</span>
-                <span>Bilanci</span>
-            </a>
-            <a href="/lista_conti" class="sidebar-link">
-                <span class="sidebar-icon">🏦</span>
-                <span>Conti</span>
-            </a>
-            <a href="/categorie" class="sidebar-link">
-                <span class="sidebar-icon">📂</span>
-                <span>Categorie</span>
-            </a>
-            <div class="sidebar-divider"></div>
-            <a href="/profilo" class="sidebar-link">
-                <span class="sidebar-icon">🧑🏻</span>
-                <span>Profilo</span>
-            </a>
-            <a href="/logout" class="sidebar-link logout">
-                <span class="sidebar-icon">🚪</span>
-                <span>Logout</span>
-            </a>
-        </div>
-    </aside>
-
-    <!-- Overlay per chiudere sidebar -->
-    <div id="sidebarOverlay" class="sidebar-overlay"></div>
-
-    <!-- Header -->
-    <header class="header">
-        <div class="header-left">
-            <button id="hamburgerMenu" class="hamburger-menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <h1>Tutte le Operazioni</h1>
-        </div>
-        <div class="nav-links">
-            <a href="/home" class="nav-link">🏠 Home</a>
-            <form action="/logout" method="get" style="display: inline;">
-                <button type="submit" class="logout-button">Logout</button>
-            </form>
-        </div>
-    </header>
-
-    <main class="main-content">
-        <!-- Riepilogo Operazioni -->
-        <section class="summary-section">
-            <h2>Riepilogo Operazioni</h2>
-            <div class="summary-container">
-                <div class="summary-card">
-                    <div class="summary-icon transactions">📝</div>
-                    <div class="summary-details">
-                        <h3>Totale Operazioni</h3>
-                        <p id="totalOperations" class="amount neutral">0</p>
-                    </div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-icon income">📈</div>
-                    <div class="summary-details">
-                        <h3>Transazioni Entrata</h3>
-                        <p id="totalIncomeTransactions" class="amount positive">0</p>
-                    </div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-icon expense">📉</div>
-                    <div class="summary-details">
-                        <h3>Transazioni Uscita</h3>
-                        <p id="totalExpenseTransactions" class="amount negative">0</p>
-                    </div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-icon transfers">🔄</div>
-                    <div class="summary-details">
-                        <h3>Trasferimenti</h3>
-                        <p id="totalTransfers" class="amount neutral">0</p>
-                    </div>
-                </div>
+    <div class="page-wrapper">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>Menu</h3>
+                <button id="closeSidebar" class="close-sidebar">&times;</button>
             </div>
-        </section>
+            <div class="sidebar-content">
+                <a href="/home" class="sidebar-link">
+                    <span class="sidebar-icon">🏠</span>
+                    <span>Home</span>
+                </a>
+                <a href="/bilanci" class="sidebar-link">
+                    <span class="sidebar-icon">📊</span>
+                    <span>Bilanci</span>
+                </a>
+                <a href="/lista_conti" class="sidebar-link">
+                    <span class="sidebar-icon">🏦</span>
+                    <span>Conti</span>
+                </a>
+                <a href="/categorie" class="sidebar-link">
+                    <span class="sidebar-icon">📂</span>
+                    <span>Categorie</span>
+                </a>
+                <div class="sidebar-divider"></div>
+                <a href="/profilo" class="sidebar-link">
+                    <span class="sidebar-icon">🧑🏻</span>
+                    <span>Profilo</span>
+                </a>
+                <a href="/logout" class="sidebar-link logout">
+                    <span class="sidebar-icon">🚪</span>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
 
-        <!-- Filtri -->
-        <section class="filters-section">
-            <div class="filters-container">
-                <div class="filter-group">
-                    <label for="typeFilter">Tipo:</label>
-                    <select id="typeFilter">
-                        <option value="">Tutte le operazioni</option>
-                        <option value="transazione">Solo transazioni</option>
-                        <option value="trasferimento">Solo trasferimenti</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="categoryFilter">Categoria:</label>
-                    <select id="categoryFilter">
-                        <option value="">Tutte le categorie</option>
-                        <option value="Guadagno">Solo entrate</option>
-                        <option value="Spesa">Solo uscite</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="sortFilter">Ordina per:</label>
-                    <select id="sortFilter">
-                        <option value="date-desc">Data (più recente)</option>
-                        <option value="date-asc">Data (più vecchio)</option>
-                        <option value="amount-desc">Importo (maggiore)</option>
-                        <option value="amount-asc">Importo (minore)</option>
-                    </select>
-                </div>
-            </div>
-        </section>
+        <!-- Overlay per chiudere sidebar -->
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-        <!-- Lista Operazioni -->
-        <section class="operations-section">
-            <h2>Lista Operazioni</h2>
-            <div id="operationsContainer" class="operations-container">
-                <!-- Le operazioni verranno caricate dinamicamente -->
-            </div>
-            <div id="loadingMessage" class="loading-message">
-                <div class="spinner"></div>
-                <p>Caricamento operazioni...</p>
-            </div>
-            <div id="noDataMessage" class="no-data-message" style="display: none;">
-                <div class="no-data-icon">📝</div>
-                <h3>Nessuna operazione disponibile</h3>
-                <p>Non ci sono ancora operazioni registrate.</p>
-                <button onclick="window.location.href='/home'" class="btn-primary">
-                    Torna alla Home
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button id="hamburgerMenu" class="hamburger-menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </button>
+                <h1>Tutte le Operazioni</h1>
             </div>
-        </section>
-    </main>
+            <div class="nav-links">
+                <a href="/home" class="nav-link">🏠 Home</a>
+                <form action="/logout" method="get" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+        </header>
 
+        <main class="main-content">
+            <!-- Riepilogo Operazioni -->
+            <section class="summary-section">
+                <h2>Riepilogo Operazioni</h2>
+                <div class="summary-container">
+                    <div class="summary-card">
+                        <div class="summary-icon transactions">📝</div>
+                        <div class="summary-details">
+                            <h3>Totale Operazioni</h3>
+                            <p id="totalOperations" class="amount neutral">0</p>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon income">📈</div>
+                        <div class="summary-details">
+                            <h3>Transazioni Entrata</h3>
+                            <p id="totalIncomeTransactions" class="amount positive">0</p>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon expense">📉</div>
+                        <div class="summary-details">
+                            <h3>Transazioni Uscita</h3>
+                            <p id="totalExpenseTransactions" class="amount negative">0</p>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon transfers">🔄</div>
+                        <div class="summary-details">
+                            <h3>Trasferimenti</h3>
+                            <p id="totalTransfers" class="amount neutral">0</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Filtri -->
+            <section class="filters-section">
+                <div class="filters-container">
+                    <div class="filter-group">
+                        <label for="typeFilter">Tipo:</label>
+                        <select id="typeFilter">
+                            <option value="">Tutte le operazioni</option>
+                            <option value="transazione">Solo transazioni</option>
+                            <option value="trasferimento">Solo trasferimenti</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="categoryFilter">Categoria:</label>
+                        <select id="categoryFilter">
+                            <option value="">Tutte le categorie</option>
+                            <option value="Guadagno">Solo entrate</option>
+                            <option value="Spesa">Solo uscite</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="sortFilter">Ordina per:</label>
+                        <select id="sortFilter">
+                            <option value="date-desc">Data (più recente)</option>
+                            <option value="date-asc">Data (più vecchio)</option>
+                            <option value="amount-desc">Importo (maggiore)</option>
+                            <option value="amount-asc">Importo (minore)</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lista Operazioni -->
+            <section class="operations-section">
+                <h2>Lista Operazioni</h2>
+                <div id="operationsContainer" class="operations-container">
+                    <!-- Le operazioni verranno caricate dinamicamente -->
+                </div>
+                <div id="loadingMessage" class="loading-message">
+                    <div class="spinner"></div>
+                    <p>Caricamento operazioni...</p>
+                </div>
+                <div id="noDataMessage" class="no-data-message" style="display: none;">
+                    <div class="no-data-icon">📝</div>
+                    <h3>Nessuna operazione disponibile</h3>
+                    <p>Non ci sono ancora operazioni registrate.</p>
+                    <button onclick="window.location.href='/home'" class="btn-primary">
+                        Torna alla Home
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <img src="/img/Logo.png" alt="FinanceHub Logo" class="footer-logo">
+                <div class="footer-text">
+                    <span class="footer-title">FinanceHub</span>
+                    <span class="footer-desc">Gestione semplice e sicura delle tue finanze</span>
+                </div>
+                <span class="footer-copyright">&copy; 2025</span>
+            </div>
+        </footer>
+    </div>
 </body>
 </html>

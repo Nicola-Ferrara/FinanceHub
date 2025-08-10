@@ -16,6 +16,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 30px;
+    min-height: calc(100vh - 255px);
 }
 
 /* Sezione informazioni conto */

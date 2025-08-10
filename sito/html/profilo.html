@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="../css/componenti/header.css">
     <link rel="stylesheet" href="../css/componenti/sidebar.css">
     <link rel="stylesheet" href="../css/componenti/notifiche.css">
+    <link rel="stylesheet" href="../css/componenti/footer.css">
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -23,219 +24,232 @@
     <script src="../js/pagine/profilo.js" defer></script>
 </head>
 <body>
-    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+    <div class="page-wrapper">
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-    <aside id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <h3>Menu</h3>
-            <button id="closeSidebar" class="close-sidebar">&times;</button>
-        </div>
-        <div class="sidebar-content">
-            <a href="/home" class="sidebar-link">
-                <span class="sidebar-icon">🏠</span>
-                Home
-            </a>
-            <a href="/bilanci" class="sidebar-link">
-                <span class="sidebar-icon">📊</span>
-                Bilanci
-            </a>
-            <a href="/lista_conti" class="sidebar-link">
-                <span class="sidebar-icon">🏦</span>
-                Conti
-            </a>
-            <a href="/operazioni" class="sidebar-link">
-                <span class="sidebar-icon">📈</span>
-                Operazioni
-            </a>
-            <a href="/categorie" class="sidebar-link">
-                <span class="sidebar-icon">📂</span>
-                Categorie
-            </a>
-            <div class="sidebar-divider"></div>
-            <a href="/logout" class="sidebar-link logout">
-                <span class="sidebar-icon">🚪</span>
-                Logout
-            </a>
-        </div>
-    </aside>
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>Menu</h3>
+                <button id="closeSidebar" class="close-sidebar">&times;</button>
+            </div>
+            <div class="sidebar-content">
+                <a href="/home" class="sidebar-link">
+                    <span class="sidebar-icon">🏠</span>
+                    Home
+                </a>
+                <a href="/bilanci" class="sidebar-link">
+                    <span class="sidebar-icon">📊</span>
+                    Bilanci
+                </a>
+                <a href="/lista_conti" class="sidebar-link">
+                    <span class="sidebar-icon">🏦</span>
+                    Conti
+                </a>
+                <a href="/operazioni" class="sidebar-link">
+                    <span class="sidebar-icon">📈</span>
+                    Operazioni
+                </a>
+                <a href="/categorie" class="sidebar-link">
+                    <span class="sidebar-icon">📂</span>
+                    Categorie
+                </a>
+                <div class="sidebar-divider"></div>
+                <a href="/logout" class="sidebar-link logout">
+                    <span class="sidebar-icon">🚪</span>
+                    Logout
+                </a>
+            </div>
+        </aside>
 
-    <header class="header">
-        <div class="header-left">
-            <button id="hamburgerMenu" class="hamburger-menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <h1>Profilo</h1>
-        </div>
-        <div class="nav-links">
-            <a href="/home" class="nav-link">🏠 Home</a>
-            <form action="/logout" method="get" style="display: inline;">
-                <button type="submit" class="logout-button">Logout</button>
-            </form>
-        </div>
-    </header>
-
-    <main class="main-content">
-        <section id="profileSection" class="profile-section">
-            <h2>Il tuo profilo</h2>
-            <form id="profileForm" class="profile-form" novalidate>
-                <div class="form-group">
-                    <label for="nome">Nome</label>
-                    <input type="text" id="nome" name="nome" required>
-                </div>
-                <div class="form-group">
-                    <label for="cognome">Cognome</label>
-                    <input type="text" id="cognome" name="cognome" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" disabled>
-                </div>
-                <div class="form-group">
-                    <label for="telefono">Telefono</label>
-                    <input type="tel" id="telefono" name="telefono" required>
-                </div>
-                <div class="form-group full-width">
-                    <label for="dataIscrizione">Data di iscrizione</label>
-                    <input type="text" id="dataIscrizione" name="dataIscrizione" disabled>
-                </div>
-                <div class="profile-actions">
-                    <button type="submit" class="btn-primary">Salva Modifiche</button>
-                    <button type="button" id="changePasswordBtn" class="btn-secondary">Cambia Password</button>
-                    <button type="button" id="deleteAccountBtn" class="btn-danger">Elimina Account</button>
-                </div>
-            </form>
-        </section>
-        <section class="hidden-accounts-section profile-section">
-            <div class="hidden-accounts-content">
-                <h2 class="hidden-accounts-title">Conti Nascosti</h2>
-                <button type="button" id="openHiddenAccountsModal" class="btn-primary hidden-accounts-link">
-                    🔒 Accedi ai conti nascosti
+        <header class="header">
+            <div class="header-left">
+                <button id="hamburgerMenu" class="hamburger-menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </button>
+                <h1>Profilo</h1>
             </div>
-        </section>
-    </main>
+            <div class="nav-links">
+                <a href="/home" class="nav-link">🏠 Home</a>
+                <form action="/logout" method="get" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+        </header>
 
-    <!-- Modale Conferma Eliminazione -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Conferma Eliminazione</h2>
-                <span class="close" id="closeDeleteModal">&times;</span>
+        <main class="main-content">
+            <section id="profileSection" class="profile-section">
+                <h2>Il tuo profilo</h2>
+                <form id="profileForm" class="profile-form" novalidate>
+                    <div class="form-group">
+                        <label for="nome">Nome</label>
+                        <input type="text" id="nome" name="nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cognome">Cognome</label>
+                        <input type="text" id="cognome" name="cognome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefono">Telefono</label>
+                        <input type="tel" id="telefono" name="telefono" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="dataIscrizione">Data di iscrizione</label>
+                        <input type="text" id="dataIscrizione" name="dataIscrizione" disabled>
+                    </div>
+                    <div class="profile-actions">
+                        <button type="submit" class="btn-primary">Salva Modifiche</button>
+                        <button type="button" id="changePasswordBtn" class="btn-secondary">Cambia Password</button>
+                        <button type="button" id="deleteAccountBtn" class="btn-danger">Elimina Account</button>
+                    </div>
+                </form>
+            </section>
+            <section class="hidden-accounts-section profile-section">
+                <div class="hidden-accounts-content">
+                    <h2 class="hidden-accounts-title">Conti Nascosti</h2>
+                    <button type="button" id="openHiddenAccountsModal" class="btn-primary hidden-accounts-link">
+                        🔒 Accedi ai conti nascosti
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <img src="/img/Logo.png" alt="FinanceHub Logo" class="footer-logo">
+                <div class="footer-text">
+                    <span class="footer-title">FinanceHub</span>
+                    <span class="footer-desc">Gestione semplice e sicura delle tue finanze</span>
+                </div>
+                <span class="footer-copyright">&copy; 2025</span>
             </div>
-            <div class="modal-body">
-                <div class="confirm-delete-content">
-                    <div class="delete-icon">🗑️</div>
-                    <h3>Sei sicuro di voler eliminare questo account?</h3>
-                    <p>Questa azione è <strong>irreversibile</strong>.</p>
-                    <div class="form-group" style="margin-top: 20px;">
-                        <label for="deletePassword">Password</label>
-                        <div class="password-container">
-                            <input type="password" id="deletePassword" required autocomplete="current-password" placeholder="Inserisci la password">
-                            <button type="button" id="toggleDeletePassword" class="toggle-password">
-                                <svg id="eyeIconDeletePassword" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                            </button>
+        </footer>
+
+        <!-- Modale Conferma Eliminazione -->
+        <div id="deleteModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Conferma Eliminazione</h2>
+                    <span class="close" id="closeDeleteModal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="confirm-delete-content">
+                        <div class="delete-icon">🗑️</div>
+                        <h3>Sei sicuro di voler eliminare questo account?</h3>
+                        <p>Questa azione è <strong>irreversibile</strong>.</p>
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label for="deletePassword">Password</label>
+                            <div class="password-container">
+                                <input type="password" id="deletePassword" required autocomplete="current-password" placeholder="Inserisci la password">
+                                <button type="button" id="toggleDeletePassword" class="toggle-password">
+                                    <svg id="eyeIconDeletePassword" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button id="cancelDeleteBtn" class="btn-secondary">Annulla</button>
-                <button id="confirmDeleteBtn" class="btn-danger">Elimina</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modale Cambia Password -->
-    <div id="passwordModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Cambia Password</h2>
-                <span class="close" id="closePasswordModal">&times;</span>
-            </div>
-            <div class="modal-body">
-                <form id="passwordForm" novalidate>
-                    <div class="form-group">
-                        <label for="currentPassword">Password Attuale</label>
-                        <div class="password-container">
-                            <input type="password" id="currentPassword" required autocomplete="current-password" placeholder="Password attuale">
-                            <button type="button" id="toggleCurrentPassword" class="toggle-password">
-                                <svg id="eyeIconCurrentPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="newPassword">Nuova Password</label>
-                        <div class="password-container">
-                            <input type="password" id="newPassword" required autocomplete="new-password" placeholder="Nuova password">
-                            <button type="button" id="toggleNewPassword" class="toggle-password">
-                                <svg id="eyeIconNewPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="password-requirements" id="passwordRequirements">
-                            <div class="requirement" id="req-length-pw">
-                                <span class="requirement-icon">⚪</span>
-                                Almeno 6 caratteri
-                            </div>
-                            <div class="requirement" id="req-uppercase-pw">
-                                <span class="requirement-icon">⚪</span>
-                                Una lettera maiuscola
-                            </div>
-                            <div class="requirement" id="req-number-pw">
-                                <span class="requirement-icon">⚪</span>
-                                Un numero
-                            </div>
-                            <div class="requirement" id="req-special-pw">
-                                <span class="requirement-icon">⚪</span>
-                                Un carattere speciale (@$!%*?&)
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn-secondary" id="cancelPasswordBtn">Annulla</button>
-                        <button type="submit" class="btn-primary">Salva</button>
-                    </div>
-                </form>
+                <div class="modal-footer">
+                    <button id="cancelDeleteBtn" class="btn-secondary">Annulla</button>
+                    <button id="confirmDeleteBtn" class="btn-danger">Elimina</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Modale Accesso Conti Nascosti -->
-    <div id="hiddenAccountsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Accedi ai Conti Nascosti</h2>
-                <span class="close" id="closeHiddenAccountsModal">&times;</span>
-            </div>
-            <div class="modal-body">
-                <form id="hiddenAccountsForm" novalidate>
-                    <div class="form-group">
-                        <label for="hiddenAccountsPassword">Password</label>
-                        <div class="password-container">
-                            <input type="password" id="hiddenAccountsPassword" required autocomplete="current-password" placeholder="Inserisci la password">
-                            <button type="button" id="toggleHiddenAccountsPassword" class="toggle-password">
-                                <svg id="eyeIconHiddenAccountsPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                            </button>
+        <!-- Modale Cambia Password -->
+        <div id="passwordModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Cambia Password</h2>
+                    <span class="close" id="closePasswordModal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="passwordForm" novalidate>
+                        <div class="form-group">
+                            <label for="currentPassword">Password Attuale</label>
+                            <div class="password-container">
+                                <input type="password" id="currentPassword" required autocomplete="current-password" placeholder="Password attuale">
+                                <button type="button" id="toggleCurrentPassword" class="toggle-password">
+                                    <svg id="eyeIconCurrentPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn-secondary" id="cancelHiddenAccountsBtn">Annulla</button>
-                        <button type="submit" class="btn-primary">Accedi</button>
-                    </div>
-                </form>
+                        <div class="form-group">
+                            <label for="newPassword">Nuova Password</label>
+                            <div class="password-container">
+                                <input type="password" id="newPassword" required autocomplete="new-password" placeholder="Nuova password">
+                                <button type="button" id="toggleNewPassword" class="toggle-password">
+                                    <svg id="eyeIconNewPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="password-requirements" id="passwordRequirements">
+                                <div class="requirement" id="req-length-pw">
+                                    <span class="requirement-icon">⚪</span>
+                                    Almeno 6 caratteri
+                                </div>
+                                <div class="requirement" id="req-uppercase-pw">
+                                    <span class="requirement-icon">⚪</span>
+                                    Una lettera maiuscola
+                                </div>
+                                <div class="requirement" id="req-number-pw">
+                                    <span class="requirement-icon">⚪</span>
+                                    Un numero
+                                </div>
+                                <div class="requirement" id="req-special-pw">
+                                    <span class="requirement-icon">⚪</span>
+                                    Un carattere speciale (@$!%*?&)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn-secondary" id="cancelPasswordBtn">Annulla</button>
+                            <button type="submit" class="btn-primary">Salva</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modale Accesso Conti Nascosti -->
+        <div id="hiddenAccountsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Accedi ai Conti Nascosti</h2>
+                    <span class="close" id="closeHiddenAccountsModal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="hiddenAccountsForm" novalidate>
+                        <div class="form-group">
+                            <label for="hiddenAccountsPassword">Password</label>
+                            <div class="password-container">
+                                <input type="password" id="hiddenAccountsPassword" required autocomplete="current-password" placeholder="Inserisci la password">
+                                <button type="button" id="toggleHiddenAccountsPassword" class="toggle-password">
+                                    <svg id="eyeIconHiddenAccountsPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn-secondary" id="cancelHiddenAccountsBtn">Annulla</button>
+                            <button type="submit" class="btn-primary">Accedi</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

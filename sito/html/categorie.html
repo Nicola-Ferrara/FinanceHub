@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="../css/componenti/header.css">
     <link rel="stylesheet" href="../css/componenti/sidebar.css">
     <link rel="stylesheet" href="../css/componenti/notifiche.css">
+    <link rel="stylesheet" href="../css/componenti/footer.css">
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
     
@@ -22,183 +23,197 @@
     <script src="../js/pagine/categorie.js" defer></script>
 </head>
 <body>
-    <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <h3>Menu</h3>
-            <button id="closeSidebar" class="close-sidebar">&times;</button>
-        </div>
-        <div class="sidebar-content">
-            <a href="/home" class="sidebar-link">
-                <span class="sidebar-icon">🏠</span>
-                <span>Home</span>
-            </a>
-            <a href="/bilanci" class="sidebar-link">
-                <span class="sidebar-icon">📊</span>
-                <span>Bilanci</span>
-            </a>
-            <a href="/lista_conti" class="sidebar-link">
-                <span class="sidebar-icon">🏦</span>
-                <span>Conti</span>
-            </a>
-            <a href="/operazioni" class="sidebar-link">
-                <span class="sidebar-icon">📈</span>
-                <span>Operazioni</span>
-            </a>
-            <div class="sidebar-divider"></div>
-            <a href="/profilo" class="sidebar-link">
-                <span class="sidebar-icon">🧑🏻</span>
-                <span>Profilo</span>
-            </a>
-            <a href="/logout" class="sidebar-link logout">
-                <span class="sidebar-icon">🚪</span>
-                <span>Logout</span>
-            </a>
-        </div>
-    </aside>
-
-    <!-- Overlay per chiudere sidebar -->
-    <div id="sidebarOverlay" class="sidebar-overlay"></div>
-
-    <!-- Header -->
-    <header class="header">
-        <div class="header-left">
-            <button id="hamburgerMenu" class="hamburger-menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <h1>Le tue categorie</h1>
-        </div>
-        <div class="nav-links">
-            <a href="/home" class="nav-link">🏠 Home</a>
-            <form action="/logout" method="get" style="display: inline;">
-                <button type="submit" class="logout-button">Logout</button>
-            </form>
-        </div>
-    </header>
-
-    <main class="main-content">
-        <!-- Aggiungi categoria -->
-        <section class="add-category-section">
-            <button id="addCategoryBtn" class="add-category-btn">
-                Aggiungi Categoria
-            </button>
-        </section>
-
-        <!-- Categorie di Guadagno -->
-        <section class="categories-section income-section">
-            <h2>🟢 Categorie di Guadagno</h2>
-            <div class="categories-container">
-                <ul id="incomeCategories" class="categories-list income">
-                    <!-- Le categorie di guadagno verranno caricate dinamicamente -->
-                </ul>
+    <div class="page-wrapper">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>Menu</h3>
+                <button id="closeSidebar" class="close-sidebar">&times;</button>
             </div>
-        </section>
-
-        <!-- Categorie di Spesa -->
-        <section class="categories-section expense-section">
-            <h2>🔴 Categorie di Spesa</h2>
-            <div class="categories-container">
-                <ul id="expenseCategories" class="categories-list expense">
-                    <!-- Le categorie di spesa verranno caricate dinamicamente -->
-                </ul>
+            <div class="sidebar-content">
+                <a href="/home" class="sidebar-link">
+                    <span class="sidebar-icon">🏠</span>
+                    <span>Home</span>
+                </a>
+                <a href="/bilanci" class="sidebar-link">
+                    <span class="sidebar-icon">📊</span>
+                    <span>Bilanci</span>
+                </a>
+                <a href="/lista_conti" class="sidebar-link">
+                    <span class="sidebar-icon">🏦</span>
+                    <span>Conti</span>
+                </a>
+                <a href="/operazioni" class="sidebar-link">
+                    <span class="sidebar-icon">📈</span>
+                    <span>Operazioni</span>
+                </a>
+                <div class="sidebar-divider"></div>
+                <a href="/profilo" class="sidebar-link">
+                    <span class="sidebar-icon">🧑🏻</span>
+                    <span>Profilo</span>
+                </a>
+                <a href="/logout" class="sidebar-link logout">
+                    <span class="sidebar-icon">🚪</span>
+                    <span>Logout</span>
+                </a>
             </div>
-        </section>
+        </aside>
 
-        <!-- Menu contestuale -->
-        <div id="contextMenu" class="context-menu">
-            <div class="context-menu-item" id="editCategoryOption">
-                <span class="context-icon">✏️</span>
-                <span>Modifica nome</span>
-            </div>
-            <div class="context-menu-item danger" id="deleteCategoryOption">
-                <span class="context-icon">🗑️</span>
-                <span>Elimina categoria</span>
-            </div>
-        </div>
+        <!-- Overlay per chiudere sidebar -->
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-        <!-- Modale per aggiungere categoria -->
-        <div id="addCategoryModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Aggiungi Categoria</h2>
-                    <span class="close">&times;</span>
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button id="hamburgerMenu" class="hamburger-menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <h1>Le tue categorie</h1>
+            </div>
+            <div class="nav-links">
+                <a href="/home" class="nav-link">🏠 Home</a>
+                <form action="/logout" method="get" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Aggiungi categoria -->
+            <section class="add-category-section">
+                <button id="addCategoryBtn" class="add-category-btn">
+                    Aggiungi Categoria
+                </button>
+            </section>
+
+            <!-- Categorie di Guadagno -->
+            <section class="categories-section income-section">
+                <h2>🟢 Categorie di Guadagno</h2>
+                <div class="categories-container">
+                    <ul id="incomeCategories" class="categories-list income">
+                        <!-- Le categorie di guadagno verranno caricate dinamicamente -->
+                    </ul>
                 </div>
-                <div class="modal-body">
-                    <form id="addCategoryForm" novalidate>
-                        <div class="form-section">
-                            <div class="form-group">
-                                <label for="categoryName">Nome Categoria *</label>
-                                <input type="text" id="categoryName" name="nome" 
-                                       placeholder="Es. Stipendio, Affitto, Cibo..." required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="categoryType">Tipo Categoria *</label>
-                                <select id="categoryType" name="tipo" required>
-                                    <option value="">Seleziona il tipo</option>
-                                    <option value="Spesa">Spesa</option>
-                                    <option value="Guadagno">Guadagno</option>
-                                </select>
-                            </div>
-                        </div>
+            </section>
 
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-secondary" id="cancelAddCategory">Annulla</button>
-                            <button type="submit" class="btn btn-primary">Aggiungi Categoria</button>
-                        </div>
-                    </form>
+            <!-- Categorie di Spesa -->
+            <section class="categories-section expense-section">
+                <h2>🔴 Categorie di Spesa</h2>
+                <div class="categories-container">
+                    <ul id="expenseCategories" class="categories-list expense">
+                        <!-- Le categorie di spesa verranno caricate dinamicamente -->
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Menu contestuale -->
+            <div id="contextMenu" class="context-menu">
+                <div class="context-menu-item" id="editCategoryOption">
+                    <span class="context-icon">✏️</span>
+                    <span>Modifica nome</span>
+                </div>
+                <div class="context-menu-item danger" id="deleteCategoryOption">
+                    <span class="context-icon">🗑️</span>
+                    <span>Elimina categoria</span>
                 </div>
             </div>
-        </div>
 
-        <!-- Modale per modificare categoria -->
-        <div id="editCategoryModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Modifica Categoria</h2>
-                    <span class="close">&times;</span>
-                </div>
-                <div class="modal-body">
-                    <form id="editCategoryForm" novalidate>
-                        <div class="form-section">
-                            <div class="form-group">
-                                <label for="editCategoryName">Nuovo Nome *</label>
-                                <input type="text" id="editCategoryName" name="nuovoNome" 
-                                       placeholder="Inserisci il nuovo nome..." required>
-                            </div>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-secondary" id="cancelEditCategory">Annulla</button>
-                            <button type="submit" class="btn btn-primary">Modifica Categoria</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modale per conferma eliminazione -->
-        <div id="deleteCategoryModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Elimina Categoria</h2>
-                    <span class="close">&times;</span>
-                </div>
-                <div class="modal-body">
-                    <div class="warning-message">
-                        <p>⚠️ <strong>Attenzione!</strong></p>
-                        <p id="deleteWarningText">Sei sicuro di voler eliminare questa categoria?</p>
+            <!-- Modale per aggiungere categoria -->
+            <div id="addCategoryModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Aggiungi Categoria</h2>
+                        <span class="close">&times;</span>
                     </div>
-                    
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" id="cancelDeleteCategory">Annulla</button>
-                        <button type="button" class="btn btn-danger" id="confirmDeleteCategory">Elimina Categoria</button>
+                    <div class="modal-body">
+                        <form id="addCategoryForm" novalidate>
+                            <div class="form-section">
+                                <div class="form-group">
+                                    <label for="categoryName">Nome Categoria *</label>
+                                    <input type="text" id="categoryName" name="nome" 
+                                        placeholder="Es. Stipendio, Affitto, Cibo..." required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="categoryType">Tipo Categoria *</label>
+                                    <select id="categoryType" name="tipo" required>
+                                        <option value="">Seleziona il tipo</option>
+                                        <option value="Spesa">Spesa</option>
+                                        <option value="Guadagno">Guadagno</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" id="cancelAddCategory">Annulla</button>
+                                <button type="submit" class="btn btn-primary">Aggiungi Categoria</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
-        </div>
-    </main>
+
+            <!-- Modale per modificare categoria -->
+            <div id="editCategoryModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Modifica Categoria</h2>
+                        <span class="close">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editCategoryForm" novalidate>
+                            <div class="form-section">
+                                <div class="form-group">
+                                    <label for="editCategoryName">Nuovo Nome *</label>
+                                    <input type="text" id="editCategoryName" name="nuovoNome" 
+                                        placeholder="Inserisci il nuovo nome..." required>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" id="cancelEditCategory">Annulla</button>
+                                <button type="submit" class="btn btn-primary">Modifica Categoria</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modale per conferma eliminazione -->
+            <div id="deleteCategoryModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Elimina Categoria</h2>
+                        <span class="close">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <div class="warning-message">
+                            <p>⚠️ <strong>Attenzione!</strong></p>
+                            <p id="deleteWarningText">Sei sicuro di voler eliminare questa categoria?</p>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelDeleteCategory">Annulla</button>
+                            <button type="button" class="btn btn-danger" id="confirmDeleteCategory">Elimina Categoria</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <img src="/img/Logo.png" alt="FinanceHub Logo" class="footer-logo">
+                <div class="footer-text">
+                    <span class="footer-title">FinanceHub</span>
+                    <span class="footer-desc">Gestione semplice e sicura delle tue finanze</span>
+                </div>
+                <span class="footer-copyright">&copy; 2025</span>
+            </div>
+        </footer>
+    </div>
+
 </body>
 </html>

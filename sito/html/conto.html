@@ -15,6 +15,7 @@
    <link rel="stylesheet" href="../css/componenti/header.css">
     <link rel="stylesheet" href="../css/componenti/sidebar.css">
     <link rel="stylesheet" href="../css/componenti/notifiche.css">
+    <link rel="stylesheet" href="../css/componenti/footer.css">
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
 
@@ -23,295 +24,308 @@
     <script src="../js/pagine/conto.js" defer></script>
 </head>
 <body>
-    <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <h3>Menu</h3>
-            <button id="closeSidebar" class="close-sidebar">&times;</button>
-        </div>
-        <div class="sidebar-content">
-            <a href="/home" class="sidebar-link">
-                <span class="sidebar-icon">🏠</span>
-                <span>Home</span>
-            </a>
-            <a href="/bilanci" class="sidebar-link">
-                <span class="sidebar-icon">📊</span>
-                <span>Bilanci</span>
-            </a>
-            <a href="/lista_conti" class="sidebar-link">
-                <span class="sidebar-icon">🏦</span>
-                <span>Conti</span>
-            </a>
-            <a href="/operazioni" class="sidebar-link">
-                <span class="sidebar-icon">📈</span>
-                <span>Operazioni</span>
-            </a>
-            <a href="/categorie" class="sidebar-link">
-                <span class="sidebar-icon">📂</span>
-                <span>Categorie</span>
-            </a>
-            <div class="sidebar-divider"></div>
-            <a href="/profilo" class="sidebar-link">
-                <span class="sidebar-icon">🧑🏻</span>
-                <span>Profilo</span>
-            </a>
-            <a href="/logout" class="sidebar-link logout">
-                <span class="sidebar-icon">🚪</span>
-                <span>Logout</span>
-            </a>
-        </div>
-    </aside>
-
-    <!-- Overlay per chiudere sidebar -->
-    <div id="sidebarOverlay" class="sidebar-overlay"></div>
-
-    <!-- Header -->
-    <header class="header">
-        <div class="header-left">
-            <button id="hamburgerMenu" class="hamburger-menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <h1>Conto</h1>
-        </div>
-        <div class="nav-links">
-            <a href="/home" class="nav-link">🏠 Home</a>
-            <form action="/logout" method="get" style="display: inline;">
-                <button type="submit" class="logout-button">Logout</button>
-            </form>
-        </div>
-    </header>
-
-    <main class="main-content">
-        <!-- Informazioni del conto -->
-        <section class="account-info-section">
-            <div class="account-header">
-                <div class="account-details">
-                    <h2 id="accountName">Nome Conto</h2>
-                    <div class="account-type-row">
-                        <p id="accountType" class="account-type">Tipo Conto</p>
-                        <p id="accountInitialBalance" class="account-initial-balance">Saldo iniziale: € 0.00</p>
-                    </div>
-                </div>
-                <div id="accountBalance" class="account-balance">€ 0.00</div>
+    <div class="page-wrapper">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>Menu</h3>
+                <button id="closeSidebar" class="close-sidebar">&times;</button>
             </div>
-        </section>
+            <div class="sidebar-content">
+                <a href="/home" class="sidebar-link">
+                    <span class="sidebar-icon">🏠</span>
+                    <span>Home</span>
+                </a>
+                <a href="/bilanci" class="sidebar-link">
+                    <span class="sidebar-icon">📊</span>
+                    <span>Bilanci</span>
+                </a>
+                <a href="/lista_conti" class="sidebar-link">
+                    <span class="sidebar-icon">🏦</span>
+                    <span>Conti</span>
+                </a>
+                <a href="/operazioni" class="sidebar-link">
+                    <span class="sidebar-icon">📈</span>
+                    <span>Operazioni</span>
+                </a>
+                <a href="/categorie" class="sidebar-link">
+                    <span class="sidebar-icon">📂</span>
+                    <span>Categorie</span>
+                </a>
+                <div class="sidebar-divider"></div>
+                <a href="/profilo" class="sidebar-link">
+                    <span class="sidebar-icon">🧑🏻</span>
+                    <span>Profilo</span>
+                </a>
+                <a href="/logout" class="sidebar-link logout">
+                    <span class="sidebar-icon">🚪</span>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
 
-        <!-- Azioni rapide -->
-        <section class="actions-section">
-            <h3>Azioni</h3>
-            <div class="action-buttons">
-                <button id="addTransactionBtn" class="action-btn transaction-btn">
-                    <span class="btn-icon">💰</span>
-                    Aggiungi Transazione
+        <!-- Overlay per chiudere sidebar -->
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button id="hamburgerMenu" class="hamburger-menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </button>
-                <button id="addTransferBtn" class="action-btn transfer-btn">
-                    <span class="btn-icon">🔄</span>
-                    Nuovo Trasferimento
-                </button>
-                <button id="editAccountBtn" class="action-btn edit-btn">
-                    <span class="btn-icon">⚙️</span>
-                    Modifica Conto
-                </button>
+                <h1>Conto</h1>
             </div>
-        </section>
-
-        <!-- Operazioni del conto -->
-        <section class="operations-section">
-            <h3>Operazioni</h3>
-            <div class="operations-filter">
-                <button class="filter-btn active" data-filter="all">Tutte</button>
-                <button class="filter-btn" data-filter="transazioni">Transazioni</button>
-                <button class="filter-btn" data-filter="trasferimenti">Trasferimenti</button>
-            </div>
-            <ul id="operationsList" class="operations-list">
-                <!-- Le operazioni verranno caricate dinamicamente -->
-            </ul>
-        </section>
-    </main>
-
-    <!-- Modale per modificare il conto -->
-    <div id="editAccountModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Modifica Conto</h2>
-                <span class="close">&times;</span>
-            </div>
-            <div class="modal-body">
-                <form id="editAccountForm" novalidate>
-                    <div class="form-section">
-                        <h3>Informazioni Conto</h3>
-                        <div class="form-group">
-                            <label for="editAccountName">Nome del Conto:</label>
-                            <input type="text" id="editAccountName" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="editAccountType">Tipo di Conto:</label>
-                            <select id="editAccountType" name="type" required>
-                                <option value="Conto Corrente">Conto Corrente</option>
-                                <option value="Conto Risparmio">Conto Risparmio</option>
-                                <option value="Conto Deposito">Conto Deposito</option>
-                                <option value="Conto Investimento">Conto Investimento</option>
-                                <option value="Carta Prepagata">Carta Prepagata</option>
-                                <option value="Contanti">Contanti</option>
-                                <option value="Altro">Altro</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="editAccountBalance">Saldo iniziale:</label>
-                            <input type="number" id="editAccountBalance" name="balance" required>
-                        </div>
-                        <div class="form-group visibilita-switch-row">
-                            <span class="switch-static-label left">Nascosto</span>
-                            <label class="switch">
-                                <input type="checkbox" id="editVisibilita" name="visibilita">
-                                <span class="slider"></span>
-                            </label>
-                            <span class="switch-static-label right">Visibile</span>
-                        </div>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" id="cancelEdit">Annulla</button>
-                        <button type="submit" class="btn btn-primary">Salva Modifiche</button>
-                        <button type="button" class="btn btn-danger" id="deleteAccount">Elimina Conto</button>
-                    </div>
+            <div class="nav-links">
+                <a href="/home" class="nav-link">🏠 Home</a>
+                <form action="/logout" method="get" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
                 </form>
             </div>
-        </div>
-    </div>
+        </header>
 
-    <!-- Modale di conferma eliminazione -->
-    <div id="deleteConfirmModal" class="modal">
-        <div class="modal-content small">
-            <div class="modal-header">
-                <h2>Conferma Eliminazione</h2>
-                <span class="close">&times;</span>
-            </div>
-            <div class="modal-body">
-                <p><strong>⚠️ Attenzione!</strong></p>
-                <p>Stai per eliminare il conto "<span id="deleteAccountName"></span>".</p>
-                <p><strong>Questa azione è irreversibile.</strong></p>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" id="cancelDelete">Annulla</button>
-                    <button type="button" class="btn btn-danger" id="confirmDelete">Elimina Conto</button>
+        <main class="main-content">
+            <!-- Informazioni del conto -->
+            <section class="account-info-section">
+                <div class="account-header">
+                    <div class="account-details">
+                        <h2 id="accountName">Nome Conto</h2>
+                        <div class="account-type-row">
+                            <p id="accountType" class="account-type">Tipo Conto</p>
+                            <p id="accountInitialBalance" class="account-initial-balance">Saldo iniziale: € 0.00</p>
+                        </div>
+                    </div>
+                    <div id="accountBalance" class="account-balance">€ 0.00</div>
                 </div>
-            </div>
-        </div>
-    </div>
+            </section>
 
-    <!-- Modale per aggiungere transazione -->
-    <div id="addTransactionModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Aggiungi Transazione</h2>
-                <span class="close">&times;</span>
+            <!-- Azioni rapide -->
+            <section class="actions-section">
+                <h3>Azioni</h3>
+                <div class="action-buttons">
+                    <button id="addTransactionBtn" class="action-btn transaction-btn">
+                        <span class="btn-icon">💰</span>
+                        Aggiungi Transazione
+                    </button>
+                    <button id="addTransferBtn" class="action-btn transfer-btn">
+                        <span class="btn-icon">🔄</span>
+                        Nuovo Trasferimento
+                    </button>
+                    <button id="editAccountBtn" class="action-btn edit-btn">
+                        <span class="btn-icon">⚙️</span>
+                        Modifica Conto
+                    </button>
+                </div>
+            </section>
+
+            <!-- Operazioni del conto -->
+            <section class="operations-section">
+                <h3>Operazioni</h3>
+                <div class="operations-filter">
+                    <button class="filter-btn active" data-filter="all">Tutte</button>
+                    <button class="filter-btn" data-filter="transazioni">Transazioni</button>
+                    <button class="filter-btn" data-filter="trasferimenti">Trasferimenti</button>
+                </div>
+                <ul id="operationsList" class="operations-list">
+                    <!-- Le operazioni verranno caricate dinamicamente -->
+                </ul>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <img src="/img/Logo.png" alt="FinanceHub Logo" class="footer-logo">
+                <div class="footer-text">
+                    <span class="footer-title">FinanceHub</span>
+                    <span class="footer-desc">Gestione semplice e sicura delle tue finanze</span>
+                </div>
+                <span class="footer-copyright">&copy; 2025</span>
             </div>
-            <div class="modal-body">
-                <form id="addTransactionForm" novalidate>
-                    <div class="form-section">
-                        <h3>Dettagli Transazione</h3>
-                        
-                        <div class="form-group">
-                            <label for="transactionAmount">Importo *</label>
-                            <div class="input-group">
-                                <span class="input-prefix">€</span>
-                                <input type="number" id="transactionAmount" name="importo" 
-                                       step="0.01" min="0.01" required>
+        </footer>
+
+        <!-- Modale per modificare il conto -->
+        <div id="editAccountModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Modifica Conto</h2>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="editAccountForm" novalidate>
+                        <div class="form-section">
+                            <h3>Informazioni Conto</h3>
+                            <div class="form-group">
+                                <label for="editAccountName">Nome del Conto:</label>
+                                <input type="text" id="editAccountName" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editAccountType">Tipo di Conto:</label>
+                                <select id="editAccountType" name="type" required>
+                                    <option value="Conto Corrente">Conto Corrente</option>
+                                    <option value="Conto Risparmio">Conto Risparmio</option>
+                                    <option value="Conto Deposito">Conto Deposito</option>
+                                    <option value="Conto Investimento">Conto Investimento</option>
+                                    <option value="Carta Prepagata">Carta Prepagata</option>
+                                    <option value="Contanti">Contanti</option>
+                                    <option value="Altro">Altro</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="editAccountBalance">Saldo iniziale:</label>
+                                <input type="number" id="editAccountBalance" name="balance" required>
+                            </div>
+                            <div class="form-group visibilita-switch-row">
+                                <span class="switch-static-label left">Nascosto</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="editVisibilita" name="visibilita">
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="switch-static-label right">Visibile</span>
                             </div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="transactionDescription">Descrizione *</label>
-                            <input type="text" id="transactionDescription" name="descrizione" 
-                                   placeholder="Es. Spesa per benzina" required>
-                        </div>
 
-                        <div class="form-group">
-                            <label for="transactionDate">Data e Ora Transazione *</label>
-                            <input type="datetime-local" id="transactionDate" name="data" required>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelEdit">Annulla</button>
+                            <button type="submit" class="btn btn-primary">Salva Modifiche</button>
+                            <button type="button" class="btn btn-danger" id="deleteAccount">Elimina Conto</button>
                         </div>
-
-                        <div class="form-group">
-                            <label for="transactionType">Tipo Transazione *</label>
-                            <select id="transactionType" name="tipo" required>
-                                <option value="">Seleziona il tipo</option>
-                                <option value="Spesa">Spesa</option>
-                                <option value="Guadagno">Guadagno</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group" id="categoryGroup" style="display: none;">
-                            <label for="transactionCategory">Categoria *</label>
-                            <select id="transactionCategory" name="categoria">
-                                <option value="">Seleziona una categoria</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" id="cancelTransaction">Annulla</button>
-                        <button type="submit" class="btn btn-primary">Aggiungi Transazione</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-    <!-- Modale per aggiungere trasferimento -->
-    <div id="addTransferModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Nuovo Trasferimento</h2>
-                <span class="close">&times;</span>
+
+        <!-- Modale di conferma eliminazione -->
+        <div id="deleteConfirmModal" class="modal">
+            <div class="modal-content small">
+                <div class="modal-header">
+                    <h2>Conferma Eliminazione</h2>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <p><strong>⚠️ Attenzione!</strong></p>
+                    <p>Stai per eliminare il conto "<span id="deleteAccountName"></span>".</p>
+                    <p><strong>Questa azione è irreversibile.</strong></p>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancelDelete">Annulla</button>
+                        <button type="button" class="btn btn-danger" id="confirmDelete">Elimina Conto</button>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
-                <form id="addTransferForm" novalidate>
-                    <div class="form-section">
-                        <h3>Dettagli Trasferimento</h3>
-                        
-                        <div class="form-group">
-                            <label for="transferAmount">Importo *</label>
-                            <div class="input-group">
-                                <span class="input-prefix">€</span>
-                                <input type="number" id="transferAmount" name="importo" 
+        </div>
+
+        <!-- Modale per aggiungere transazione -->
+        <div id="addTransactionModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Aggiungi Transazione</h2>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="addTransactionForm" novalidate>
+                        <div class="form-section">
+                            <h3>Dettagli Transazione</h3>
+                            
+                            <div class="form-group">
+                                <label for="transactionAmount">Importo *</label>
+                                <div class="input-group">
+                                    <span class="input-prefix">€</span>
+                                    <input type="number" id="transactionAmount" name="importo" 
                                         step="0.01" min="0.01" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="transferDescription">Descrizione *</label>
-                            <input type="text" id="transferDescription" name="descrizione" 
-                                    placeholder="Es. Trasferimento a conto risparmio" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="destinationAccount">Conto di Destinazione *</label>
-                            <select id="destinationAccount" name="contoDestinatario" required>
-                                <option value="">Seleziona il conto di destinazione</option>
-                            </select>
-                        </div>
-                        
-                        <div class="transfer-preview" id="transferPreview" style="display: none;">
-                            <div class="transfer-flow">
-                                <div class="account-box from">
-                                    <span class="account-label">Da:</span>
-                                    <span id="fromAccountName" class="account-name"></span>
-                                </div>
-                                <div class="transfer-arrow">→</div>
-                                <div class="account-box to">
-                                    <span class="account-label">A:</span>
-                                    <span id="toAccountName" class="account-name"></span>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                            
+                            <div class="form-group">
+                                <label for="transactionDescription">Descrizione *</label>
+                                <input type="text" id="transactionDescription" name="descrizione" 
+                                    placeholder="Es. Spesa per benzina" required>
+                            </div>
 
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" id="cancelTransfer">Annulla</button>
-                        <button type="submit" class="btn btn-primary">Effettua Trasferimento</button>
-                    </div>
-                </form>
+                            <div class="form-group">
+                                <label for="transactionDate">Data e Ora Transazione *</label>
+                                <input type="datetime-local" id="transactionDate" name="data" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="transactionType">Tipo Transazione *</label>
+                                <select id="transactionType" name="tipo" required>
+                                    <option value="">Seleziona il tipo</option>
+                                    <option value="Spesa">Spesa</option>
+                                    <option value="Guadagno">Guadagno</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" id="categoryGroup" style="display: none;">
+                                <label for="transactionCategory">Categoria *</label>
+                                <select id="transactionCategory" name="categoria">
+                                    <option value="">Seleziona una categoria</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelTransaction">Annulla</button>
+                            <button type="submit" class="btn btn-primary">Aggiungi Transazione</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- Modale per aggiungere trasferimento -->
+        <div id="addTransferModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Nuovo Trasferimento</h2>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="addTransferForm" novalidate>
+                        <div class="form-section">
+                            <h3>Dettagli Trasferimento</h3>
+                            
+                            <div class="form-group">
+                                <label for="transferAmount">Importo *</label>
+                                <div class="input-group">
+                                    <span class="input-prefix">€</span>
+                                    <input type="number" id="transferAmount" name="importo" 
+                                            step="0.01" min="0.01" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="transferDescription">Descrizione *</label>
+                                <input type="text" id="transferDescription" name="descrizione" 
+                                        placeholder="Es. Trasferimento a conto risparmio" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="destinationAccount">Conto di Destinazione *</label>
+                                <select id="destinationAccount" name="contoDestinatario" required>
+                                    <option value="">Seleziona il conto di destinazione</option>
+                                </select>
+                            </div>
+                            
+                            <div class="transfer-preview" id="transferPreview" style="display: none;">
+                                <div class="transfer-flow">
+                                    <div class="account-box from">
+                                        <span class="account-label">Da:</span>
+                                        <span id="fromAccountName" class="account-name"></span>
+                                    </div>
+                                    <div class="transfer-arrow">→</div>
+                                    <div class="account-box to">
+                                        <span class="account-label">A:</span>
+                                        <span id="toAccountName" class="account-name"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelTransfer">Annulla</button>
+                            <button type="submit" class="btn btn-primary">Effettua Trasferimento</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="../css/componenti/header.css">
     <link rel="stylesheet" href="../css/componenti/sidebar.css">
     <link rel="stylesheet" href="../css/componenti/notifiche.css">
+    <link rel="stylesheet" href="../css/componenti/footer.css">
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
     
@@ -22,80 +23,93 @@
     <script src="../js/pagine/conti_nascosti.js" defer></script>
 </head>
 <body>
-    <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <h3>Menu</h3>
-            <button id="closeSidebar" class="close-sidebar">&times;</button>
-        </div>
-        <div class="sidebar-content">
-            <a href="/home" class="sidebar-link">
-                <span class="sidebar-icon">🏠</span>
-                <span>Home</span>
-            </a>
-            <a href="/bilanci" class="sidebar-link">
-                <span class="sidebar-icon">📊</span>
-                <span>Bilanci</span>
-            </a>
-            <a href="/lista_conti" class="sidebar-link">
-                <span class="sidebar-icon">🏦</span>
-                <span>Conti</span>
-            </a>
-            <a href="/operazioni" class="sidebar-link">
-                <span class="sidebar-icon">📈</span>
-                <span>Operazioni</span>
-            </a>
-            <a href="/categorie" class="sidebar-link">
-                <span class="sidebar-icon">📂</span>
-                <span>Categorie</span>
-            </a>
-            <div class="sidebar-divider"></div>
-            <a href="/profilo" class="sidebar-link">
-                <span class="sidebar-icon">🧑🏻</span>
-                <span>Profilo</span>
-            </a>
-            <a href="/logout" class="sidebar-link logout">
-                <span class="sidebar-icon">🚪</span>
-                <span>Logout</span>
-            </a>
-        </div>
-    </aside>
-
-    <!-- Overlay per chiudere sidebar -->
-    <div id="sidebarOverlay" class="sidebar-overlay"></div>
-
-    <!-- Header -->
-    <header class="header">
-        <div class="header-left">
-            <button id="hamburgerMenu" class="hamburger-menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <h1>I tuoi conti nascosti</h1>
-        </div>
-        <div class="nav-links">
-            <a href="/home" class="nav-link">🏠 Home</a>
-            <form action="/logout" method="get" style="display: inline;">
-                <button type="submit" class="logout-button">Logout</button>
-            </form>
-        </div>
-    </header>
-
-    <main class="main-content">
-        <!-- Lista Conti -->
-        <section class="accounts-section">
-            <div class="accounts-grid" id="accountsGrid">
-                <!-- I conti verranno caricati dinamicamente -->
+    <div class="page-wrapper">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>Menu</h3>
+                <button id="closeSidebar" class="close-sidebar">&times;</button>
             </div>
-            
-            <!-- Messaggio vuoto -->
-            <div id="emptyMessage" class="empty-message" style="display: none;">
-                <div class="empty-icon">🏦</div>
-                <h3>Nessun conto nascosto</h3>
-                <p>I conti nascosti verranno mostrati in questa pagina!</p>
+            <div class="sidebar-content">
+                <a href="/home" class="sidebar-link">
+                    <span class="sidebar-icon">🏠</span>
+                    <span>Home</span>
+                </a>
+                <a href="/bilanci" class="sidebar-link">
+                    <span class="sidebar-icon">📊</span>
+                    <span>Bilanci</span>
+                </a>
+                <a href="/lista_conti" class="sidebar-link">
+                    <span class="sidebar-icon">🏦</span>
+                    <span>Conti</span>
+                </a>
+                <a href="/operazioni" class="sidebar-link">
+                    <span class="sidebar-icon">📈</span>
+                    <span>Operazioni</span>
+                </a>
+                <a href="/categorie" class="sidebar-link">
+                    <span class="sidebar-icon">📂</span>
+                    <span>Categorie</span>
+                </a>
+                <div class="sidebar-divider"></div>
+                <a href="/profilo" class="sidebar-link">
+                    <span class="sidebar-icon">🧑🏻</span>
+                    <span>Profilo</span>
+                </a>
+                <a href="/logout" class="sidebar-link logout">
+                    <span class="sidebar-icon">🚪</span>
+                    <span>Logout</span>
+                </a>
             </div>
-        </section>
-    </main>
+        </aside>
+
+        <!-- Overlay per chiudere sidebar -->
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button id="hamburgerMenu" class="hamburger-menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <h1>I tuoi conti nascosti</h1>
+            </div>
+            <div class="nav-links">
+                <a href="/home" class="nav-link">🏠 Home</a>
+                <form action="/logout" method="get" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Lista Conti -->
+            <section class="accounts-section">
+                <div class="accounts-grid" id="accountsGrid">
+                    <!-- I conti verranno caricati dinamicamente -->
+                </div>
+                
+                <!-- Messaggio vuoto -->
+                <div id="emptyMessage" class="empty-message" style="display: none;">
+                    <div class="empty-icon">🏦</div>
+                    <h3>Nessun conto nascosto</h3>
+                    <p>I conti nascosti verranno mostrati in questa pagina!</p>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <img src="/img/Logo.png" alt="FinanceHub Logo" class="footer-logo">
+                <div class="footer-text">
+                    <span class="footer-title">FinanceHub</span>
+                    <span class="footer-desc">Gestione semplice e sicura delle tue finanze</span>
+                </div>
+                <span class="footer-copyright">&copy; 2025</span>
+            </div>
+        </footer>
+    </div>
 </body>
 </html>

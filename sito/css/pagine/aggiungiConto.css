@@ -10,6 +10,7 @@ body {
 
 /* Main content */
 .main-content {
+    min-height: calc(100vh - 275px);
     padding: 40px 20px;
     max-width: 600px;
     margin: 0 auto;

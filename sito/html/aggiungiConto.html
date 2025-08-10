@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="../css/componenti/header.css">
     <link rel="stylesheet" href="../css/componenti/sidebar.css">
     <link rel="stylesheet" href="../css/componenti/notifiche.css">
+    <link rel="stylesheet" href="../css/componenti/footer.css">
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
     
@@ -22,125 +23,139 @@
     <script src="/js/componenti/sidebar.js"></script>
     <script src="../js/pagine/aggiungiConto.js" defer></script>
 </head>
+
 <body>
-    <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <h3>Menu</h3>
-            <button id="closeSidebar" class="close-sidebar">&times;</button>
-        </div>
-        <div class="sidebar-content">
-            <a href="/home" class="sidebar-link">
-                <span class="sidebar-icon">🏠</span>
-                <span>Home</span>
-            </a>
-            <a href="/bilanci" class="sidebar-link">
-                <span class="sidebar-icon">📊</span>
-                <span>Bilanci</span>
-            </a>
-            <a href="/lista_conti" class="sidebar-link">
-                <span class="sidebar-icon">🏦</span>
-                <span>Conti</span>
-            </a>
-            <a href="/operazioni" class="sidebar-link">
-                <span class="sidebar-icon">📈</span>
-                <span>Operazioni</span>
-            </a>
-            <a href="/categorie" class="sidebar-link">
-                <span class="sidebar-icon">📂</span>
-                <span>Categorie</span>
-            </a>
-            <div class="sidebar-divider"></div>
-            <a href="/profilo" class="sidebar-link">
-                <span class="sidebar-icon">🧑🏻</span>
-                <span>Profilo</span>
-            </a>
-            <a href="/logout" class="sidebar-link logout">
-                <span class="sidebar-icon">🚪</span>
-                <span>Logout</span>
-            </a>
-        </div>
-    </aside>
+    <div class="page-wrapper">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>Menu</h3>
+                <button id="closeSidebar" class="close-sidebar">&times;</button>
+            </div>
+            <div class="sidebar-content">
+                <a href="/home" class="sidebar-link">
+                    <span class="sidebar-icon">🏠</span>
+                    <span>Home</span>
+                </a>
+                <a href="/bilanci" class="sidebar-link">
+                    <span class="sidebar-icon">📊</span>
+                    <span>Bilanci</span>
+                </a>
+                <a href="/lista_conti" class="sidebar-link">
+                    <span class="sidebar-icon">🏦</span>
+                    <span>Conti</span>
+                </a>
+                <a href="/operazioni" class="sidebar-link">
+                    <span class="sidebar-icon">📈</span>
+                    <span>Operazioni</span>
+                </a>
+                <a href="/categorie" class="sidebar-link">
+                    <span class="sidebar-icon">📂</span>
+                    <span>Categorie</span>
+                </a>
+                <div class="sidebar-divider"></div>
+                <a href="/profilo" class="sidebar-link">
+                    <span class="sidebar-icon">🧑🏻</span>
+                    <span>Profilo</span>
+                </a>
+                <a href="/logout" class="sidebar-link logout">
+                    <span class="sidebar-icon">🚪</span>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
 
-    <!-- Overlay per chiudere sidebar -->
-    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+        <!-- Overlay per chiudere sidebar -->
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-    <!-- Header -->
-    <header class="header">
-        <div class="header-left">
-            <button id="hamburgerMenu" class="hamburger-menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <h1>I tuoi conti</h1>
-        </div>
-        <div class="nav-links">
-            <a href="/home" class="nav-link">🏠 Home</a>
-            <form action="/logout" method="get" style="display: inline;">
-                <button type="submit" class="logout-button">Logout</button>
-            </form>
-        </div>
-    </header>
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button id="hamburgerMenu" class="hamburger-menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <h1>I tuoi conti</h1>
+            </div>
+            <div class="nav-links">
+                <a href="/home" class="nav-link">🏠 Home</a>
+                <form action="/logout" method="get" style="display: inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            </div>
+        </header>
 
-    <main class="main-content">
-        <div class="form-container">
-            <form id="addAccountForm" class="account-form" novalidate autocomplete="off">
-                <div class="form-group">
-                    <label for="accountName">Nome del Conto *</label>
-                    <input type="text" id="accountName" name="nome" required
-                        placeholder="Es. Conto Corrente Principale">
-                </div>
-
-                <div class="form-group">
-                    <label for="accountType">Tipo di Conto *</label>
-                    <select id="accountType" name="tipo" required>
-                        <option value="">Seleziona il tipo di conto</option>
-                        <option value="Corrente">Conto Corrente</option>
-                        <option value="Risparmio">Conto Risparmio</option>
-                        <option value="Deposito">Conto Deposito</option>
-                        <option value="Investimento">Conto Investimento</option>
-                        <option value="Carta">Carta Prepagata</option>
-                        <option value="Contanti">Contanti</option>
-                        <option value="Altro">Altro</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="initialBalance">Saldo Iniziale *</label>
-                    <div class="input-group">
-                        <span class="input-prefix">€</span>
-                        <input type="number" id="initialBalance" name="saldo" 
-                            step="0.01" value="0.00" min="-9999999999999.99" required>
+        <main class="main-content">
+            <div class="form-container">
+                <form id="addAccountForm" class="account-form" novalidate autocomplete="off">
+                    <div class="form-group">
+                        <label for="accountName">Nome del Conto *</label>
+                        <input type="text" id="accountName" name="nome" required
+                            placeholder="Es. Conto Corrente Principale">
                     </div>
-                    <small class="form-help">Inserisci il saldo attuale del conto (anche negativo)</small>
-                </div>
 
-                <div class="form-group visibilita-switch-row">
-                    <span class="switch-static-label left">Nascosto</span>
-                    <label class="switch">
-                        <input type="checkbox" id="visibilita" name="visibilita" checked>
-                        <span class="slider"></span>
-                    </label>
-                    <span class="switch-static-label right">Visibile</span>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" id="cancelBtn">
-                        Annulla
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        Aggiungi Conto
-                    </button>
-                </div>
-            </form>
+                    <div class="form-group">
+                        <label for="accountType">Tipo di Conto *</label>
+                        <select id="accountType" name="tipo" required>
+                            <option value="">Seleziona il tipo di conto</option>
+                            <option value="Corrente">Conto Corrente</option>
+                            <option value="Risparmio">Conto Risparmio</option>
+                            <option value="Deposito">Conto Deposito</option>
+                            <option value="Investimento">Conto Investimento</option>
+                            <option value="Carta">Carta Prepagata</option>
+                            <option value="Contanti">Contanti</option>
+                            <option value="Altro">Altro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="initialBalance">Saldo Iniziale *</label>
+                        <div class="input-group">
+                            <span class="input-prefix">€</span>
+                            <input type="number" id="initialBalance" name="saldo" 
+                                step="0.01" value="0.00" min="-9999999999999.99" required>
+                        </div>
+                        <small class="form-help">Inserisci il saldo attuale del conto (anche negativo)</small>
+                    </div>
+
+                    <div class="form-group visibilita-switch-row">
+                        <span class="switch-static-label left">Nascosto</span>
+                        <label class="switch">
+                            <input type="checkbox" id="visibilita" name="visibilita" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span class="switch-static-label right">Visibile</span>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancelBtn">
+                            Annulla
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Aggiungi Conto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <!-- Loading overlay -->
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-spinner"></div>
+            <p>Aggiunta conto in corso...</p>
         </div>
-    </main>
 
-    <!-- Loading overlay -->
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="loading-spinner"></div>
-        <p>Aggiunta conto in corso...</p>
+        <footer class="footer">
+            <div class="footer-content">
+                <img src="/img/Logo.png" alt="FinanceHub Logo" class="footer-logo">
+                <div class="footer-text">
+                    <span class="footer-title">FinanceHub</span>
+                    <span class="footer-desc">Gestione semplice e sicura delle tue finanze</span>
+                </div>
+                <span class="footer-copyright">&copy; 2025</span>
+            </div>
+        </footer>
     </div>
 </body>
 </html>
