@@ -16,11 +16,38 @@ document.addEventListener("DOMContentLoaded", function() {
         return;
     }
 
+    showLoading(true);
     setupSidebar();
     fetchContoData();
     setupFilterListeners();
     setupActionListeners();
 });
+
+function showLoading(show) {
+    const loading = document.getElementById('loadingMessage');
+    const main = document.getElementById('mainContent');
+    const error = document.getElementById('errorMessage');
+    if (show) {
+        loading.style.display = 'block';
+        main.style.display = 'none';
+        error.style.display = 'none';
+    } else {
+        loading.style.display = 'none';
+    }
+}
+
+function showMainContent() {
+    document.getElementById('mainContent').style.display = 'block';
+    document.getElementById('loadingMessage').style.display = 'none';
+    document.getElementById('errorMessage').style.display = 'none';
+}
+
+function showError(message) {
+    document.getElementById('errorText').textContent = message;
+    document.getElementById('errorMessage').style.display = 'block';
+    document.getElementById('loadingMessage').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'none';
+}
 
 // Funzione per recuperare i dati del conto specifico
 async function fetchContoData() {
@@ -40,7 +67,7 @@ async function fetchContoData() {
         
     } catch (error) {
         console.error("Errore:", error);
-        showError("Errore durante il caricamento dei dati del conto");
+        showError("Conto non trovato");
     }
 }
 
@@ -72,6 +99,8 @@ async function fetchOperazioni() {
         
         // Applica il filtro corrente
         filterOperations(currentFilter);
+
+        showMainContent();
         
     } catch (error) {
         console.error("Errore:", error);
@@ -270,12 +299,6 @@ function formatDate(dateString) {
     });
     
     return `${dateFormatted} - ${timeFormatted}`;
-}
-
-// Funzione per mostrare errori
-function showError(message) {
-    const operationsList = document.getElementById("operationsList");
-    operationsList.innerHTML = `<li class="empty-state" style="color: #dc3545;">${message}</li>`;
 }
 
 function setupModalListeners() {
@@ -758,4 +781,11 @@ async function handleAddTransferSubmit(event) {
         console.error('Errore:', error);
         showNotification(error.message || 'Errore durante il trasferimento', 'error');
     }
+}
+
+function showError(message) {
+    document.getElementById('errorText').textContent = message;
+    document.getElementById('errorMessage').style.display = 'block';
+    document.getElementById('loadingMessage').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'none';
 }

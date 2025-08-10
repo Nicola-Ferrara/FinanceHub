@@ -13,9 +13,9 @@ body {
     padding: 30px;
     max-width: 1000px;
     margin: 0 auto;
-    display: flex;
+    /*display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 30px;*/
     min-height: calc(100vh - 255px);
 }
 
@@ -753,4 +753,71 @@ input:checked + .slider:before {
     cursor: pointer;
     width: 18px;
     height: 18px;
+}
+
+.loading-message, .error-message {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+
+.error-message h2 {
+    font-size: 24px;
+    margin: 0 0 10px 0;
+    font-weight: 400;
+}
+
+.error-message p {
+    font-size: 16px;
+    margin: 0 0 30px 0;
+}
+
+.account-info-section,
+.actions-section,
+.operations-section {
+    margin-bottom: 24px;
+}
+
+.btn-back {
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 15px 30px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+    min-width: 140px;
+}
+
+.btn-back:hover {
+    transform: translateY(-2px);
+    background: #5a6268;
+    box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
 }

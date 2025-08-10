@@ -86,51 +86,67 @@
         </header>
 
         <main class="main-content">
+            <!-- Schermata di caricamento -->
+            <div id="loadingMessage" class="loading-message">
+                <div class="spinner"></div>
+                <p>Caricamento conto...</p>
+            </div>
+            <!-- Schermata di errore -->
+            <div id="errorMessage" class="error-message" style="display: none;">
+                <div class="error-icon">❌</div>
+                <h2>Errore</h2>
+                <p id="errorText">Conto non trovato</p>
+                <button onclick="window.location.href='/home'" class="btn-back">
+                    Torna alla home
+                </button>
+            </div>
             <!-- Informazioni del conto -->
-            <section class="account-info-section">
-                <div class="account-header">
-                    <div class="account-details">
-                        <h2 id="accountName">Nome Conto</h2>
-                        <div class="account-type-row">
-                            <p id="accountType" class="account-type">Tipo Conto</p>
-                            <p id="accountInitialBalance" class="account-initial-balance">Saldo iniziale: € 0.00</p>
+            <div id="mainContent" style="display: none;">
+                <section class="account-info-section">
+                    <div class="account-header">
+                        <div class="account-details">
+                            <h2 id="accountName">Nome Conto</h2>
+                            <div class="account-type-row">
+                                <p id="accountType" class="account-type">Tipo Conto</p>
+                                <p id="accountInitialBalance" class="account-initial-balance">Saldo iniziale: € 0.00</p>
+                            </div>
                         </div>
+                        <div id="accountBalance" class="account-balance">€ 0.00</div>
                     </div>
-                    <div id="accountBalance" class="account-balance">€ 0.00</div>
-                </div>
-            </section>
+                </section>
 
-            <!-- Azioni rapide -->
-            <section class="actions-section">
-                <h3>Azioni</h3>
-                <div class="action-buttons">
-                    <button id="addTransactionBtn" class="action-btn transaction-btn">
-                        <span class="btn-icon">💰</span>
-                        Aggiungi Transazione
-                    </button>
-                    <button id="addTransferBtn" class="action-btn transfer-btn">
-                        <span class="btn-icon">🔄</span>
-                        Nuovo Trasferimento
-                    </button>
-                    <button id="editAccountBtn" class="action-btn edit-btn">
-                        <span class="btn-icon">⚙️</span>
-                        Modifica Conto
-                    </button>
-                </div>
-            </section>
+                <!-- Azioni rapide -->
+                <section class="actions-section">
+                    <h3>Azioni</h3>
+                    <div class="action-buttons">
+                        <button id="addTransactionBtn" class="action-btn transaction-btn">
+                            <span class="btn-icon">💰</span>
+                            Aggiungi Transazione
+                        </button>
+                        <button id="addTransferBtn" class="action-btn transfer-btn">
+                            <span class="btn-icon">🔄</span>
+                            Nuovo Trasferimento
+                        </button>
+                        <button id="editAccountBtn" class="action-btn edit-btn">
+                            <span class="btn-icon">⚙️</span>
+                            Modifica Conto
+                        </button>
+                    </div>
+                </section>
 
-            <!-- Operazioni del conto -->
-            <section class="operations-section">
-                <h3>Operazioni</h3>
-                <div class="operations-filter">
-                    <button class="filter-btn active" data-filter="all">Tutte</button>
-                    <button class="filter-btn" data-filter="transazioni">Transazioni</button>
-                    <button class="filter-btn" data-filter="trasferimenti">Trasferimenti</button>
-                </div>
-                <ul id="operationsList" class="operations-list">
-                    <!-- Le operazioni verranno caricate dinamicamente -->
-                </ul>
-            </section>
+                <!-- Operazioni del conto -->
+                <section class="operations-section">
+                    <h3>Operazioni</h3>
+                    <div class="operations-filter">
+                        <button class="filter-btn active" data-filter="all">Tutte</button>
+                        <button class="filter-btn" data-filter="transazioni">Transazioni</button>
+                        <button class="filter-btn" data-filter="trasferimenti">Trasferimenti</button>
+                    </div>
+                    <ul id="operationsList" class="operations-list">
+                        <!-- Le operazioni verranno caricate dinamicamente -->
+                    </ul>
+                </section>
+            </div>
         </main>
 
         <footer class="footer">

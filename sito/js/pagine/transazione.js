@@ -46,7 +46,7 @@ async function loadTransaction() {
         const transactionId = getTransactionIdFromUrl();
         
         if (!transactionId) {
-            showError('ID transazione mancante nell\'URL');
+            showError('Dati mancanti nell\'URL');
             return;
         }
         
