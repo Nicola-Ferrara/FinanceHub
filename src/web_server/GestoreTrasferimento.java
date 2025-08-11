@@ -6,6 +6,9 @@ import dto.*;
 import exception.EccezioniDatabase;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.List;
 import java.io.IOException;
@@ -266,17 +269,21 @@ public class GestoreTrasferimento extends BaseGestorePagina {
             // Validazione formato data
             Timestamp dataTrasferimento;
             try {
-                java.time.OffsetDateTime odt = java.time.OffsetDateTime.parse(data);
-                java.time.Instant instant = odt.toInstant();
+                String dataStrNorm = data;
+                if (dataStrNorm.length() == 16) { // "YYYY-MM-DDTHH:mm"
+                    dataStrNorm += ":00";
+                }
+                OffsetDateTime odt;
+                if (dataStrNorm.endsWith("Z")) {
+                    odt = OffsetDateTime.parse(dataStrNorm);
+                } else {
+                    odt = LocalDateTime.parse(dataStrNorm).atZone(java.time.ZoneId.of("Europe/Rome")).toOffsetDateTime();
+                }
+                Instant instant = odt.toInstant();
                 dataTrasferimento = Timestamp.from(instant);
             } catch (Exception e) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
-                    "{\"error\": \"Formato data non valido\"}");
-            }
-            
-            if (dataTrasferimento.after(new Timestamp(System.currentTimeMillis()))) {
-                return createResponse(Response.Status.BAD_REQUEST, "application/json", 
-                    "{\"error\": \"La data non può essere futura\"}");
+                    "{\"error\": \"Formato data non valido. Usa: YYYY-MM-DDTHH:MM\"}");
             }
             
             // Modifica la trasferimento
