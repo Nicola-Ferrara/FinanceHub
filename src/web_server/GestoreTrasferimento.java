@@ -266,9 +266,10 @@ public class GestoreTrasferimento extends BaseGestorePagina {
             // Validazione formato data
             Timestamp dataTrasferimento;
             try {
-                String dataFormatted = data.contains(":00:00") ? data.replace("T", " ") : data.replace("T", " ") + ":00";
-                dataTrasferimento = Timestamp.valueOf(dataFormatted);
-            } catch (IllegalArgumentException e) {
+                java.time.OffsetDateTime odt = java.time.OffsetDateTime.parse(data);
+                java.time.Instant instant = odt.toInstant();
+                dataTrasferimento = Timestamp.from(instant);
+            } catch (Exception e) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"Formato data non valido\"}");
             }
