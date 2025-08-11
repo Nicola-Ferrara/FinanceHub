@@ -332,16 +332,14 @@ function formatDate(dateString) {
 
 function formatDateForInput(dateString) {
     if (!dateString) return '';
-    // Assicurati che sia in formato ISO con Z
     if (!dateString.endsWith('Z')) {
         dateString += 'Z';
     }
     const date = new Date(dateString);
-    // Ottieni i valori in UTC, non in locale!
-    const year = date.getUTCFullYear();
-    const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-    const day = date.getUTCDate().toString().padStart(2, '0');
-    const hour = date.getUTCHours().toString().padStart(2, '0');
-    const minute = date.getUTCMinutes().toString().padStart(2, '0');
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hour = date.getHours().toString().padStart(2, '0');
+    const minute = date.getMinutes().toString().padStart(2, '0');
     return `${year}-${month}-${day}T${hour}:${minute}`;
 }
