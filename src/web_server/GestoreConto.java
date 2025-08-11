@@ -3,6 +3,7 @@ package web_server;
 import fi.iki.elonen.NanoHTTPD.*;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.sql.Timestamp;
@@ -367,14 +368,19 @@ public class GestoreConto extends BaseGestorePagina {
 
                 Timestamp dataTransazione;
                 try {
-                    OffsetDateTime odt = OffsetDateTime.parse(dataStr);
+                    String dataStrNorm = dataStr;
+                    if (dataStrNorm.length() == 16) { // "YYYY-MM-DDTHH:mm"
+                        dataStrNorm += ":00";
+                    }
+                    OffsetDateTime odt;
+                    if (dataStrNorm.endsWith("Z")) {
+                        odt = OffsetDateTime.parse(dataStrNorm);
+                    } else {
+                        // Interpreta la data come nel fuso orario del server
+                        odt = LocalDateTime.parse(dataStrNorm).atZone(java.time.ZoneId.systemDefault()).toOffsetDateTime();
+                    }
                     Instant instant = odt.toInstant();
                     dataTransazione = Timestamp.from(instant);
-                    Timestamp now = Timestamp.from(Instant.now());
-                    if (dataTransazione.after(now)) {
-                        return createResponse(Response.Status.BAD_REQUEST, "application/json", 
-                            "{\"error\": \"La data non può essere futura\"}");
-                    }
                 } catch (Exception e) {
                     return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                         "{\"error\": \"Formato data non valido. Usa: YYYY-MM-DDTHH:MM\"}");

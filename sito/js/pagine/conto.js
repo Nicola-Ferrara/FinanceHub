@@ -538,15 +538,13 @@ async function loadCategories(tipo) {
 async function handleAddTransactionSubmit(event) {
     event.preventDefault();
     
-     const formData = new FormData(event.target);
-    const localDate = new Date(formData.get('data'));
-    const dataUTC = localDate.toISOString();
+    const formData = new FormData(event.target);
 
     const transactionData = {
         importo: parseFloat(formData.get('importo')),
         descrizione: formData.get('descrizione').trim(),
         categoriaId: parseInt(formData.get('categoria')),
-        data: dataUTC
+        data: formData.get('data')
     };
     
     if (!transactionData.importo || isNaN(transactionData.importo) || transactionData.importo <= 0) {
