@@ -6,6 +6,8 @@ import dto.*;
 import exception.EccezioniDatabase;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.List;
 import java.io.IOException;
@@ -270,8 +272,9 @@ public class GestoreTransazione extends BaseGestorePagina {
             // Validazione formato data
             Timestamp dataTransazione;
             try {
-                String dataFormatted = data.contains(":00:00") ? data.replace("T", " ") : data.replace("T", " ") + ":00";
-                dataTransazione = Timestamp.valueOf(dataFormatted);
+                OffsetDateTime odt = OffsetDateTime.parse(data);
+                Instant instant = odt.toInstant();
+                dataTransazione = Timestamp.from(instant);
             } catch (IllegalArgumentException e) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"Formato data non valido\"}");

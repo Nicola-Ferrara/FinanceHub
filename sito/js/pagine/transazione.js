@@ -148,12 +148,15 @@ async function handleSaveTransaction(event) {
         isEditing = true;
         document.getElementById('saveBtn').disabled = true;
         document.getElementById('saveBtn').textContent = 'Salvataggio...';
-        
+
         const formData = new FormData(event.target);
+        const localDate = new Date(formData.get('data'));
+        const dataUTC = localDate.toISOString();
+    
         const updatedData = {
             id: transferData.id,
             importo: parseFloat(formData.get('importo')),
-            data: formData.get('data'),
+            data: dataUTC,
             descrizione: formData.get('descrizione') || '',
             idCategoria: parseInt(formData.get('categoria')),
             idConto: transferData.idConto
