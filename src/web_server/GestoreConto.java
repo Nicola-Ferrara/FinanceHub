@@ -376,7 +376,6 @@ public class GestoreConto extends BaseGestorePagina {
                     if (dataStrNorm.endsWith("Z")) {
                         odt = OffsetDateTime.parse(dataStrNorm);
                     } else {
-                        // Interpreta la data come nel fuso orario del server
                         odt = LocalDateTime.parse(dataStrNorm).atZone(java.time.ZoneId.systemDefault()).toOffsetDateTime();
                     }
                     Instant instant = odt.toInstant();
@@ -537,11 +536,6 @@ public class GestoreConto extends BaseGestorePagina {
                     }
                     Instant instant = odt.toInstant();
                     dataTrasferimento = Timestamp.from(instant);
-                    Timestamp now = Timestamp.from(Instant.now());
-                    if (dataTrasferimento.after(now)) {
-                        return createResponse(Response.Status.BAD_REQUEST, "application/json", 
-                            "{\"error\": \"La data non può essere futura\"}");
-                    }
                 } catch (Exception e) {
                     return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                         "{\"error\": \"Formato data non valido. Usa: YYYY-MM-DDTHH:MM\"}");
