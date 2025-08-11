@@ -1,7 +1,9 @@
 package web_server;
 
 import fi.iki.elonen.NanoHTTPD.*;
-import java.time.LocalDateTime;
+
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.*;
 import java.sql.Timestamp;
 
@@ -365,9 +367,10 @@ public class GestoreConto extends BaseGestorePagina {
 
                 Timestamp dataTransazione;
                 try {
-                    LocalDateTime localDateTime = LocalDateTime.parse(dataStr);
-                    dataTransazione = Timestamp.valueOf(localDateTime);
-                    Timestamp now = new Timestamp(System.currentTimeMillis());
+                    OffsetDateTime odt = OffsetDateTime.parse(dataStr);
+                    Instant instant = odt.toInstant();
+                    dataTransazione = Timestamp.from(instant);
+                    Timestamp now = Timestamp.from(Instant.now());
                     if (dataTransazione.after(now)) {
                         return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                             "{\"error\": \"La data non può essere futura\"}");
