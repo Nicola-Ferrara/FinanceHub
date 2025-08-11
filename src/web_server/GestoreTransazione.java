@@ -7,6 +7,7 @@ import exception.EccezioniDatabase;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.List;
@@ -272,26 +273,21 @@ public class GestoreTransazione extends BaseGestorePagina {
             // Validazione formato data
             Timestamp dataTransazione;
             try {
-                String dataStr = data;
-                // Se manca ":ss", aggiungilo
-                if (dataStr.length() == 16) { // "YYYY-MM-DDTHH:mm"
-                    dataStr += ":00";
+                String dataStrNorm = data;
+                if (dataStrNorm.length() == 16) {
+                    dataStrNorm += ":00";
                 }
-                // Se manca la "Z", aggiungila (forza UTC)
-                if (!dataStr.endsWith("Z")) {
-                    dataStr += "Z";
+                OffsetDateTime odt;
+                if (dataStrNorm.endsWith("Z")) {
+                    odt = OffsetDateTime.parse(dataStrNorm);
+                } else {
+                    odt = LocalDateTime.parse(dataStrNorm).atZone(java.time.ZoneId.systemDefault()).toOffsetDateTime();
                 }
-                OffsetDateTime odt = OffsetDateTime.parse(dataStr);
                 Instant instant = odt.toInstant();
                 dataTransazione = Timestamp.from(instant);
-            } catch (IllegalArgumentException e) {
+            } catch (Exception e) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
-                    "{\"error\": \"Formato data non valido\"}");
-            }
-            
-            if (dataTransazione.after(new Timestamp(System.currentTimeMillis()))) {
-                return createResponse(Response.Status.BAD_REQUEST, "application/json", 
-                    "{\"error\": \"La data non può essere futura\"}");
+                    "{\"error\": \"Formato data non valido. Usa: YYYY-MM-DDTHH:MM\"}");
             }
             
             // Trova la categoria

@@ -139,8 +139,6 @@ async function handleSaveTransfer(event) {
         document.getElementById('saveBtn').textContent = 'Salvataggio...';
         
         const formData = new FormData(event.target);
-        //const localDate = new Date(formData.get('data'));
-        //const dataUTC = localDate.toISOString();
 
         const updatedData = {
             id: transferData.id,
