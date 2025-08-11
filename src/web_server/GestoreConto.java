@@ -506,15 +506,31 @@ public class GestoreConto extends BaseGestorePagina {
                 // Estrai i dati dal JSON
                 String importoStr = extractJsonValueNumber(requestBody, "importo");
                 String descrizione = extractJsonValue(requestBody, "descrizione");
+                String dataStr = extractJsonValue(requestBody, "data");
                 String contoDestinatarioStr = extractJsonValueNumber(requestBody, "contoDestinatario");
                 
-                if (importoStr == null || descrizione == null || contoDestinatarioStr == null) {
+                if (importoStr == null || descrizione == null ||  dataStr == null || contoDestinatarioStr == null) {
                     return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                         "{\"error\": \"Dati mancanti\"}");
                 }
                 
                 double importo = Double.parseDouble(importoStr);
                 int contoDestinatario = Integer.parseInt(contoDestinatarioStr);
+
+                Timestamp dataTrasferimento;
+                try {
+                    OffsetDateTime odt = OffsetDateTime.parse(dataStr);
+                    Instant instant = odt.toInstant();
+                    dataTrasferimento = Timestamp.from(instant);
+                    Timestamp now = Timestamp.from(Instant.now());
+                    if (dataTrasferimento.after(now)) {
+                        return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                            "{\"error\": \"La data non può essere futura\"}");
+                    }
+                } catch (Exception e) {
+                    return createResponse(Response.Status.BAD_REQUEST, "application/json", 
+                        "{\"error\": \"Formato data non valido. Usa: YYYY-MM-DDTHH:MM\"}");
+}
                 
                 // Verifica che i conti esistano e siano diversi
                 Conto contoMit = controller.getContoById(contoMittente);
@@ -537,8 +553,8 @@ public class GestoreConto extends BaseGestorePagina {
                 }
                 
                 // Effettua il trasferimento
-                controller.aggiungiTrasferimento(importo, descrizione, contoMittente, contoDestinatario);
-                
+                controller.aggiungiTrasferimento(importo, descrizione, contoMittente, contoDestinatario, dataTrasferimento);
+
                 return createResponse(Response.Status.OK, "application/json", 
                     "{\"success\": true, \"message\": \"Trasferimento effettuato con successo\"}");
             }

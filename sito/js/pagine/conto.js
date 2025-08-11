@@ -638,10 +638,19 @@ function openAddTransferModal() {
     // Reset del form
     document.getElementById('addTransferForm').reset();
     document.getElementById('transferPreview').style.display = 'none';
-    
+
+    // Imposta la data di default (ora attuale, formato locale)
+    const now = new Date();
+    const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    const transferDateInput = document.getElementById('transferDate');
+    if (transferDateInput) {
+        transferDateInput.value = localDateTime;
+        transferDateInput.max = localDateTime;
+    }
+
     // Carica i conti disponibili
     loadDestinationAccounts();
-    
+
     document.getElementById('addTransferModal').style.display = 'block';
 }
 
@@ -707,9 +716,13 @@ async function handleAddTransferSubmit(event) {
     event.preventDefault();
     
     const formData = new FormData(event.target);
+    const localDate = new Date(formData.get('data'));
+    const dataUTC = localDate.toISOString();
+
     const transferData = {
         importo: parseFloat(formData.get('importo')),
         descrizione: formData.get('descrizione').trim(),
+        data: dataUTC,
         contoDestinatario: parseInt(formData.get('contoDestinatario'))
     };
     
@@ -753,6 +766,26 @@ async function handleAddTransferSubmit(event) {
     // Verifica fondi sufficienti
     if (transferData.importo > contoData.saldo) {
         showNotification(`Fondi insufficienti. Saldo disponibile: €${contoData.saldo.toFixed(2)}`, 'error');
+        return;
+    }
+
+    if (!transferData.data) {
+        showNotification('Inserisci la data della transazione', 'error');
+        return;
+    }
+    
+    const selectedDate = new Date(transferData.data);
+    const now = new Date();
+    if (selectedDate > now) {
+        showNotification('La data non può essere futura', 'error');
+        return;
+    }
+    
+    // ✅ OPZIONALE: Controllo data troppo vecchia (se vuoi)
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    if (selectedDate < oneYearAgo) {
+        showNotification('La data non può essere più vecchia di 1 anno', 'error');
         return;
     }
     

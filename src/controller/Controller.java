@@ -371,10 +371,9 @@ public class Controller {
         }
     }
 
-    public void aggiungiTrasferimento(double importo, String descrizione, int idContoMittente, int idContoDestinatario) throws EccezioniDatabase {
+    public void aggiungiTrasferimento(double importo, String descrizione, int idContoMittente, int idContoDestinatario, Timestamp data) throws EccezioniDatabase {
         try {
             int id = daoFactory.getTrasferimentoDAO().newID();
-            Timestamp data = new Timestamp(System.currentTimeMillis());
             Trasferimento trasferimento = new Trasferimento(id, importo, data, descrizione, idContoMittente, idContoDestinatario);
             daoFactory.getTrasferimentoDAO().saveTrasferimento(trasferimento, utente.getEmail());
             for (Conto conto : utente.getConti()) {

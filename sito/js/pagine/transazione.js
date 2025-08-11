@@ -332,11 +332,15 @@ function formatDate(dateString) {
 
 function formatDateForInput(dateString) {
     if (!dateString) return '';
-    dateString = dateString.replace(' ', 'T').replace('Z', '');
-    const match = dateString.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
-    if (match) {
-        const [, year, month, day, hour, minute] = match;
-        return `${year}-${month}-${day}T${hour}:${minute}`;
+    // Se manca la Z, aggiungila
+    if (!dateString.endsWith('Z')) {
+        dateString += 'Z';
     }
-    return '';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hour = date.getHours().toString().padStart(2, '0');
+    const minute = date.getMinutes().toString().padStart(2, '0');
+    return `${year}-${month}-${day}T${hour}:${minute}`;
 }
