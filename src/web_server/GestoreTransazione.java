@@ -272,7 +272,16 @@ public class GestoreTransazione extends BaseGestorePagina {
             // Validazione formato data
             Timestamp dataTransazione;
             try {
-                OffsetDateTime odt = OffsetDateTime.parse(data);
+                String dataStr = data;
+                // Se manca ":ss", aggiungilo
+                if (dataStr.length() == 16) { // "YYYY-MM-DDTHH:mm"
+                    dataStr += ":00";
+                }
+                // Se manca la "Z", aggiungila (forza UTC)
+                if (!dataStr.endsWith("Z")) {
+                    dataStr += "Z";
+                }
+                OffsetDateTime odt = OffsetDateTime.parse(dataStr);
                 Instant instant = odt.toInstant();
                 dataTransazione = Timestamp.from(instant);
             } catch (IllegalArgumentException e) {
