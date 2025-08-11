@@ -151,11 +151,12 @@ async function handleSaveTransaction(event) {
 
         const formData = new FormData(event.target);
         const dataLocal = formData.get('data');
+        const dataISO = new Date(dataLocal).toISOString();
     
         const updatedData = {
             id: transferData.id,
             importo: parseFloat(formData.get('importo')),
-            data: dataLocal,
+            data: dataISO,
             descrizione: formData.get('descrizione') || '',
             idCategoria: parseInt(formData.get('categoria')),
             idConto: transferData.idConto
