@@ -525,7 +525,16 @@ public class GestoreConto extends BaseGestorePagina {
 
                 Timestamp dataTrasferimento;
                 try {
-                    OffsetDateTime odt = OffsetDateTime.parse(dataStr);
+                    String dataStrNorm = dataStr;
+                    if (dataStrNorm.length() == 16) { // "YYYY-MM-DDTHH:mm"
+                        dataStrNorm += ":00";
+                    }
+                    OffsetDateTime odt;
+                    if (dataStrNorm.endsWith("Z")) {
+                        odt = OffsetDateTime.parse(dataStrNorm);
+                    } else {
+                        odt = LocalDateTime.parse(dataStrNorm).atZone(java.time.ZoneId.systemDefault()).toOffsetDateTime();
+                    }
                     Instant instant = odt.toInstant();
                     dataTrasferimento = Timestamp.from(instant);
                     Timestamp now = Timestamp.from(Instant.now());
@@ -536,7 +545,7 @@ public class GestoreConto extends BaseGestorePagina {
                 } catch (Exception e) {
                     return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                         "{\"error\": \"Formato data non valido. Usa: YYYY-MM-DDTHH:MM\"}");
-}
+                }
                 
                 // Verifica che i conti esistano e siano diversi
                 Conto contoMit = controller.getContoById(contoMittente);

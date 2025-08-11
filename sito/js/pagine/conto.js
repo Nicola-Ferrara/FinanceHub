@@ -714,13 +714,11 @@ async function handleAddTransferSubmit(event) {
     event.preventDefault();
     
     const formData = new FormData(event.target);
-    const localDate = new Date(formData.get('data'));
-    const dataUTC = localDate.toISOString();
 
     const transferData = {
         importo: parseFloat(formData.get('importo')),
         descrizione: formData.get('descrizione').trim(),
-        data: dataUTC,
+        data: formData.get('data'),
         contoDestinatario: parseInt(formData.get('contoDestinatario'))
     };
     
