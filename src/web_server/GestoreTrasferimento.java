@@ -270,14 +270,14 @@ public class GestoreTrasferimento extends BaseGestorePagina {
             Timestamp dataTrasferimento;
             try {
                 String dataStrNorm = data;
-                if (dataStrNorm.length() == 16) { // "YYYY-MM-DDTHH:mm"
+                if (dataStrNorm.length() == 16) {
                     dataStrNorm += ":00";
                 }
                 OffsetDateTime odt;
                 if (dataStrNorm.endsWith("Z")) {
                     odt = OffsetDateTime.parse(dataStrNorm);
                 } else {
-                    odt = LocalDateTime.parse(dataStrNorm).atZone(java.time.ZoneId.of("Europe/Rome")).toOffsetDateTime();
+                    odt = LocalDateTime.parse(dataStrNorm).atZone(java.time.ZoneId.systemDefault()).toOffsetDateTime();
                 }
                 Instant instant = odt.toInstant();
                 dataTrasferimento = Timestamp.from(instant);
