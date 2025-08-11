@@ -332,7 +332,6 @@ function formatDate(dateString) {
 
 function formatDateForInput(dateString) {
     if (!dateString) return '';
-    // Se manca la Z, aggiungila
     if (!dateString.endsWith('Z')) {
         dateString += 'Z';
     }

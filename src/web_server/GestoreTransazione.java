@@ -131,7 +131,7 @@ public class GestoreTransazione extends BaseGestorePagina {
                 "\"conto\": \"%s\", \"idConto\": %d}",
                 transazione.getID(),
                 transazione.getImporto(),
-                transazione.getData().toString(),
+                transazione.getData().toInstant().toString(),
                 escapeJson(descrizione),
                 escapeJson(categoria),
                 tipoCategoria,
