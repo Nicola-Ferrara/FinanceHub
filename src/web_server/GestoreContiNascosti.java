@@ -27,33 +27,39 @@ public class GestoreContiNascosti extends BaseGestorePagina {
         Method method = session.getMethod();
         
         if ("/conti_nascosti".equals(uri) && method == Method.GET) {
-            return serveListaContiPage();
+            return serveListaContiPage(session);
         } else if ("/api/conti-nascosti".equals(uri) && method == Method.GET) {
-            return handleAccounts();
+            return handleAccounts(session);  // <-- Fix 1: passa session
         }
 
         return createResponse(Response.Status.NOT_FOUND, "text/plain", "Risorsa non trovata");
     }
     
-    private Response serveListaContiPage() {
-        // Verifica che l'utente sia loggato
-        if (!controller.isUtenteLogged()) {
+    private Response serveListaContiPage(IHTTPSession session) {
+        Controller sessionController = getSessionController(session);
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
             Response response = createResponse(Response.Status.REDIRECT, "text/html", "");
             response.addHeader("Location", "/login");
             return addNoCacheHeaders(response);
         }
-        if (!controller.getVisibilità()) {
-            // Se l'utente ha già autorizzato la visibilità dei conti nascosti, reindirizza alla pagina dei conti nascosti
+        
+        if (!sessionController.getVisibilità()) {  // <-- Fix 2: usa sessionController
+            // Se l'utente ha già autorizzato la visibilità dei conti nascosti, reindirizza alla pagina home
             Response response = createResponse(Response.Status.REDIRECT, "text/html", "");
             response.addHeader("Location", "/home");
             return addNoCacheHeaders(response);
         }
         
         try {
-            // Carica il file HTML
-            String filePath = "./sito/html/conti_nascosti.html";
-            String content = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(filePath)));
-            controller.setVisibilità(false);
+            String htmlPath = "conti_nascosti.html";  // <-- Fix 3: usa leggiFile
+            String content = leggiFile(htmlPath);
+            
+            if (content == null) {
+                return createResponse(Response.Status.INTERNAL_ERROR, "text/html", 
+                    "<h1>Errore durante il caricamento della pagina</h1>");
+            }
+            
+            sessionController.setVisibilità(false);  // <-- Fix 4: usa sessionController
             
             Response response = createResponse(Response.Status.OK, "text/html", content);
             return addNoCacheHeaders(response);
@@ -64,9 +70,16 @@ public class GestoreContiNascosti extends BaseGestorePagina {
         }
     }
 
-    private Response handleAccounts() {
+    private Response handleAccounts(IHTTPSession session) {  // <-- Fix 1: aggiungi parametro
+        Controller sessionController = getSessionController(session);  // <-- Fix 5: recupera sessionController
+        
+        if (sessionController == null || !sessionController.isUtenteLogged()) {  // <-- Fix 5: aggiungi check
+            return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
+                "{\"error\": \"Non autorizzato\"}");
+        }
+        
         try {
-            List<Conto> conti = controller.getContiNascosti();
+            List<Conto> conti = sessionController.getContiNascosti();  // <-- Fix 6: usa sessionController
             
             StringBuilder jsonBuilder = new StringBuilder("[");
             for (int i = 0; i < conti.size(); i++) {

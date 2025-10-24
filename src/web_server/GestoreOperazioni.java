@@ -23,42 +23,50 @@ public class GestoreOperazioni extends BaseGestorePagina {
         Method method = session.getMethod();
         
         if ("/operazioni".equals(uri) && method == Method.GET) {
-            return serveOperazioniPage();
+            return serveOperazioniPage(session);
         } else if ("/api/operazioni".equals(uri) && method == Method.GET) {
-            return handleOperazioniData();
+            return handleOperazioniData(session);
         }
         
         return createResponse(Response.Status.NOT_FOUND, "text/plain", "Risorsa non trovata");
     }
     
-    private Response serveOperazioniPage() {
-        if (!controller.isUtenteLogged()) {
+    private Response serveOperazioniPage(IHTTPSession session) {
+        Controller sessionController = getSessionController(session);
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
             Response response = createResponse(Response.Status.REDIRECT, "text/html", "");
             response.addHeader("Location", "/login");
             return addNoCacheHeaders(response);
         }
         
         try {
-            String filePath = "./sito/html/operazioni.html";
-            String content = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(filePath)));
+            String htmlPath = "operazioni.html";  // <-- Fix 1: usa leggiFile
+            String content = leggiFile(htmlPath);
+            
+            if (content == null) {
+                return createResponse(Response.Status.INTERNAL_ERROR, "text/html", 
+                    "<h1>Errore durante il caricamento della pagina</h1>");
+            }
             
             Response response = createResponse(Response.Status.OK, "text/html", content);
             return addNoCacheHeaders(response);
         } catch (Exception e) {
+            e.printStackTrace();
             return createResponse(Response.Status.INTERNAL_ERROR, "text/plain", 
                 "Errore nel caricamento della pagina: " + e.getMessage());
         }
     }
     
-    private Response handleOperazioniData() {
+    private Response handleOperazioniData(IHTTPSession session) {
+        Controller sessionController = getSessionController(session);  // <-- Fix 2: sposta all'inizio
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
+            return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
+                "{\"error\": \"Utente non autorizzato\"}");
+        }
+        
         try {
-            if (!controller.isUtenteLogged()) {
-                return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
-                    "{\"error\": \"Utente non autorizzato\"}");
-            }
-            
             // Ottieni tutte le operazioni
-            Operazione[] operazioni = controller.getTutteOperazioni();
+            Operazione[] operazioni = sessionController.getTutteOperazioni();  // <-- Fix 3: usa sessionController
             
             // Costruisci JSON response
             StringBuilder jsonBuilder = new StringBuilder("[");
@@ -73,10 +81,10 @@ public class GestoreOperazioni extends BaseGestorePagina {
                 if (operazione instanceof Transazione) {
                     Transazione transazione = (Transazione) operazione;
                     
-                    // Trova il nome del conto - ✅ CORRETTO
+                    // Trova il nome del conto
                     String nomeConto = "Conto sconosciuto";
                     try {
-                        var conti = controller.getTuttiConti();
+                        var conti = sessionController.getTuttiConti();  // <-- Fix 4: usa sessionController
                         for (var conto : conti) {
                             if (conto.getTransazioni() != null) {
                                 for (var t : conto.getTransazioni()) {
@@ -92,7 +100,6 @@ public class GestoreOperazioni extends BaseGestorePagina {
                         // Ignora errori nella ricerca del conto
                     }
                     
-                    // ✅ FORMATO JSON CORRETTO
                     jsonBuilder.append(String.format(java.util.Locale.US,
                         "{\"tipo\": \"transazione\", \"id\": %d, \"importo\": %.2f, " +
                         "\"data\": \"%s\", \"descrizione\": \"%s\", " +
@@ -102,14 +109,14 @@ public class GestoreOperazioni extends BaseGestorePagina {
                         transazione.getData().toString(),
                         escapeJson(transazione.getDescrizione()),
                         escapeJson(transazione.getCategoria().getNome()),
-                        transazione.getCategoria().getTipo().toString(), // ✅ Questo sarà "Guadagno" o "Spesa"
+                        transazione.getCategoria().getTipo().toString(),
                         escapeJson(nomeConto)
                     ));
                     
                 } else if (operazione instanceof Trasferimento) {
                     Trasferimento trasferimento = (Trasferimento) operazione;
                     
-                    // Trova i nomi dei conti - ✅ CORRETTO
+                    // Trova i nomi dei conti
                     String nomeContoMittente = "Conto eliminato";
                     String nomeContoDestinatario = "Conto eliminato";
                     
@@ -124,7 +131,7 @@ public class GestoreOperazioni extends BaseGestorePagina {
                     
                     // Trova conti esistenti
                     try {
-                        var conti = controller.getTuttiConti();
+                        var conti = sessionController.getTuttiConti();  // <-- Fix 5: usa sessionController
                         for (var conto : conti) {
                             if (conto.getID() == trasferimento.getIdContoMittente()) {
                                 nomeContoMittente = conto.getNome();

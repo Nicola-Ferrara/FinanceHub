@@ -6,9 +6,7 @@ import fi.iki.elonen.NanoHTTPD.Response;
 import controller.Controller;
 import dto.*;
 
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 
 public class GestoreCategorie extends BaseGestorePagina {
     
@@ -30,44 +28,51 @@ public class GestoreCategorie extends BaseGestorePagina {
         Method method = session.getMethod();
         
         if ("/categorie".equals(uri) && method == Method.GET) {
-            return serveCategoriesPage();
+            return serveCategoriesPage(session);
         } else if ("/api/categorie/spesa".equals(uri) && method == Method.GET) {
-            return getCategorieSpesa();
+            return getCategorieSpesa(session);  // <-- Passa session
         } else if ("/api/categorie/guadagno".equals(uri) && method == Method.GET) {
-            return getCategorieGuadagno();
+            return getCategorieGuadagno(session);  // <-- Passa session
         } else if ("/api/categoria".equals(uri) && method == Method.POST) {
             return handleAddCategoria(session);
         } else if (uri.startsWith("/api/categoria/") && method == Method.PUT) {
             return handleUpdateCategoria(uri, session);
         } else if (uri.startsWith("/api/categoria/") && method == Method.DELETE) {
-            return handleDeleteCategoria(uri);
+            return handleDeleteCategoria(uri, session);  // <-- Passa session
         }
         
         return createResponse(Response.Status.NOT_FOUND, "text/plain", "Risorsa non trovata");
     }
     
-    private Response serveCategoriesPage() {
-        if (!controller.isUtenteLogged()) {
+    private Response serveCategoriesPage(IHTTPSession session) {
+        Controller sessionController = getSessionController(session);
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
             Response response = createResponse(Response.Status.REDIRECT, "text/html", "");
             response.addHeader("Location", "/login");
             return addNoCacheHeaders(response);
         }
         
-        try {
-            String filePath = "./sito/html/categorie.html";
-            String content = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(filePath)));
-            
-            Response response = createResponse(Response.Status.OK, "text/html", content);
-            return addNoCacheHeaders(response);
-        } catch (Exception e) {
-            return createResponse(Response.Status.INTERNAL_ERROR, "text/plain", 
-                "Errore nel caricamento della pagina categorie: " + e.getMessage());
+        String htmlPath = "categorie.html";
+        String html = leggiFile(htmlPath);
+        
+        if (html == null) {
+            return createResponse(Response.Status.INTERNAL_ERROR, "text/html", 
+                "<h1>Errore durante il caricamento della pagina</h1>");
         }
+        
+        Response response = createResponse(Response.Status.OK, "text/html", html);
+        return addNoCacheHeaders(response);
     }
     
-    private Response getCategorieSpesa() {
+    private Response getCategorieSpesa(IHTTPSession session) {  // <-- Aggiungi parametro
+        Controller sessionController = getSessionController(session);
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
+            return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
+                "{\"error\": \"Non autorizzato\"}");
+        }
+        
         try {
-            LinkedList<Categoria> categorie = controller.getCategoriaSpesa();
+            LinkedList<Categoria> categorie = sessionController.getCategoriaSpesa();  // <-- Usa sessionController
             StringBuilder jsonBuilder = new StringBuilder("[");
             
             for (int i = 0; i < categorie.size(); i++) {
@@ -93,9 +98,15 @@ public class GestoreCategorie extends BaseGestorePagina {
         }
     }
     
-    private Response getCategorieGuadagno() {
+    private Response getCategorieGuadagno(IHTTPSession session) {  // <-- Aggiungi parametro
+        Controller sessionController = getSessionController(session);
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
+            return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
+                "{\"error\": \"Non autorizzato\"}");
+        }
+        
         try {
-            LinkedList<Categoria> categorie = controller.getCategoriaGuadagno();
+            LinkedList<Categoria> categorie = sessionController.getCategoriaGuadagno();  // <-- Usa sessionController
             StringBuilder jsonBuilder = new StringBuilder("[");
             
             for (int i = 0; i < categorie.size(); i++) {
@@ -122,18 +133,24 @@ public class GestoreCategorie extends BaseGestorePagina {
     }
     
     private Response handleAddCategoria(IHTTPSession session) {
+        Controller sessionController = getSessionController(session);
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
+            return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
+                "{\"error\": \"Non autorizzato\"}");
+        }
+        
         try {
-            // Leggi il body della richiesta
-            Map<String, String> body = new HashMap<>();
-            session.parseBody(body);
-            String requestBody = body.get("postData");
-            
-            if (requestBody == null || requestBody.isEmpty()) {
+            String contentLengthHeader = session.getHeaders().get("content-length");
+            if (contentLengthHeader == null) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"Body della richiesta vuoto\"}");
             }
             
-            // Estrai i dati dal JSON
+            int contentLength = Integer.parseInt(contentLengthHeader);
+            byte[] buffer = new byte[contentLength];
+            int bytesRead = session.getInputStream().read(buffer, 0, contentLength);
+            String requestBody = new String(buffer, 0, bytesRead, "UTF-8");
+            
             String nome = extractJsonValue(requestBody, "nome");
             String tipoStr = extractJsonValue(requestBody, "tipo");
             
@@ -147,18 +164,15 @@ public class GestoreCategorie extends BaseGestorePagina {
                     "{\"error\": \"Tipo categoria mancante\"}");
             }
             
-            // Validation tipo
             if (!tipoStr.equals("Spesa") && !tipoStr.equals("Guadagno")) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"Tipo categoria non valido. Deve essere 'Spesa' o 'Guadagno'\"}");
             }
             
-            // Converti il tipo
             Categoria.TipoCategoria tipo = tipoStr.equals("Spesa") ? 
                 Categoria.TipoCategoria.Spesa : Categoria.TipoCategoria.Guadagno;
             
-            // Aggiungi la categoria
-            controller.aggiungiCategoria(nome.trim(), tipo);
+            sessionController.aggiungiCategoria(nome.trim(), tipo);  // <-- Usa sessionController
             
             return createResponse(Response.Status.OK, "application/json", 
                 "{\"success\": true, \"message\": \"Categoria aggiunta con successo\"}");
@@ -171,8 +185,13 @@ public class GestoreCategorie extends BaseGestorePagina {
     }
     
     private Response handleUpdateCategoria(String uri, IHTTPSession session) {
+        Controller sessionController = getSessionController(session);
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
+            return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
+                "{\"error\": \"Non autorizzato\"}");
+        }
+        
         try {
-            // Estrai ID dalla URI
             String[] parts = uri.split("/");
             if (parts.length < 4) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
@@ -181,53 +200,22 @@ public class GestoreCategorie extends BaseGestorePagina {
             
             int categoriaId = Integer.parseInt(parts[3]);
             
-            // Verifica che non sia una categoria predefinita
             if (categoriaId == 1 || categoriaId == 2) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"Non è possibile modificare le categorie predefinite\"}");
             }
             
-            // Leggi il body della richiesta
-            String requestBody = null;
-            
-            try {
-                String contentLengthHeader = session.getHeaders().get("content-length");
-                if (contentLengthHeader != null && !contentLengthHeader.equals("0")) {
-                    int contentLength = Integer.parseInt(contentLengthHeader);
-                    
-                    if (contentLength > 0) {
-                        byte[] bodyBytes = new byte[contentLength];
-                        java.io.InputStream inputStream = session.getInputStream();
-                        
-                        int totalRead = 0;
-                        while (totalRead < contentLength) {
-                            int bytesRead = inputStream.read(bodyBytes, totalRead, contentLength - totalRead);
-                            if (bytesRead == -1) break;
-                            totalRead += bytesRead;
-                        }
-                        
-                        if (totalRead > 0) {
-                            requestBody = new String(bodyBytes, 0, totalRead, "UTF-8");
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                // Fallback a parseBody
-                try {
-                    Map<String, String> files = new HashMap<>();
-                    session.parseBody(files);
-                    requestBody = files.get("postData");
-                } catch (Exception e2) {
-                    // Ignore fallback errors
-                }
-            }
-            
-            if (requestBody == null || requestBody.trim().isEmpty()) {
+            String contentLengthHeader = session.getHeaders().get("content-length");
+            if (contentLengthHeader == null) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"Body della richiesta vuoto\"}");
             }
             
-            // Estrai il nuovo nome dal JSON
+            int contentLength = Integer.parseInt(contentLengthHeader);
+            byte[] buffer = new byte[contentLength];
+            int bytesRead = session.getInputStream().read(buffer, 0, contentLength);
+            String requestBody = new String(buffer, 0, bytesRead, "UTF-8");
+            
             String nuovoNome = extractJsonValue(requestBody, "nuovoNome");
             
             if (nuovoNome == null || nuovoNome.trim().isEmpty()) {
@@ -235,8 +223,7 @@ public class GestoreCategorie extends BaseGestorePagina {
                     "{\"error\": \"Nuovo nome mancante o vuoto\"}");
             }
             
-            // Modifica la categoria
-            boolean success = controller.modificaCategoria(categoriaId, nuovoNome.trim());
+            boolean success = sessionController.modificaCategoria(categoriaId, nuovoNome.trim());  // <-- Usa sessionController
             
             if (!success) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
@@ -256,7 +243,13 @@ public class GestoreCategorie extends BaseGestorePagina {
         }
     }
     
-    private Response handleDeleteCategoria(String uri) {
+    private Response handleDeleteCategoria(String uri, IHTTPSession session) {  // <-- Aggiungi parametro
+        Controller sessionController = getSessionController(session);
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
+            return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
+                "{\"error\": \"Non autorizzato\"}");
+        }
+        
         try {
             String[] parts = uri.split("/");
             if (parts.length < 4) {
@@ -266,14 +259,12 @@ public class GestoreCategorie extends BaseGestorePagina {
             
             int categoriaId = Integer.parseInt(parts[3]);
             
-            // Verifica che non sia una categoria predefinita
             if (categoriaId == 1 || categoriaId == 2) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"Non è possibile eliminare le categorie predefinite 'Spesa' e 'Guadagno'\"}");
             }
             
-            // Elimina la categoria
-            boolean success = controller.eliminaCategoria(categoriaId);
+            boolean success = sessionController.eliminaCategoria(categoriaId);  // <-- Usa sessionController
             
             if (!success) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
@@ -293,7 +284,6 @@ public class GestoreCategorie extends BaseGestorePagina {
         }
     }
     
-    // Utility per estrarre valori JSON (semplice parsing)
     private String extractJsonValue(String json, String key) {
         String searchKey = "\"" + key + "\":\"";
         int keyIndex = json.indexOf(searchKey);
@@ -307,7 +297,6 @@ public class GestoreCategorie extends BaseGestorePagina {
         return json.substring(valueStart, valueEnd);
     }
     
-    // Utility per escape caratteri speciali in JSON
     private String escapeJsonString(String str) {
         if (str == null) return "";
         return str.replace("\\", "\\\\")

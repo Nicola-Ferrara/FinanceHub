@@ -27,49 +27,52 @@ public class GestoreBilanci extends BaseGestorePagina {
         Method method = session.getMethod();
         
         if ("/bilanci".equals(uri) && method == Method.GET) {
-            return serveBilanciPage();
+            return serveBilanciPage(session);
         } else if ("/api/bilanci".equals(uri) && method == Method.GET) {
-            return handleBilanciData();
+            return handleBilanciData(session);
         }
         
         return createResponse(Response.Status.NOT_FOUND, "text/plain", "Risorsa non trovata");
     }
     
-    private Response serveBilanciPage() {
-        if (!controller.isUtenteLogged()) {
+    private Response serveBilanciPage(IHTTPSession session) {
+        Controller sessionController = getSessionController(session);
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
             Response response = createResponse(Response.Status.REDIRECT, "text/html", "");
             response.addHeader("Location", "/login");
             return addNoCacheHeaders(response);
         }
         
-        try {
-            String filePath = "./sito/html/bilanci.html";
-            String content = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(filePath)));
-            
-            Response response = createResponse(Response.Status.OK, "text/html", content);
-            return addNoCacheHeaders(response);
-        } catch (Exception e) {
-            return createResponse(Response.Status.INTERNAL_ERROR, "text/plain", 
-                "Errore nel caricamento della pagina: " + e.getMessage());
+        String htmlPath = "bilanci.html";  // <-- Fix: usa leggiFile
+        String html = leggiFile(htmlPath);
+        
+        if (html == null) {
+            return createResponse(Response.Status.INTERNAL_ERROR, "text/html", 
+                "<h1>Errore durante il caricamento della pagina</h1>");
         }
+        
+        Response response = createResponse(Response.Status.OK, "text/html", html);
+        return addNoCacheHeaders(response);
     }
     
-    private Response handleBilanciData() {
+    private Response handleBilanciData(IHTTPSession session) {
+        Controller sessionController = getSessionController(session);  // <-- Fix: recupera all'inizio
+        
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
+            return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
+                "{\"error\": \"Utente non autorizzato\"}");
+        }
+        
         try {
-            if (!controller.isUtenteLogged()) {
-                return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
-                    "{\"error\": \"Utente non autorizzato\"}");
-            }
-            
             // Ottieni data iscrizione utente
-            LocalDate dataIscrizione = controller.getDataIscrizioneUtente();
+            LocalDate dataIscrizione = sessionController.getDataIscrizioneUtente();  // <-- Fix: usa sessionController
             LocalDate oggi = LocalDate.now();
             
             // Crea mappa per bilanci mensili
             Map<String, BilancioMensile> bilanciMensili = new TreeMap<>();
             
             // Genera tutti i mesi dall'iscrizione ad oggi
-            LocalDate current = dataIscrizione.withDayOfMonth(1); // Primo giorno del mese di iscrizione
+            LocalDate current = dataIscrizione.withDayOfMonth(1);
             while (!current.isAfter(oggi.withDayOfMonth(1))) {
                 String chiave = current.format(DateTimeFormatter.ofPattern("yyyy-MM"));
                 bilanciMensili.put(chiave, new BilancioMensile(current.getYear(), current.getMonthValue()));
@@ -77,7 +80,7 @@ public class GestoreBilanci extends BaseGestorePagina {
             }
             
             // Calcola entrate e uscite per ogni mese
-            var operazioni = controller.getTutteOperazioni();
+            var operazioni = sessionController.getTutteOperazioni();  // <-- Fix: usa sessionController
             
             for (var operazione : operazioni) {
                 LocalDate dataOperazione = operazione.getData().toLocalDateTime().toLocalDate();
@@ -94,7 +97,6 @@ public class GestoreBilanci extends BaseGestorePagina {
                         }
                         bilancio.transazioni++;
                     }
-                    // Note: I trasferimenti non influenzano il bilancio generale
                 }
             }
             
@@ -125,7 +127,6 @@ public class GestoreBilanci extends BaseGestorePagina {
         }
     }
     
-    // Classe helper per bilancio mensile
     private static class BilancioMensile {
         int anno;
         int mese;

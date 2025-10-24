@@ -23,24 +23,28 @@ public class GestoreListaConti extends BaseGestorePagina {
         Method method = session.getMethod();
         
         if ("/lista_conti".equals(uri) && method == Method.GET) {
-            return serveListaContiPage();
+            return serveListaContiPage(session);
         }
         
         return createResponse(Response.Status.NOT_FOUND, "text/plain", "Risorsa non trovata");
     }
     
-    private Response serveListaContiPage() {
-        // Verifica che l'utente sia loggato
-        if (!controller.isUtenteLogged()) {
+    private Response serveListaContiPage(IHTTPSession session) {
+        Controller sessionController = getSessionController(session);
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
             Response response = createResponse(Response.Status.REDIRECT, "text/html", "");
             response.addHeader("Location", "/login");
             return addNoCacheHeaders(response);
         }
         
         try {
-            // Carica il file HTML
-            String filePath = "./sito/html/lista_conti.html";
-            String content = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(filePath)));
+            String htmlPath = "lista_conti.html";  // <-- Fix: usa leggiFile
+            String content = leggiFile(htmlPath);
+            
+            if (content == null) {
+                return createResponse(Response.Status.INTERNAL_ERROR, "text/html", 
+                    "<h1>Errore durante il caricamento della pagina</h1>");
+            }
             
             Response response = createResponse(Response.Status.OK, "text/html", content);
             return addNoCacheHeaders(response);

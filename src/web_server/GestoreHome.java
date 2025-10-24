@@ -29,13 +29,13 @@ public class GestoreHome extends BaseGestorePagina {
         Method method = session.getMethod();
         
         if ("/home".equals(uri) && method == Method.GET) {
-            return serveHomePage();
+            return serveHomePage(session);
         } else if ("/api/bilancio".equals(uri) && method == Method.GET) {
-            return handleBalance();
+            return handleBalance(session);  // <-- Passa session
         } else if ("/api/conti".equals(uri) && method == Method.GET) {
-            return handleAccounts();
+            return handleAccounts(session);  // <-- Passa session
         } else if ("/api/operazioni-home".equals(uri) && method == Method.GET) {
-            return handleOperazioni();
+            return handleOperazioni(session);  // <-- Passa session
         } else if ("/logout".equals(uri) && method == Method.GET) {
             return handleLogout(session);
         }
@@ -43,32 +43,45 @@ public class GestoreHome extends BaseGestorePagina {
         return createResponse(Response.Status.NOT_FOUND, "text/plain", "Risorsa non trovata");
     }
     
-    private Response serveHomePage() {
-        if (!controller.isUtenteLogged()) {
+    private Response serveHomePage(IHTTPSession session) {
+        Controller sessionController = getSessionController(session);
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
             Response response = createResponse(Response.Status.REDIRECT, "text/html", "");
             response.addHeader("Location", "/login");
             return addNoCacheHeaders(response);
         }
         
         try {
-            String filePath = "./sito/html/home.html";
-            String content = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(filePath)));
+            String htmlPath = "home.html";  // <-- Usa il metodo leggiFile
+            String content = leggiFile(htmlPath);
+            
+            if (content == null) {
+                return createResponse(Response.Status.INTERNAL_ERROR, "text/html", 
+                    "<h1>Errore durante il caricamento della pagina</h1>");
+            }
             
             // Sostituisci il segnaposto con il nome e cognome dell'utente
-            String nomeCognome = controller.getNomeCognome();
+            String nomeCognome = sessionController.getNomeCognome();  // <-- Usa sessionController
             content = content.replace("{{nomeCognome}}", nomeCognome);
             
             Response response = createResponse(Response.Status.OK, "text/html", content);
             return addNoCacheHeaders(response);
         } catch (Exception e) {
+            e.printStackTrace();
             return createResponse(Response.Status.INTERNAL_ERROR, "text/plain", "Errore nel caricamento della pagina: " + e.getMessage());
         }
     }
     
-    private Response handleBalance() {
+    private Response handleBalance(IHTTPSession session) {  // <-- Aggiungi parametro
+        Controller sessionController = getSessionController(session);
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
+            return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
+                "{\"error\": \"Non autorizzato\"}");
+        }
+        
         try {
-            double entrate = controller.calcolaEntrate();
-            double uscite = controller.calcolaUscite();
+            double entrate = sessionController.calcolaEntrate();  // <-- Usa sessionController
+            double uscite = sessionController.calcolaUscite();
 
             String json = String.format(java.util.Locale.US, "{\"entrate\": %.2f, \"uscite\": %.2f}", entrate, uscite);
 
@@ -81,9 +94,15 @@ public class GestoreHome extends BaseGestorePagina {
         }
     }
     
-    private Response handleAccounts() {
+    private Response handleAccounts(IHTTPSession session) {  // <-- Aggiungi parametro
+        Controller sessionController = getSessionController(session);
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
+            return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
+                "{\"error\": \"Non autorizzato\"}");
+        }
+        
         try {
-            List<Conto> conti = controller.getContiVisibili();
+            List<Conto> conti = sessionController.getContiVisibili();  // <-- Usa sessionController
             
             StringBuilder jsonBuilder = new StringBuilder("[");
             for (int i = 0; i < conti.size(); i++) {
@@ -109,9 +128,15 @@ public class GestoreHome extends BaseGestorePagina {
         }
     }
 
-    private Response handleOperazioni() {
+    private Response handleOperazioni(IHTTPSession session) {  // <-- Aggiungi parametro
+        Controller sessionController = getSessionController(session);
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
+            return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
+                "{\"error\": \"Non autorizzato\"}");
+        }
+        
         try {
-            Operazione[] operazioni = controller.getUltimeOperazioni();
+            Operazione[] operazioni = sessionController.getUltimeOperazioni();  // <-- Usa sessionController
             
             StringBuilder jsonBuilder = new StringBuilder("[");
             for (int i = 0; i < operazioni.length; i++) {
@@ -126,7 +151,7 @@ public class GestoreHome extends BaseGestorePagina {
                     categoria = transazione.getCategoria().getNome();
                     
                     // Trova il nome del conto per questa transazione
-                    for (Conto conto : controller.getConti()) {
+                    for (Conto conto : sessionController.getConti()) {  // <-- Usa sessionController
                         if (conto.getTransazioni().contains(transazione)) {
                             categoria += " - " + conto.getNome();
                             break;
@@ -147,7 +172,7 @@ public class GestoreHome extends BaseGestorePagina {
                         nomeContoMittente = trasferimento.getNomeContoEliminato() + " (Eliminato)";
                     }
                     
-                    for (Conto conto : controller.getTuttiConti()) {
+                    for (Conto conto : sessionController.getTuttiConti()) {  // <-- Usa sessionController
                         if (conto.getID() == trasferimento.getIdContoMittente()) {
                             nomeContoMittente = conto.getNome();
                         }
@@ -188,15 +213,21 @@ public class GestoreHome extends BaseGestorePagina {
     }
 
     private Response handleLogout(IHTTPSession session) {
-        try {
-            controller.clearUtente();
-            Response response = createResponse(Response.Status.REDIRECT, "text/html", "");
-            response.addHeader("Location", "/login");
-            return addNoCacheHeaders(response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return createResponse(Response.Status.INTERNAL_ERROR, "text/plain", "Errore durante il logout: " + e.getMessage());
+        String cookieHeader = session.getHeaders().get("cookie");
+        
+        if (cookieHeader != null) {
+            for (String cookie : cookieHeader.split("; ")) {
+                if (cookie.startsWith("session_token=")) {
+                    String sessionToken = cookie.substring("session_token=".length());
+                    SessionManager.removeSession(sessionToken);
+                    break;
+                }
+            }
         }
+        
+        Response response = createResponse(Response.Status.REDIRECT, "text/html", "");
+        response.addHeader("Location", "/login");
+        response.addHeader("Set-Cookie", "session_token=; Path=/; Max-Age=0");  // <-- Rimuovi il cookie
+        return addNoCacheHeaders(response);
     }
-
 }

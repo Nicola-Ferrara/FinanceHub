@@ -33,12 +33,19 @@ public class GestoreRegistrazione extends BaseGestorePagina {
     
     private Response serveRegisterPage() {
         try {
-            String filePath = "./sito/html/register.html";
-            String content = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(filePath)));
+            String htmlPath = "register.html";  // <-- Fix: usa leggiFile
+            String content = leggiFile(htmlPath);
+            
+            if (content == null) {
+                return createResponse(Response.Status.INTERNAL_ERROR, "text/html", 
+                    "<h1>Errore durante il caricamento della pagina</h1>");
+            }
+            
             Response response = createResponse(Response.Status.OK, "text/html", content);
             return addNoCacheHeaders(response);
         } catch (Exception e) {
-            return addNoCacheHeaders(createResponse(Response.Status.INTERNAL_ERROR, "text/plain", "Errore nel caricamento della pagina: " + e.getMessage()));
+            return addNoCacheHeaders(createResponse(Response.Status.INTERNAL_ERROR, "text/plain", 
+                "Errore nel caricamento della pagina: " + e.getMessage()));
         }
     }
     
@@ -54,7 +61,9 @@ public class GestoreRegistrazione extends BaseGestorePagina {
         String email = parameters.get("email") != null ? parameters.get("email").get(0) : null;
         String password = parameters.get("password") != null ? parameters.get("password").get(0) : null;
 
-        boolean registrazioneSuccesso = controller.effettuaRegistrazione(nome, cognome, telefono, email, password);
+        // Crea un nuovo Controller per la registrazione (non usare quello condiviso)
+        Controller registrationController = new Controller();  // <-- Fix: nuovo controller
+        boolean registrazioneSuccesso = registrationController.effettuaRegistrazione(nome, cognome, telefono, email, password);
 
         if (registrazioneSuccesso) {
             return addNoCacheHeaders(createResponse(Response.Status.CREATED, "text/plain", "Registrazione completata con successo"));

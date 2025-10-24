@@ -11,9 +11,6 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.List;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class GestoreTrasferimento extends BaseGestorePagina {
     
@@ -33,7 +30,7 @@ public class GestoreTrasferimento extends BaseGestorePagina {
         Method method = session.getMethod();
         
         if ("/trasferimento".equals(uri) && method == Method.GET) {
-            return serveTransferPage();
+            return serveTransferPage(session);
         } else if ("/api/trasferimento".equals(uri)) {
             switch (method) {
                 case GET:
@@ -51,20 +48,27 @@ public class GestoreTrasferimento extends BaseGestorePagina {
         return createResponse(Response.Status.NOT_FOUND, "text/plain", "Risorsa non trovata");
     }
 
-    private Response serveTransferPage() {
-        if (!controller.isUtenteLogged()) {
+    private Response serveTransferPage(IHTTPSession session) {
+        Controller sessionController = getSessionController(session);
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
             Response response = createResponse(Response.Status.REDIRECT, "text/html", "");
             response.addHeader("Location", "/login");
             return addNoCacheHeaders(response);
         }
         
         try {
-            String filePath = "./sito/html/trasferimento.html";
-            String content = new String(Files.readAllBytes(Paths.get(filePath)));
+            String htmlPath = "trasferimento.html";  // <-- Fix 1: usa leggiFile
+            String content = leggiFile(htmlPath);
+            
+            if (content == null) {
+                return createResponse(Response.Status.INTERNAL_ERROR, "text/html", 
+                    "<h1>Errore durante il caricamento della pagina</h1>");
+            }
             
             Response response = createResponse(Response.Status.OK, "text/html", content);
             return addNoCacheHeaders(response);
-        } catch (IOException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             return createResponse(Response.Status.INTERNAL_ERROR, "text/plain", 
                 "Errore nel caricamento della pagina: " + e.getMessage());
         }
@@ -72,7 +76,8 @@ public class GestoreTrasferimento extends BaseGestorePagina {
 
     private Response handleGetTransfer(IHTTPSession session) {
         try {
-            if (!controller.isUtenteLogged()) {
+            Controller sessionController = getSessionController(session);
+            if (sessionController == null || !sessionController.isUtenteLogged()) {
                 return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
                     "{\"error\": \"Utente non autorizzato\"}");
             }
@@ -100,7 +105,7 @@ public class GestoreTrasferimento extends BaseGestorePagina {
             int idContoMittente = 0;
             int idContoDestinatario = 0;
             
-            for (Conto conto : controller.getTuttiConti()) {
+            for (Conto conto : sessionController.getTuttiConti()) {  // <-- Fix 2: usa sessionController
                 if (conto.getTrasferimenti() != null) {
                     for (Trasferimento t : conto.getTrasferimenti()) {
                         if (t.getID() == transferId) {
@@ -160,7 +165,8 @@ public class GestoreTrasferimento extends BaseGestorePagina {
 
     private Response handleUpdateTransfern(IHTTPSession session) {
         try {
-            if (!controller.isUtenteLogged()) {
+            Controller sessionController = getSessionController(session);
+            if (sessionController == null || !sessionController.isUtenteLogged()) {
                 return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
                     "{\"error\": \"Utente non autorizzato\"}");
             }
@@ -286,8 +292,8 @@ public class GestoreTrasferimento extends BaseGestorePagina {
                     "{\"error\": \"Formato data non valido. Usa: YYYY-MM-DDTHH:MM\"}");
             }
             
-            // Modifica la trasferimento
-            controller.modificaTrasferimento(id, importo, descrizione, dataTrasferimento);
+            // Modifica il trasferimento
+            sessionController.modificaTrasferimento(id, importo, descrizione, dataTrasferimento);  // <-- Fix 3: usa sessionController
             
             Response response = createResponse(Response.Status.OK, "application/json", 
                 "{\"success\": true, \"message\": \"Trasferimento modificato con successo\"}");
@@ -300,13 +306,14 @@ public class GestoreTrasferimento extends BaseGestorePagina {
         } catch (Exception e) {
             e.printStackTrace();
             return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
-                "{\"error\": \"Errore durante la modifica della trasferimento: " + escapeJson(e.getMessage()) + "\"}");
+                "{\"error\": \"Errore durante la modifica del trasferimento: " + escapeJson(e.getMessage()) + "\"}");
         }
     }
 
     private Response handleDeleteTransfer(IHTTPSession session) {
         try {
-            if (!controller.isUtenteLogged()) {
+            Controller sessionController = getSessionController(session);
+            if (sessionController == null || !sessionController.isUtenteLogged()) {
                 return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
                     "{\"error\": \"Utente non autorizzato\"}");
             }
@@ -316,7 +323,7 @@ public class GestoreTrasferimento extends BaseGestorePagina {
             
             if (idStr == null || idStr.isEmpty()) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
-                    "{\"error\": \"ID trasferimento\"}");
+                    "{\"error\": \"ID trasferimento mancante\"}");
             }
             
             int transferId;
@@ -324,16 +331,16 @@ public class GestoreTrasferimento extends BaseGestorePagina {
                 transferId = Integer.parseInt(idStr);
             } catch (NumberFormatException e) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
-                    "{\"error\": \"ID non validi\"}");
+                    "{\"error\": \"ID non valido\"}");
             }
             
             if (transferId <= 0) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
-                    "{\"error\": \"ID devono essere maggiori di zero\"}");
+                    "{\"error\": \"ID deve essere maggiore di zero\"}");
             }
             
-            // Elimina la trasferimento
-            controller.eliminaTrasferimento(transferId);
+            // Elimina il trasferimento
+            sessionController.eliminaTrasferimento(transferId);  // <-- Fix 4: usa sessionController
             
             Response response = createResponse(Response.Status.OK, "application/json", 
                 "{\"success\": true, \"message\": \"Trasferimento eliminato con successo\"}");
@@ -346,7 +353,7 @@ public class GestoreTrasferimento extends BaseGestorePagina {
         } catch (Exception e) {
             e.printStackTrace();
             return createResponse(Response.Status.INTERNAL_ERROR, "application/json", 
-                "{\"error\": \"Errore durante l'eliminazione della trasferimento: " + escapeJson(e.getMessage()) + "\"}");
+                "{\"error\": \"Errore durante l'eliminazione del trasferimento: " + escapeJson(e.getMessage()) + "\"}");
         }
     }
 
@@ -397,5 +404,4 @@ public class GestoreTrasferimento extends BaseGestorePagina {
         }
         return "";
     }
-
 }

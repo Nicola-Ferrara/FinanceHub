@@ -5,9 +5,6 @@ import exception.EccezioniDatabase;
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
 import fi.iki.elonen.NanoHTTPD.Response;
 import fi.iki.elonen.NanoHTTPD.Method;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Map;
 
 
@@ -31,7 +28,7 @@ public class GestoreProfilo extends BaseGestorePagina {
         Method method = session.getMethod();
         
         if ("/profilo".equals(uri) && method == Method.GET) {
-            return serveProfiloPage();
+            return serveProfiloPage(session);
         } else if ("/api/profilo".equals(uri)) {
             switch (method) {
                 case GET:
@@ -53,20 +50,27 @@ public class GestoreProfilo extends BaseGestorePagina {
         return createResponse(Response.Status.NOT_FOUND, "text/plain", "Risorsa non trovata");
     }
 
-    private Response serveProfiloPage() {
-        if (!controller.isUtenteLogged()) {
+    private Response serveProfiloPage(IHTTPSession session) {
+        Controller sessionController = getSessionController(session);
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
             Response response = createResponse(Response.Status.REDIRECT, "text/html", "");
             response.addHeader("Location", "/login");
             return addNoCacheHeaders(response);
         }
         
         try {
-            String filePath = "./sito/html/profilo.html";
-            String content = new String(Files.readAllBytes(Paths.get(filePath)));
+            String htmlPath = "profilo.html";  // <-- Fix 1: usa leggiFile
+            String content = leggiFile(htmlPath);
+            
+            if (content == null) {
+                return createResponse(Response.Status.INTERNAL_ERROR, "text/html", 
+                    "<h1>Errore durante il caricamento della pagina</h1>");
+            }
             
             Response response = createResponse(Response.Status.OK, "text/html", content);
             return addNoCacheHeaders(response);
-        } catch (IOException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             return createResponse(Response.Status.INTERNAL_ERROR, "text/plain", 
                 "Errore nel caricamento della pagina: " + e.getMessage());
         }
@@ -74,7 +78,8 @@ public class GestoreProfilo extends BaseGestorePagina {
 
     private Response handleGetProfilo(IHTTPSession session) {
         try {
-            if (!controller.isUtenteLogged()) {
+            Controller sessionController = getSessionController(session);
+            if (sessionController == null || !sessionController.isUtenteLogged()) {
                 return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
                     "{\"error\": \"Utente non autorizzato\"}");
             }
@@ -82,11 +87,11 @@ public class GestoreProfilo extends BaseGestorePagina {
             // Costruisci JSON response con null safety
             String jsonResponse = String.format(java.util.Locale.US,
                 "{\"nome\": \"%s\", \"cognome\": \"%s\", \"email\": \"%s\", \"telefono\": \"%s\", \"data\": \"%s\"}",
-                controller.getUtente().getNome(),
-                controller.getUtente().getCognome(),
-                controller.getUtente().getEmail(),
-                controller.getUtente().getNumeroTel(),
-                controller.getUtente().getDataIscrizione()
+                sessionController.getUtente().getNome(),  // <-- Fix 2: usa sessionController
+                sessionController.getUtente().getCognome(),
+                sessionController.getUtente().getEmail(),
+                sessionController.getUtente().getNumeroTel(),
+                sessionController.getUtente().getDataIscrizione()
             );
             
             Response response = createResponse(Response.Status.OK, "application/json", jsonResponse);
@@ -101,7 +106,8 @@ public class GestoreProfilo extends BaseGestorePagina {
 
     private Response handleUpdateProfilo(IHTTPSession session) {
         try {
-            if (!controller.isUtenteLogged()) {
+            Controller sessionController = getSessionController(session);
+            if (sessionController == null || !sessionController.isUtenteLogged()) {
                 return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
                     "{\"error\": \"Utente non autorizzato\"}");
             }
@@ -203,7 +209,7 @@ public class GestoreProfilo extends BaseGestorePagina {
                     "{\"error\": \"Il telefono deve contenere solo cifre\"}");
             }
 
-            controller.modificaUtente(nome, cognome, telefono);
+            sessionController.modificaUtente(nome, cognome, telefono);  // <-- Fix 3: usa sessionController
             
             Response response = createResponse(Response.Status.OK, "application/json", 
                 "{\"success\": true, \"message\": \"Utente modificato con successo\"}");
@@ -221,11 +227,12 @@ public class GestoreProfilo extends BaseGestorePagina {
 
     private Response handleDeleteProfilo(IHTTPSession session) {
         try {
-            if (!controller.isUtenteLogged()) {
+            Controller sessionController = getSessionController(session);
+            if (sessionController == null || !sessionController.isUtenteLogged()) {
                 return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
                     "{\"error\": \"Utente non autorizzato\"}");
             }
-            controller.eliminaUtente();
+            sessionController.eliminaUtente();  // <-- Fix 4: usa sessionController
 
             Response response = createResponse(Response.Status.OK, "application/json", "{\"success\": true, \"message\": \"Utente eliminato con successo\"}");
             return addNoCacheHeaders(response);
@@ -243,7 +250,8 @@ public class GestoreProfilo extends BaseGestorePagina {
 
     private Response handleUpdateProfiloPassword(IHTTPSession session) {
         try {
-            if (!controller.isUtenteLogged()) {
+            Controller sessionController = getSessionController(session);
+            if (sessionController == null || !sessionController.isUtenteLogged()) {
                 return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
                     "{\"error\": \"Utente non autorizzato\"}");
             }
@@ -295,7 +303,7 @@ public class GestoreProfilo extends BaseGestorePagina {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"La password attuale è obbligatoria\"}");
             }
-            if (!controller.checkPassword(currentPassword)) {
+            if (!sessionController.checkPassword(currentPassword)) {  // <-- Fix 5: usa sessionController
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"La password attuale non è corretta\"}");
             }
@@ -314,7 +322,7 @@ public class GestoreProfilo extends BaseGestorePagina {
                     "{\"error\": \"La password deve contenere almeno una lettera maiuscola, un numero e un carattere speciale (@$!%*?&)\"}");
             }
             
-            controller.modificaPassword(password);
+            sessionController.modificaPassword(password);  // <-- Fix 6: usa sessionController
             
             Response response = createResponse(Response.Status.OK, "application/json", 
                 "{\"success\": true, \"message\": \"Password modificata con successo\"}");
@@ -332,7 +340,8 @@ public class GestoreProfilo extends BaseGestorePagina {
 
     private Response handleVerificaPassword(IHTTPSession session) {
         try {
-            if (!controller.isUtenteLogged()) {
+            Controller sessionController = getSessionController(session);
+            if (sessionController == null || !sessionController.isUtenteLogged()) {
                 return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
                     "{\"success\": false, \"error\": \"Utente non autorizzato\"}");
             }
@@ -375,8 +384,8 @@ public class GestoreProfilo extends BaseGestorePagina {
                     "{\"success\": false, \"error\": \"Password mancante\"}");
             }
 
-            if (controller.checkPassword(password)) {
-                controller.setVisibilità(true);
+            if (sessionController.checkPassword(password)) {  // <-- Fix 7: usa sessionController
+                sessionController.setVisibilità(true);  // <-- Fix 8: usa sessionController
                 return createResponse(Response.Status.OK, "application/json", "{\"success\": true}");
             } else {
                 return createResponse(Response.Status.UNAUTHORIZED, "application/json", 

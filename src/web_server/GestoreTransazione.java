@@ -11,9 +11,6 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.List;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class GestoreTransazione extends BaseGestorePagina {
     
@@ -34,7 +31,7 @@ public class GestoreTransazione extends BaseGestorePagina {
         Method method = session.getMethod();
         
         if ("/transazione".equals(uri) && method == Method.GET) {
-            return serveTransactionPage();
+            return serveTransactionPage(session);
         } else if ("/api/transazione".equals(uri)) {
             switch (method) {
                 case GET:
@@ -48,26 +45,33 @@ public class GestoreTransazione extends BaseGestorePagina {
                         "{\"error\": \"Metodo non supportato\"}");
             }
         } else if ("/api/transazione-categorie".equals(uri) && method == Method.GET) {
-            return handleGetCategories();
+            return handleGetCategories(session);
         }
         
         return createResponse(Response.Status.NOT_FOUND, "text/plain", "Risorsa non trovata");
     }
     
-    private Response serveTransactionPage() {
-        if (!controller.isUtenteLogged()) {
+    private Response serveTransactionPage(IHTTPSession session) {
+        Controller sessionController = getSessionController(session);
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
             Response response = createResponse(Response.Status.REDIRECT, "text/html", "");
             response.addHeader("Location", "/login");
             return addNoCacheHeaders(response);
         }
         
         try {
-            String filePath = "./sito/html/transazione.html";
-            String content = new String(Files.readAllBytes(Paths.get(filePath)));
+            String htmlPath = "transazione.html";  // <-- Fix 1: usa leggiFile
+            String content = leggiFile(htmlPath);
+            
+            if (content == null) {
+                return createResponse(Response.Status.INTERNAL_ERROR, "text/html", 
+                    "<h1>Errore durante il caricamento della pagina</h1>");
+            }
             
             Response response = createResponse(Response.Status.OK, "text/html", content);
             return addNoCacheHeaders(response);
-        } catch (IOException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             return createResponse(Response.Status.INTERNAL_ERROR, "text/plain", 
                 "Errore nel caricamento della pagina: " + e.getMessage());
         }
@@ -75,7 +79,8 @@ public class GestoreTransazione extends BaseGestorePagina {
     
     private Response handleGetTransaction(IHTTPSession session) {
         try {
-            if (!controller.isUtenteLogged()) {
+            Controller sessionController = getSessionController(session);
+            if (sessionController == null || !sessionController.isUtenteLogged()) {
                 return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
                     "{\"error\": \"Utente non autorizzato\"}");
             }
@@ -101,7 +106,7 @@ public class GestoreTransazione extends BaseGestorePagina {
             String nomeConto = "Conto sconosciuto";
             int idConto = 0;
             
-            for (Conto conto : controller.getTuttiConti()) {
+            for (Conto conto : sessionController.getTuttiConti()) {  // <-- Fix 2: usa sessionController
                 if (conto.getTransazioni() != null) {
                     for (Transazione t : conto.getTransazioni()) {
                         if (t.getID() == transactionId) {
@@ -153,7 +158,8 @@ public class GestoreTransazione extends BaseGestorePagina {
     
     private Response handleUpdateTransaction(IHTTPSession session) {
         try {
-            if (!controller.isUtenteLogged()) {
+            Controller sessionController = getSessionController(session);
+            if (sessionController == null || !sessionController.isUtenteLogged()) {
                 return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
                     "{\"error\": \"Utente non autorizzato\"}");
             }
@@ -217,54 +223,44 @@ public class GestoreTransazione extends BaseGestorePagina {
                     "{\"error\": \"Errore nel parsing dei dati JSON\"}");
             }
             
-            // ✅ VALIDAZIONI COMPLETE LATO SERVER
-            
-            // Validazione ID
+            // Validazioni
             if (id <= 0) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"ID transazione non valido\"}");
             }
             
-            // Validazione importo
             if (importo <= 0) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"L'importo deve essere maggiore di zero\"}");
             }
             
-            // ✅ NUOVO - Controllo limite massimo importo (PostgreSQL NUMERIC(15,2))
             if (importo > 9999999999999.99) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"L'importo non può superare i 9.999.999.999.999,99 €\"}");
             }
             
-            // Validazione data
             if (data == null || data.isEmpty()) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"Data mancante\"}");
             }
             
-            // ✅ NUOVO - Validazione descrizione obbligatoria
             if (descrizione == null || descrizione.trim().isEmpty()) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"La descrizione è obbligatoria\"}");
             }
             
-            // ✅ PULISCI la descrizione
             descrizione = descrizione.trim();
             
-            // ✅ NUOVO - Validazione lunghezza minima descrizione
             if (descrizione.length() < 3) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"La descrizione deve essere di almeno 3 caratteri\"}");
             }
             
-            // ✅ NUOVO - Validazione lunghezza massima descrizione
             if (descrizione.length() > 500) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"La descrizione non può superare i 500 caratteri\"}");
             }
             
-            // ✅ NUOVO - Validazione categoria obbligatoria
             if (idCategoria <= 0) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"Seleziona una categoria valida\"}");
@@ -291,14 +287,14 @@ public class GestoreTransazione extends BaseGestorePagina {
             }
             
             // Trova la categoria
-            Categoria categoria = controller.getCategoriaById(idCategoria);
+            Categoria categoria = sessionController.getCategoriaById(idCategoria);  // <-- Fix 3: usa sessionController
             if (categoria == null) {
                 return createResponse(Response.Status.BAD_REQUEST, "application/json", 
                     "{\"error\": \"Categoria non trovata\"}");
             }
             
             // Modifica la transazione
-            controller.modificaTransazione(id, importo, descrizione, categoria, idConto, dataTransazione);
+            sessionController.modificaTransazione(id, importo, descrizione, categoria, idConto, dataTransazione);  // <-- Fix 4: usa sessionController
             
             Response response = createResponse(Response.Status.OK, "application/json", 
                 "{\"success\": true, \"message\": \"Transazione modificata con successo\"}");
@@ -317,7 +313,8 @@ public class GestoreTransazione extends BaseGestorePagina {
     
     private Response handleDeleteTransaction(IHTTPSession session) {
         try {
-            if (!controller.isUtenteLogged()) {
+            Controller sessionController = getSessionController(session);
+            if (sessionController == null || !sessionController.isUtenteLogged()) {
                 return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
                     "{\"error\": \"Utente non autorizzato\"}");
             }
@@ -347,7 +344,7 @@ public class GestoreTransazione extends BaseGestorePagina {
             }
             
             // Elimina la transazione
-            controller.eliminaTransazione(transactionId, accountId);
+            sessionController.eliminaTransazione(transactionId, accountId);  // <-- Fix 5: usa sessionController
             
             Response response = createResponse(Response.Status.OK, "application/json", 
                 "{\"success\": true, \"message\": \"Transazione eliminata con successo\"}");
@@ -364,14 +361,15 @@ public class GestoreTransazione extends BaseGestorePagina {
         }
     }
     
-    private Response handleGetCategories() {
-        if (!controller.isUtenteLogged()) {
+    private Response handleGetCategories(IHTTPSession session) {
+        Controller sessionController = getSessionController(session);
+        if (sessionController == null || !sessionController.isUtenteLogged()) {
             return createResponse(Response.Status.UNAUTHORIZED, "application/json", 
                 "{\"error\": \"Utente non autorizzato\"}");
         }
         
         try {
-            List<Categoria> categorie = controller.getTutteCategorie();
+            List<Categoria> categorie = sessionController.getTutteCategorie();  // <-- Fix 6: usa sessionController
             
             StringBuilder json = new StringBuilder("[");
             for (int i = 0; i < categorie.size(); i++) {
